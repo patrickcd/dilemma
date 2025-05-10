@@ -4,8 +4,9 @@ Expression language implementation using Lark
 
 from lark import Lark, Transformer, exceptions as lark_exceptions
 from lark import Token
+from dilemma.lookup import nested_getattr
 
-# Define the grammar for our simple expression language
+# ruff: noqa: E501
 grammar = r"""
     ?start: expr
 
@@ -38,13 +39,15 @@ grammar = r"""
          | FLOAT -> float_number
          | "-" INTEGER -> negative_int
          | "-" FLOAT -> negative_float
+         | "True" -> true_value
+         | "False" -> false_value
          | VARIABLE -> variable
          | "(" expr ")" -> paren
 
     // Define reserved keywords
-    // But use string literals in rules above for "or" and "and"
+    // But use string literals in rules above for "or", "and", "True", "False"
     // Use a negative lookahead in VARIABLE to exclude these as variable names
-    VARIABLE: /(?!or\b|and\b)[a-zA-Z_][a-zA-Z0-9_]*/
+    VARIABLE: /(?!or\b|and\b|True\b|False\b)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*/
     INTEGER: /[0-9]+/
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i
 
@@ -74,11 +77,20 @@ class ExpressionTransformer(Transformer):
     def negative_float(self, items: list[Token]) -> float:
         return -float(items[0])
 
+    def true_value(self, _) -> bool:
+        return True
+
+    def false_value(self, _) -> bool:
+        return False
+
     def variable(self, items: list[Token]) -> int | float | bool:
-        var_name = items[0].value
-        if var_name not in self.variables:
-            raise NameError(f"Variable '{var_name}' is not defined.")
-        return self.variables[var_name]
+        var_path = items[0].value
+        try:
+            # Use nested_getattr for resolving dot notation paths
+            return nested_getattr(self.variables, var_path)
+        except AttributeError:
+            msg = f"Variable '{var_path}' is not defined or path cannot be resolved"
+            raise NameError(msg)
 
     def add(self, items: list) -> float:
         return items[0] + items[1]
