@@ -39,16 +39,32 @@ def nested_getattr(obj, attr) -> int | float | bool:
                     f"Cannot resolve segment '{name}' on {obj!r}"
                 ) from None
 
-    check_numeric(obj)
+    # Validate the type of the final value
+    validate_supported_type(obj)
+
     return obj
 
 
-def check_numeric(value):
+def validate_supported_type(value):
     """
-    Check if the value is numeric (int or float).
+    Validate that the value is of a supported type.
+
+    Supported types:
+    - int
+    - float
+    - bool
+    - str
+
+    Args:
+        value: The value to validate.
+
+    Raises:
+        TypeError: If the value is not of a supported type.
     """
-    if not isinstance(value, (int, float, bool)):
-        raise TypeError(f"Expected numeric or boolean value, got {type(value).__name__}")
+    supported_types = (int, float, bool, str)
+
+    if not isinstance(value, supported_types):
+        raise TypeError(f"Unsupported type: {type(value).__name__}")
 
 
 def compile_getter(ref, sample_context_json):

@@ -2,7 +2,7 @@ import pytest
 import json
 from hypothesis import given, strategies as st, settings, example
 from dilemma.lang import evaluate
-from dilemma.lookup import nested_getattr, check_numeric, compile_getter
+from dilemma.lookup import nested_getattr, validate_supported_type, compile_getter
 
 # Strategy for generating nested variable names with smaller size limits
 nested_variable_names_st = st.lists(
@@ -218,7 +218,6 @@ def test_attribute_access_errors():
     class TestObj:
         def __init__(self):
             self.value = 42
-            # String values are not supported
             self.nested = {"data": 100}
 
     obj = TestObj()
@@ -238,15 +237,6 @@ def test_attribute_access_errors():
 
     with pytest.raises(NameError):
         evaluate("obj.value.something", context)
-
-    # Test with TypeError for non-numeric values
-    obj.string_value = "not supported"
-    with pytest.raises(TypeError, match="Expected numeric or boolean value"):
-        nested_getattr(obj, "string_value")
-
-    obj.list_value = [1, 2, 3]
-    with pytest.raises(TypeError, match="Expected numeric or boolean value"):
-        nested_getattr(obj, "list_value")
 
 
 # Add an example with a class to the nested_getattr test
@@ -304,13 +294,24 @@ def test_nested_getattr_non_subscriptable():
     assert "not subscriptable" in str(excinfo.value)
 
 
-def test_check_numeric_invalid():
-    """Test check_numeric with non-numeric values."""
+def test_validate_supported_type_invalid():
+    """Test validate_supported_type with unsupported values."""
     with pytest.raises(TypeError):
-        check_numeric("not a number")
+        validate_supported_type({"not a number"})
 
     with pytest.raises(TypeError):
-        check_numeric([1, 2, 3])
+        validate_supported_type([1, 2, 3])
+
+
+def test_nested_getattr_with_invalid_types():
+    """Test nested_getattr raises TypeError for unsupported types."""
+    obj = {"dict_value": {"a":9}, "list_value": [1, 2, 3]}
+
+    with pytest.raises(TypeError, match="Unsupported type: dict"):
+        nested_getattr(obj, "dict_value")
+
+    with pytest.raises(TypeError, match="Unsupported type: list"):
+        nested_getattr(obj, "list_value")
 
 
 def test_nested_getattr_invalid_container_check():
@@ -439,3 +440,25 @@ def test_nested_getattr_primitive_container_check():
     with pytest.raises(AttributeError) as excinfo:
         nested_getattr(test_obj, "float_val.something.more")
     assert "non-container" in str(excinfo.value)
+
+
+def test_string_comparisons_in_nested_structures():
+    """Test string comparisons in nested structures."""
+    context = {
+        "user": {
+            "name": "Alice",
+            "role": "admin",
+            "details": {
+                "nickname": "Ally",
+                "status": "active"
+            }
+        }
+    }
+
+    # Test equality
+    assert evaluate("user.name == 'Alice'", context) is True
+    assert evaluate("user.role == 'user'", context) is False
+
+    # Test inequality
+    assert evaluate("user.details.nickname != 'Bob'", context) is True
+    assert evaluate("user.details.status != 'active'", context) is False

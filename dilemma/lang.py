@@ -26,6 +26,7 @@ grammar = r"""
                | sum ">" sum -> gt
                | sum "<=" sum -> le
                | sum ">=" sum -> ge
+               | sum "in" sum -> contains
 
     ?sum: product
        | sum "+" product -> add
@@ -37,6 +38,7 @@ grammar = r"""
 
     ?term: INTEGER -> int_number
          | FLOAT -> float_number
+         | STRING -> string_literal
          | "-" INTEGER -> negative_int
          | "-" FLOAT -> negative_float
          | "True" -> true_value
@@ -52,6 +54,7 @@ grammar = r"""
     VARIABLE: /(?!or\b|and\b|True\b|False\b|false\b|true)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*/
     INTEGER: /[0-9]+/
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i
+    STRING: /"(\\.|[^\\"])*"|\'(\\.|[^\\\'])*\'/
 
     %import common.WS
     %ignore WS
@@ -112,14 +115,22 @@ class ExpressionTransformer(Transformer):
         """Handle parenthesized expressions by returning the inner value"""
         return items[0]
 
+    def string_literal(self, items: list[Token]) -> str:
+        # Remove surrounding quotes and unescape
+        return items[0][1:-1].encode('utf-8').decode('unicode_escape')
+
     # Comparison operations
     def eq(self, items: list) -> bool:
+        if isinstance(items[0], str) or isinstance(items[1], str):
+            return items[0] == items[1]
         # Handle floating point comparisons with a small epsilon
         if isinstance(items[0], float) or isinstance(items[1], float):
             return abs(items[0] - items[1]) < self.EPSILON
         return items[0] == items[1]
 
     def ne(self, items: list) -> bool:
+        if isinstance(items[0], str) or isinstance(items[1], str):
+            return items[0] != items[1]
         # Handle floating point comparisons with a small epsilon
         if isinstance(items[0], float) or isinstance(items[1], float):
             return abs(items[0] - items[1]) >= self.EPSILON
@@ -143,6 +154,11 @@ class ExpressionTransformer(Transformer):
 
     def or_op(self, items: list) -> bool:
         return bool(items[0]) or bool(items[1])
+
+    def contains(self, items: list) -> bool:
+        if isinstance(items[0], str) and isinstance(items[1], str):
+            return items[0] in items[1]
+        raise TypeError("'in' operator is only supported for strings")
 
 
 # Thread-local storage for the parser
@@ -184,10 +200,12 @@ def evaluate(expression: str, variables: dict | None = None) -> int | float | bo
         transformer = ExpressionTransformer(variables=variables)
         return transformer.transform(tree)
     except lark_exceptions.VisitError as e:
-        # Check if the underlying error is a ZeroDivisionError or NameError
+        # Check if the underlying error is a ZeroDivisionError, NameError, or TypeError
         if isinstance(e.__context__, ZeroDivisionError):
             raise ZeroDivisionError("Division by zero") from e
         if isinstance(e.__context__, NameError):
             raise NameError(str(e.__context__)) from e
+        if isinstance(e.__context__, TypeError):
+            raise TypeError(str(e.__context__)) from e
         # Re-raise other VisitErrors
         raise ValueError(f"Error evaluating expression: {expression}") from e
