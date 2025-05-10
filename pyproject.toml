@@ -54,6 +54,9 @@ dev = [
 ]
 all = ["dilemma[test,doc,dev]"]
 
+[project.scripts]
+dilemma = "dilemma.cli:evaluate_expression"
+
 [tool.setuptools]
 platforms = ["unix", "linux", "osx", "cygwin", "win32"]
 packages = ["dilemma"]  # optional
