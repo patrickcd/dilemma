@@ -13,12 +13,9 @@ authors = [
 description = "This is an expression language python package."
 readme = "README.md"
 license = {file = "LICENSE"}
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
@@ -138,25 +135,4 @@ line-ending = "auto"
 python_version = "3.12"
 #
 
-[tool.pyright]
-pythonVersion = "3.10"
-typeCheckingMode = "basic"
-# enable subset of "strict"
-reportDuplicateImport = true
-reportInvalidStubStatement = true
-reportOverlappingOverload = true
-reportPropertyTypeMismatch = true
-reportUntypedClassDecorator = true
-reportUntypedFunctionDecorator = true
-reportUntypedNamedTuple = true
-reportUnusedImport = true
-# disable subset of "basic"
-reportGeneralTypeIssues = true
-reportMissingModuleSource = false
-reportOptionalCall = true
-reportOptionalIterable = true
-reportOptionalMemberAccess = true
-reportOptionalOperand = true
-reportOptionalSubscript = true
-reportPrivateImportUsage = true
-reportUnboundVariable = true
+

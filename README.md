@@ -1,58 +1,197 @@
-# FastVector
+# Dilemma Expression Engine
 
-![Python](https://img.shields.io/badge/python-3.9+-blue)
-![License](https://camo.githubusercontent.com/890acbdcb87868b382af9a4b1fac507b9659d9bf/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d626c75652e737667)
-[![Build](https://github.com/franneck94/Python-Project-Template/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/franneck94/Python-Project-Template/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/franneck94/Python-Project-Template-Eng/branch/master/graph/badge.svg)](https://codecov.io/gh/franneck94/Python-Project-Template-Eng)
-[![Documentation](https://img.shields.io/badge/ref-Documentation-blue)](https://franneck94.github.io/Python-Project-Template-Eng/)
+A lightweight yet powerful expression evaluation engine with optimized performance for Python applications.
 
-## Template For Python Projects
+## Features
 
-This is a template for Python projects. What you get:
+- Secure evaluation of mathematical and logical expressions
+- Support for variables with dot notation (e.g., `user.profile.settings.enabled`)
+- Rich comparison operations with proper handling of floating-point values
+- Logical operations (`and`, `or`) for boolean expressions
+- Performance optimization strategies for repeated evaluations
 
-- Source code and test code is seperated in different directories.
-- External libraries installed and managed by [Pip](https://pypi.org/project/pip/) and [setuptools](https://setuptools.pypa.io/en/latest/) in a pyproject.toml.
-- Setup for tests using [Pytest](https://docs.pytest.org/en/stable/) and coverage with [Pytest-Cov](https://github.com/pytest-dev/pytest-cov).
-- Continuous testing with [Github-Actions](https://github.com/features/actions/) including [pre-commit](https://github.com/pre-commit/pre-commit).
-- Code coverage reports, including automatic upload to [Codecov](https://codecov.io).
-- Code documentation with [Mkdocs](https://www.mkdocs.org/).
-
-## Structure
-
-``` text
-├── pyproject.toml
-├── ... other config files ...
-├── docs
-│   ├── api.md
-│   └── index.md
-├── examples
-│   └── ...
-├── fastvector
-│   ├── __init__.py
-│   ├── vector.py
-│   └── version.py
-└── tests
-    ├── __init__.py
-    └── test_vector.py
-```
-
-### Commands
+## Installation
 
 ```bash
-# Build and Install (local)
-pip install -e .  # OR
-pip install -e ../Python-Project-Template  # OR
-pip install -e ../Python-Project-Template[all]
+pip install dilemma
 ```
 
-```bash
-# Test
-pytest tests  # OR
-pytest .  # OR
-pytest
+## Usage
+
+Here's a quick example to get you started:
+
+```python
+from dilemma.lang import evaluate
+
+# Evaluate a simple expression
+result = evaluate("2 * (3 + 4)")  # Returns 14
+
+# Use variables in expressions
+variables = {
+    "user": {
+        "profile": {
+            "age": 32,
+            "preferences": {
+                "theme": "dark"
+            }
+        }
+    },
+    "settings": {
+        "min_age": 18
+    }
+}
+
+# Evaluate with variables
+is_adult = evaluate("user.profile.age >= settings.min_age", variables)  # Returns True
 ```
 
+import json
+from dilemma.compiled import create_optimized_evaluator
+
+# Define a sample JSON structure
+sample_json = json.dumps({
+    "user": {
+        "profile": {
+            "age": 25
+        }
+    },
+    "settings": {
+        "min_age": 18
+    }
+})
+
+# Create an optimized evaluator
+expr = "user.profile.age >= settings.min_age"
+optimized_eval = create_optimized_evaluator(expr, sample_json)
+
+# Use for repeated evaluations with different data
+for user_data in users:
+    if optimized_eval(user_data):
+        # Process adult users
+        pass
+
+
+```markdown
+# Dilemma Expression Engine
+
+A lightweight yet powerful expression evaluation engine with optimized performance for Python applications.
+
+## Features
+
+- Secure evaluation of mathematical and logical expressions
+- Support for variables with dot notation (e.g., `user.profile.settings.enabled`)
+- Rich comparison operations with proper handling of floating-point values
+- Logical operations (`and`, `or`) for boolean expressions
+- Performance optimization strategies for repeated evaluations
+
+## Installation
+
 ```bash
-# Code Coverage
-pytest --cov=fastvector tests --cov-report=html
+pip install dilemma
 ```
+
+## Basic Usage
+
+```python
+from dilemma.lang import evaluate
+
+# Evaluate a simple expression
+result = evaluate("2 * (3 + 4)")  # Returns 14
+
+# Use variables in expressions
+variables = {
+    "user": {
+        "profile": {
+            "age": 32,
+            "preferences": {
+                "theme": "dark"
+            }
+        }
+    },
+    "settings": {
+        "min_age": 18
+    }
+}
+
+# Evaluate with variables
+is_adult = evaluate("user.profile.age >= settings.min_age", variables)  # Returns True
+```
+
+## Optimized Usage
+
+For expressions that are evaluated repeatedly, you can create an optimized evaluator to gain significant performance benefits:
+
+```python
+import json
+from dilemma.compiled import create_optimized_evaluator
+
+# Define a sample JSON structure
+sample_json = json.dumps({
+    "user": {
+        "profile": {
+            "age": 25
+        }
+    },
+    "settings": {
+        "min_age": 18
+    }
+})
+
+# Create an optimized evaluator
+expr = "user.profile.age >= settings.min_age"
+optimized_eval = create_optimized_evaluator(expr, sample_json)
+
+# Use for repeated evaluations with different data
+for user_data in users:
+    if optimized_eval(user_data):
+        # Process adult users
+        pass
+```
+
+## Performance
+
+Dilemma provides impressive performance for expression evaluation. Our benchmarks show:
+
+| Evaluation Method | Time (1000 evaluations) | Relative Speed |
+|-------------------|-------------------------|----------------|
+| Direct evaluation | 0.120462s               | 1x             |
+| Pre-parsed        | 0.028149s               | 4.28x faster   |
+| Fully optimized   | 0.016621s               | 7.25x faster   |
+
+These benchmarks were run using an expression with multiple variable references:
+```
+a.x + a.y + a.z + b.x + b.y + b.z
+```
+
+## Optimization Details
+
+Dilemma offers two levels of optimization:
+
+1. **Pre-parsed evaluation**: Parses the expression once and reuses the parse tree for subsequent evaluations (4.28x speedup)
+
+2. **Fully optimized evaluation**: Combines pre-parsing with compiled variable getters for extremely efficient variable resolution (7.25x speedup)
+
+## Use Cases
+
+- Form validation rules
+- Business logic expressions
+- Dynamic filtering of datasets
+- Guard conditions in workflows
+- Configuration-driven behavior
+
+## Safety
+
+Unlike Python's built-in `eval()`, Dilemma provides a secure evaluation environment:
+
+- No execution of arbitrary Python code
+- No access to builtins or imports
+- Limited to mathematical and logical operations
+- Explicit variable passing
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
