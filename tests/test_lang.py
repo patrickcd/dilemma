@@ -1,5 +1,6 @@
 import pytest
 from dilemma.lang import evaluate, ExpressionTransformer
+import threading
 
 
 def test_specific_cases():
@@ -156,3 +157,22 @@ def test_comparison_with_arithmetic():
 
     for expr, expected in test_cases:
         assert evaluate(expr) == expected
+
+
+def test_thread_safety():
+    def worker(expression, results, index):
+        results[index] = evaluate(expression)
+
+    expressions = ["1 + 1", "2 * 3", "4 / 2"]
+    results = [None] * len(expressions)
+    threads = []
+
+    for i, expr in enumerate(expressions):
+        thread = threading.Thread(target=worker, args=(expr, results, i))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    assert results == [2, 6, 2.0]

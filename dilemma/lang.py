@@ -5,6 +5,7 @@ Expression language implementation using Lark
 from lark import Lark, Transformer, exceptions as lark_exceptions
 from lark import Token
 from dilemma.lookup import nested_getattr
+import threading
 
 # ruff: noqa: E501
 grammar = r"""
@@ -144,10 +145,17 @@ class ExpressionTransformer(Transformer):
         return bool(items[0]) or bool(items[1])
 
 
-def build_parser() -> Lark:
-    return Lark(grammar, start="expr", parser="lalr")
+# Thread-local storage for the parser
+_thread_local = threading.local()
 
-parser = build_parser()
+def build_parser() -> Lark:
+    """
+    Returns a thread-local instance of the Lark parser.
+    Ensures thread safety by creating a separate parser for each thread.
+    """
+    if not hasattr(_thread_local, "parser"):
+        _thread_local.parser = Lark(grammar, start="expr", parser="lalr")
+    return _thread_local.parser
 
 
 # Function to evaluate expressions
@@ -165,6 +173,7 @@ def evaluate(expression: str, variables: dict | None = None) -> int | float | bo
     """
     # First try to parse
     try:
+        parser = build_parser()  # Use thread-local parser
         tree = parser.parse(expression)
     except Exception as e:
         # Handle parse errors

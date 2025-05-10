@@ -10,79 +10,10 @@ A lightweight yet powerful expression evaluation engine with optimized performan
 - Logical operations (`and`, `or`) for boolean expressions
 - Performance optimization strategies for repeated evaluations
 
-## Installation
+## Async Note
 
-```bash
-pip install dilemma
-```
-
-## Usage
-
-Here's a quick example to get you started:
-
-```python
-from dilemma.lang import evaluate
-
-# Evaluate a simple expression
-result = evaluate("2 * (3 + 4)")  # Returns 14
-
-# Use variables in expressions
-variables = {
-    "user": {
-        "profile": {
-            "age": 32,
-            "preferences": {
-                "theme": "dark"
-            }
-        }
-    },
-    "settings": {
-        "min_age": 18
-    }
-}
-
-# Evaluate with variables
-is_adult = evaluate("user.profile.age >= settings.min_age", variables)  # Returns True
-```
-
-import json
-from dilemma.compiled import create_optimized_evaluator
-
-# Define a sample JSON structure
-sample_json = json.dumps({
-    "user": {
-        "profile": {
-            "age": 25
-        }
-    },
-    "settings": {
-        "min_age": 18
-    }
-})
-
-# Create an optimized evaluator
-expr = "user.profile.age >= settings.min_age"
-optimized_eval = create_optimized_evaluator(expr, sample_json)
-
-# Use for repeated evaluations with different data
-for user_data in users:
-    if optimized_eval(user_data):
-        # Process adult users
-        pass
-
-
-```markdown
-# Dilemma Expression Engine
-
-A lightweight yet powerful expression evaluation engine with optimized performance for Python applications.
-
-## Features
-
-- Secure evaluation of mathematical and logical expressions
-- Support for variables with dot notation (e.g., `user.profile.settings.enabled`)
-- Rich comparison operations with proper handling of floating-point values
-- Logical operations (`and`, `or`) for boolean expressions
-- Performance optimization strategies for repeated evaluations
+The current implementation is **not** suitable for async code because it using threading.local to
+maintain different parsers per thread.
 
 ## Installation
 
