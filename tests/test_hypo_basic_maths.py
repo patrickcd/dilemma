@@ -5,12 +5,14 @@ from dilemma.lang import evaluate
 # Strategy for generating integers including negative numbers
 integers_st = st.integers(min_value=-100, max_value=1000)
 
+
 # Strategy for generating simple expressions with integers
 @st.composite
 def integer_expressions(draw):
     """Generate a simple integer expression and its expected result"""
     number = draw(integers_st)
     return str(number), number
+
 
 # Strategy for generating addition expressions
 @st.composite
@@ -22,6 +24,7 @@ def addition_expressions(draw):
     expected = left + right
     return expr, expected
 
+
 # Strategy for generating subtraction expressions
 @st.composite
 def subtraction_expressions(draw):
@@ -32,6 +35,7 @@ def subtraction_expressions(draw):
     expected = left - right
     return expr, expected
 
+
 # Strategy for generating multiplication expressions
 @st.composite
 def multiplication_expressions(draw):
@@ -41,6 +45,7 @@ def multiplication_expressions(draw):
     expr = f"{left} * {right}"
     expected = left * right
     return expr, expected
+
 
 # Strategy for generating division expressions
 @st.composite
@@ -54,6 +59,7 @@ def division_expressions(draw):
     expected = left / right
     return expr, expected
 
+
 # Strategy for generating complex expressions with multiple operations
 @st.composite
 def complex_expressions(draw):
@@ -66,7 +72,7 @@ def complex_expressions(draw):
 
     for _ in range(num_operations):
         # Choose operation (avoid division if it might cause errors)
-        if expr.endswith('0'):
+        if expr.endswith("0"):
             # Avoid potential division by zero
             operation = draw(st.sampled_from(["+", "-", "*"]))
         else:
@@ -88,6 +94,7 @@ def complex_expressions(draw):
 
     return expr, expected
 
+
 # Strategy for generating equality expressions
 @st.composite
 def equality_expressions(draw):
@@ -97,6 +104,7 @@ def equality_expressions(draw):
     expr = f"{left} == {right}"
     expected = left == right
     return expr, expected
+
 
 # Strategy for generating inequality expressions
 @st.composite
@@ -108,6 +116,7 @@ def inequality_expressions(draw):
     expected = left != right
     return expr, expected
 
+
 # Strategy for generating less than expressions
 @st.composite
 def less_than_expressions(draw):
@@ -117,6 +126,7 @@ def less_than_expressions(draw):
     expr = f"{left} < {right}"
     expected = left < right
     return expr, expected
+
 
 # Strategy for generating greater than expressions
 @st.composite
@@ -128,6 +138,7 @@ def greater_than_expressions(draw):
     expected = left > right
     return expr, expected
 
+
 # Strategy for generating less than or equal expressions
 @st.composite
 def less_equal_expressions(draw):
@@ -137,6 +148,7 @@ def less_equal_expressions(draw):
     expr = f"{left} <= {right}"
     expected = left <= right
     return expr, expected
+
 
 # Strategy for generating greater than or equal expressions
 @st.composite
@@ -148,23 +160,26 @@ def greater_equal_expressions(draw):
     expected = left >= right
     return expr, expected
 
+
 # Strategy for generating various whitespace variations
 @st.composite
 def whitespace_variations(draw):
     """Generate expressions with varied whitespace"""
-    base_expr, expected = draw(st.one_of(
-        integer_expressions(),
-        addition_expressions(),
-        subtraction_expressions(),
-        multiplication_expressions(),
-        division_expressions(),
-        equality_expressions(),
-        inequality_expressions(),
-        less_than_expressions(),
-        greater_than_expressions(),
-        less_equal_expressions(),
-        greater_equal_expressions()
-    ))
+    base_expr, expected = draw(
+        st.one_of(
+            integer_expressions(),
+            addition_expressions(),
+            subtraction_expressions(),
+            multiplication_expressions(),
+            division_expressions(),
+            equality_expressions(),
+            inequality_expressions(),
+            less_than_expressions(),
+            greater_than_expressions(),
+            less_equal_expressions(),
+            greater_equal_expressions(),
+        )
+    )
 
     # Create variations with different whitespace
     whitespace = draw(st.text(alphabet=" \t", min_size=0, max_size=3))
@@ -181,11 +196,13 @@ def whitespace_variations(draw):
 
     return base_expr, expected  # Fallback
 
+
 @given(integer_expressions())
 def test_integer_expressions(expr_tuple):
     """Test that integer expressions are evaluated correctly"""
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
+
 
 @given(addition_expressions())
 def test_addition(expr_tuple):
@@ -193,11 +210,13 @@ def test_addition(expr_tuple):
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
 
+
 @given(subtraction_expressions())
 def test_subtraction(expr_tuple):
     """Test that subtraction expressions are evaluated correctly"""
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
+
 
 @given(multiplication_expressions())
 def test_multiplication(expr_tuple):
@@ -205,11 +224,13 @@ def test_multiplication(expr_tuple):
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
 
+
 @given(division_expressions())
 def test_division(expr_tuple):
     """Test that division expressions are evaluated correctly"""
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
+
 
 @given(complex_expressions())
 def test_complex_expressions(expr_tuple):
@@ -217,11 +238,13 @@ def test_complex_expressions(expr_tuple):
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
 
+
 @given(whitespace_variations())
 def test_whitespace_handling(expr_tuple):
     """Test that expressions with varied whitespace are handled correctly"""
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
+
 
 @given(equality_expressions())
 def test_equality(expr_tuple):
@@ -229,11 +252,13 @@ def test_equality(expr_tuple):
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
 
+
 @given(inequality_expressions())
 def test_inequality(expr_tuple):
     """Test that inequality comparisons are evaluated correctly"""
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
+
 
 @given(less_than_expressions())
 def test_less_than(expr_tuple):
@@ -241,11 +266,13 @@ def test_less_than(expr_tuple):
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
 
+
 @given(greater_than_expressions())
 def test_greater_than(expr_tuple):
     """Test that greater than comparisons are evaluated correctly"""
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
+
 
 @given(less_equal_expressions())
 def test_less_equal(expr_tuple):
@@ -253,11 +280,13 @@ def test_less_equal(expr_tuple):
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
 
+
 @given(greater_equal_expressions())
 def test_greater_equal(expr_tuple):
     """Test that greater than or equal comparisons are evaluated correctly"""
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
+
 
 # Test for operation precedence
 @given(st.integers(0, 100), st.integers(0, 100), st.integers(0, 100))
@@ -272,6 +301,7 @@ def test_operation_precedence(a, b, c):
     expr = f"{a} - {b} + {c}"
     expected = (a - b) + c
     assert evaluate(expr) == expected
+
 
 # Test for operation precedence with multiplication
 @given(st.integers(0, 20), st.integers(0, 20), st.integers(0, 20))
@@ -296,6 +326,7 @@ def test_multiplication_precedence(a, b, c):
     expr = f"{a} * {b} - {c}"
     expected = (a * b) - c
     assert evaluate(expr) == expected
+
 
 # Test for operation precedence with division
 @given(st.integers(0, 20), st.integers(1, 20), st.integers(1, 20))
@@ -331,6 +362,7 @@ def test_division_precedence(a, b, c):
     expected = (a / b) * c
     assert evaluate(expr) == expected
 
+
 # Add a hypothesis test for division by zero
 @given(st.integers(min_value=1, max_value=1000))
 def test_hypothesis_division_by_zero(numerator):
@@ -339,9 +371,12 @@ def test_hypothesis_division_by_zero(numerator):
     with pytest.raises(ZeroDivisionError):
         evaluate(expr)
 
+
 # Test boundary conditions with large integers
-@given(st.integers(min_value=10000, max_value=1000000),
-       st.integers(min_value=10000, max_value=1000000))
+@given(
+    st.integers(min_value=10000, max_value=1000000),
+    st.integers(min_value=10000, max_value=1000000),
+)
 def test_large_integers(a, b):
     """Test expressions with very large integers"""
     # Addition with large integers
@@ -356,6 +391,7 @@ def test_large_integers(a, b):
     if a < 10000 and b < 10000:
         expr = f"{a} * {b}"
         assert evaluate(expr) == a * b
+
 
 # Test expressions with many operations
 @given(st.lists(st.integers(min_value=1, max_value=20), min_size=5, max_size=10))
@@ -378,9 +414,11 @@ def test_many_operations(numbers):
 
     assert evaluate(expr) == expected
 
+
 # Test with negative numbers
-@given(st.integers(min_value=-100, max_value=-1),
-       st.integers(min_value=-100, max_value=-1))
+@given(
+    st.integers(min_value=-100, max_value=-1), st.integers(min_value=-100, max_value=-1)
+)
 def test_negative_numbers(a, b):
     """Test expressions with negative numbers"""
     # Addition with negative numbers
@@ -399,14 +437,3 @@ def test_negative_numbers(a, b):
     if b != 0:
         expr = f"{a} / {b}"
         assert evaluate(expr) == a / b
-
-# Add a comment explaining the use of eval() for test expectations
-"""
-NOTE: This test suite uses Python's eval() function to calculate expected results for tests.
-This is safe in this context because:
-1. eval() is only used in the test code, not in the actual implementation
-2. The expressions being evaluated are generated by the test code, not from external input
-3. The expressions are limited to simple arithmetic operations and integers
-
-The main implementation in dilemma.lang uses a proper grammar-based parser for security.
-"""

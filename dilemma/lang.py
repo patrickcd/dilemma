@@ -32,13 +32,19 @@ grammar = r"""
     ?product: term
            | product "*" term -> mul
            | product "/" term -> div
+           | product "%" term -> mod  // Example of adding modulo, if desired
 
     ?term: INTEGER -> int_number
          | FLOAT -> float_number
          | "-" INTEGER -> negative_int
          | "-" FLOAT -> negative_float
+         | VARIABLE -> variable
          | "(" expr ")" -> paren
 
+    // Define reserved keywords
+    // But use string literals in rules above for "or" and "and"
+    // Use a negative lookahead in VARIABLE to exclude these as variable names
+    VARIABLE: /(?!or\b|and\b)[a-zA-Z_][a-zA-Z0-9_]*/
     INTEGER: /[0-9]+/
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i
 
@@ -52,6 +58,10 @@ class ExpressionTransformer(Transformer):
     # Epsilon value for float comparison
     EPSILON = 1e-10
 
+    def __init__(self, variables: dict | None = None):
+        super().__init__()
+        self.variables = variables if variables is not None else {}
+
     def int_number(self, items: list[Token]) -> int:
         return int(items[0])
 
@@ -63,6 +73,12 @@ class ExpressionTransformer(Transformer):
 
     def negative_float(self, items: list[Token]) -> float:
         return -float(items[0])
+
+    def variable(self, items: list[Token]) -> int | float | bool:
+        var_name = items[0].value
+        if var_name not in self.variables:
+            raise NameError(f"Variable '{var_name}' is not defined.")
+        return self.variables[var_name]
 
     def add(self, items: list) -> float:
         return items[0] + items[1]
@@ -121,15 +137,17 @@ parser = Lark(grammar, start="expr", parser="lalr")
 
 
 # Function to evaluate expressions
-def evaluate(expression: str) -> int | float | bool:
+def evaluate(expression: str, variables: dict | None = None) -> int | float | bool:
     """
-    Evaluate an expression with integers, arithmetic operations, and comparisons
+    Evaluate an expression with integers, arithmetic operations, comparisons,
+    and variables.
 
     Args:
         expression: String containing the expression to evaluate
+        variables: Optional dictionary of variable names to their values
 
     Returns:
-        Result of the evaluation (integer or boolean)
+        Result of the evaluation (integer, float, or boolean)
     """
     # First try to parse
     try:
@@ -140,10 +158,13 @@ def evaluate(expression: str) -> int | float | bool:
 
     # Then try to evaluate
     try:
-        return ExpressionTransformer().transform(tree)
+        transformer = ExpressionTransformer(variables=variables)
+        return transformer.transform(tree)
     except lark_exceptions.VisitError as e:
-        # Check if the underlying error is a ZeroDivisionError
+        # Check if the underlying error is a ZeroDivisionError or NameError
         if isinstance(e.__context__, ZeroDivisionError):
             raise ZeroDivisionError("Division by zero") from e
+        if isinstance(e.__context__, NameError):
+            raise NameError(str(e.__context__)) from e
         # Re-raise other VisitErrors
         raise ValueError(f"Error evaluating expression: {expression}") from e
