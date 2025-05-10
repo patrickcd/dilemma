@@ -99,3 +99,16 @@ def test_hypothesis_logical_operations(a, b):
     # Test with comparisons
     assert evaluate(f"{a} > 0 and {b} > 0") == (a > 0 and b > 0)
     assert evaluate(f"{a} > 0 or {b} > 0") == (a > 0 or b > 0)
+
+
+def test_boolean_literals():
+    """Test boolean literals True/False and true/false."""
+    # Test literal False values
+    assert evaluate("False") is False
+    assert evaluate("false") is False
+
+    # Test in logical expressions
+    assert evaluate("False and True") is False
+    assert evaluate("True and False") is False
+    assert evaluate("False or False") is False
+    assert evaluate("False or True") is True

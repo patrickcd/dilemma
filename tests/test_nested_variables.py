@@ -1,7 +1,8 @@
 import pytest
+import json
 from hypothesis import given, strategies as st, settings, example
 from dilemma.lang import evaluate
-from dilemma.lookup import nested_getattr
+from dilemma.lookup import nested_getattr, check_numeric, compile_getter
 
 # Strategy for generating nested variable names with smaller size limits
 nested_variable_names_st = st.lists(
@@ -276,3 +277,165 @@ def test_nested_getattr_with_class(value):
     context = {"obj": obj}
     assert nested_getattr(context, "obj.value") == value
     assert nested_getattr(context, "obj.nested.data") == value * 2
+
+
+def test_nested_getattr_non_container():
+    """Test that nested_getattr raises AttributeError for non-containers in the path."""
+    # Create a simple object with a primitive value
+    obj = {"a": 5}
+
+    # Attempting to access a.b should fail because 'a' is an integer, not a container
+    with pytest.raises(AttributeError) as excinfo:
+        nested_getattr(obj, "a.b")
+
+    assert "not subscriptable" in str(excinfo.value)
+
+
+def test_nested_getattr_non_subscriptable():
+    """Test nested_getattr with an object that's not subscriptable."""
+    class NoSubscript:
+        pass
+
+    obj = {"a": NoSubscript()}
+
+    with pytest.raises(AttributeError) as excinfo:
+        nested_getattr(obj, "a.b")
+
+    assert "not subscriptable" in str(excinfo.value)
+
+
+def test_check_numeric_invalid():
+    """Test check_numeric with non-numeric values."""
+    with pytest.raises(TypeError):
+        check_numeric("not a number")
+
+    with pytest.raises(TypeError):
+        check_numeric([1, 2, 3])
+
+
+def test_nested_getattr_invalid_container_check():
+    """Test the container check for intermediate segments in nested_getattr."""
+    # Create a test object with primitive values that shouldn't be used as containers
+    test_obj = {
+        "num": 123,
+        "bool": True,
+        "float_val": 3.14
+    }
+
+    # Test with integer as intermediate segment
+    with pytest.raises(AttributeError) as excinfo:
+        nested_getattr(test_obj, "num.something")
+    assert "not subscriptable" in str(excinfo.value)
+
+    # Test with boolean as intermediate segment
+    with pytest.raises(AttributeError) as excinfo:
+        nested_getattr(test_obj, "bool.something")
+    assert "not subscriptable" in str(excinfo.value)
+
+    # Test with float as intermediate segment
+    with pytest.raises(AttributeError) as excinfo:
+        nested_getattr(test_obj, "float_val.something")
+    assert "not subscriptable" in str(excinfo.value)
+
+
+def test_compile_getter_attr_path():
+    """Test compile_getter with attribute access paths."""
+    # Test with JSON containing non-dict values that would be accessed via attributes
+    sample_json = json.dumps({
+        "config": {
+            "settings": 5  # This numeric value would be accessed via attributes in real code
+        }
+    })
+
+    # Get a compiled getter that includes attribute access
+    getter = compile_getter("config.settings.enabled", sample_json)
+
+    # Create a test object with the expected structure
+    class Settings:
+        def __init__(self):
+            self.enabled = True
+
+    test_obj = {
+        "config": {
+            "settings": Settings()
+        }
+    }
+
+    # The getter should be able to access the attribute
+    assert getter(test_obj) is True
+
+
+def test_compile_getter_eval_error():
+    """Test compile_getter handling of eval errors."""
+    import unittest.mock
+
+    with unittest.mock.patch('dilemma.lookup.eval') as mock_eval:
+        # Set up mock to raise exception
+        mock_eval.side_effect = SyntaxError("Invalid syntax")
+
+        # This should handle the exception and raise a ValueError
+        with pytest.raises(ValueError) as excinfo:
+            compile_getter("a.b", json.dumps({"a": {"b": 1}}))
+
+        assert "Failed to compile" in str(excinfo.value)
+
+
+def test_compile_getter_complex_path():
+    """Test compile_getter with a mix of attribute and item access."""
+    # Test with a JSON structure
+    sample_json = json.dumps({
+        "users": {
+            "admin": {
+                "permissions": {
+                    "canEdit": True
+                }
+            }
+        }
+    })
+
+    # Create a getter for a path that will use mixed access
+    getter = compile_getter("users.admin.permissions.canEdit", sample_json)
+
+    # Create a test object with the SAME structure as the JSON
+    # Since the JSON has dictionaries all the way, we need to use dictionaries
+    test_obj = {
+        "users": {
+            "admin": {
+                "permissions": {
+                    "canEdit": False  # Different value to verify the getter works
+                }
+            }
+        }
+    }
+
+    # The getter should correctly navigate the structure
+    assert getter(test_obj) is False
+
+
+def test_nested_getattr_primitive_container_check():
+    """Test the non-container check at the beginning of nested_getattr."""
+    # Create a test object with primitive values that should fail the container check
+    # The key difference here is that we're setting up the test to hit the specific
+    # container validation logic at the start of the function
+    test_obj = {
+        "num": 123,
+        "bool": True,
+        "float_val": 3.14
+    }
+
+    # Test with integer as intermediate segment - this should trigger the
+    # initial container check, not the subscriptable check
+    with pytest.raises(AttributeError) as excinfo:
+        nested_getattr(test_obj, "num.something.deeper")  # Note: adding a deeper level
+
+    # This should hit the container check, which returns a different error
+    assert "non-container" in str(excinfo.value)
+
+    # Also test with boolean and float
+    with pytest.raises(AttributeError) as excinfo:
+        nested_getattr(test_obj, "bool.something.more")
+    assert "non-container" in str(excinfo.value)
+
+    with pytest.raises(AttributeError) as excinfo:
+        nested_getattr(test_obj, "float_val.something.more")
+    assert "non-container" in str(excinfo.value)

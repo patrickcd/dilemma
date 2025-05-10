@@ -102,6 +102,8 @@ def compile_getter(ref, sample_context_json):
     src = f"lambda context: {expr}"
 
     try:
+        # Note - eval is being used with an expression generated internally
+        #  that should be safe, as it only contains attribute/item lookups
         getter = eval(src, {})  # use empty globals
     except Exception as e:
         raise ValueError(f"Failed to compile {src!r}: {e}")

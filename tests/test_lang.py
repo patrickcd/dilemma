@@ -1,5 +1,5 @@
 import pytest
-from dilemma.lang import evaluate, ExpressionTransformer
+from dilemma.lang import evaluate, ExpressionTransformer, parser
 
 
 def test_specific_cases():

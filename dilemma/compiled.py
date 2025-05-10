@@ -76,19 +76,40 @@ def extract_variable_paths(tree):
     """
     paths = set()
 
-    # Define a visitor function to extract variables
     def _extract_vars(node):
-        # Check if this is a variable node
-        if hasattr(node, "data") and node.data == "variable" and node.children:
-            # The first child should be the token with the variable path
-            token = node.children[0]
-            if hasattr(token, "value"):
-                paths.add(token.value)
+        # Process this node if it's a variable node
+        if _is_variable_node(node):
+            path = _extract_path_from_node(node)
+            if path:
+                paths.add(path)
 
-        # Recursively process all children
+        # Process all children
+        for child in _get_node_children(node):
+            _extract_vars(child)
+
+    def _is_variable_node(node):
+        """Check if a node represents a variable."""
+        return (hasattr(node, "data") and
+                node.data == "variable" and
+                hasattr(node, "children") and
+                len(node.children) > 0)
+
+    def _extract_path_from_node(node):
+        """Extract the variable path from a variable node."""
+        token = node.children[0]
+        if hasattr(token, "value"):
+            return token.value
+        return None
+
+    def _get_node_children(node):
+        """Safely get a node's children or return an empty list."""
         if hasattr(node, "children"):
-            for child in node.children:
-                _extract_vars(child)
+            # Handle the case where children is not iterable
+            try:
+                return list(node.children)
+            except (TypeError, ValueError):
+                return []
+        return []
 
     # Start extraction from the root
     _extract_vars(tree)
