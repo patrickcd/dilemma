@@ -4,7 +4,7 @@ Expression language implementation using Lark
 
 from lark import Lark, Transformer, exceptions as lark_exceptions
 from lark import Token
-from dilemma.lookup import nested_getattr
+from dilemma.lookup import nested_getattr, validate_supported_type
 import threading
 
 # ruff: noqa: E501
@@ -88,9 +88,10 @@ class ExpressionTransformer(Transformer):
     def false_value(self, _) -> bool:
         return False
 
-    def variable(self, items: list[Token]) -> int | float | bool:
+    def variable(self, items: list[Token]) -> int | float | bool | str:
         var_path = items[0].value
         try:
+            # nested_getattr already validates the type
             return nested_getattr(self.variables, var_path)
         except AttributeError:
             msg = f"Variable '{var_path}' is not defined or path cannot be resolved. Available variables: {list(self.variables.keys())}"
@@ -175,7 +176,7 @@ def build_parser() -> Lark:
 
 
 # Function to evaluate expressions
-def evaluate(expression: str, variables: dict | None = None) -> int | float | bool:
+def evaluate(expression: str, variables: dict | None = None) -> int | float | bool | str:
     """
     Evaluate an expression with integers, arithmetic operations, comparisons,
     and variables.
@@ -185,7 +186,7 @@ def evaluate(expression: str, variables: dict | None = None) -> int | float | bo
         variables: Optional dictionary of variable names to their values
 
     Returns:
-        Result of the evaluation (integer, float, or boolean)
+        Result of the evaluation (integer, float, boolean, or string)
     """
     # First try to parse
     try:
@@ -198,7 +199,10 @@ def evaluate(expression: str, variables: dict | None = None) -> int | float | bo
     # Then try to evaluate
     try:
         transformer = ExpressionTransformer(variables=variables)
-        return transformer.transform(tree)
+        result = transformer.transform(tree)
+        # Final validation to ensure result is of supported type
+        validate_supported_type(result)
+        return result
     except lark_exceptions.VisitError as e:
         # Check if the underlying error is a ZeroDivisionError, NameError, or TypeError
         if isinstance(e.__context__, ZeroDivisionError):
