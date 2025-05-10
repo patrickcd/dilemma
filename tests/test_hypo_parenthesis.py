@@ -104,7 +104,7 @@ def test_hypothesis_basic_parentheses(a, b):
 
     # Test division (avoiding division by zero)
     if b != 0:
-        assert evaluate(f"({a} / {b})") == a // b
+        assert evaluate(f"({a} / {b})") == a / b
 
 @given(
     st.integers(min_value=-20, max_value=20),
@@ -122,7 +122,7 @@ def test_hypothesis_precedence_change(a, b, c):
 
     # Nested operations
     if c != 0:
-        assert evaluate(f"{a} * ({b} / {c})") == a * (b // c)
+        assert evaluate(f"{a} * ({b} / {c})") == a * (b / c)
 
     # Complex grouping
     assert evaluate(f"({a} + {b}) - ({a} * {c})") == (a + b) - (a * c)

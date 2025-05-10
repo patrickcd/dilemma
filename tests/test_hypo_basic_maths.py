@@ -50,8 +50,8 @@ def division_expressions(draw):
     # Ensure we don't divide by zero
     right = draw(st.integers(min_value=1, max_value=100))
     expr = f"{left} / {right}"
-    # Use integer division to match our implementation
-    expected = left // right
+    # Use true division to match our implementation
+    expected = left / right
     return expr, expected
 
 # Strategy for generating complex expressions with multiple operations
@@ -83,7 +83,7 @@ def complex_expressions(draw):
 
     # Replace Python's normal division with integer division
     # to match our implementation
-    expr_for_eval = expr.replace('/', '//')
+    expr_for_eval = expr  # Use true division for eval
     expected = eval(expr_for_eval)
 
     return expr, expected
@@ -303,32 +303,32 @@ def test_division_precedence(a, b, c):
     """Test that division has higher precedence than addition/subtraction"""
     # a + b / c should be a + (b / c)
     expr = f"{a} + {b} / {c}"
-    expected = a + (b // c)
+    expected = a + (b / c)
     assert evaluate(expr) == expected
 
     # a - b / c should be a - (b / c)
     expr = f"{a} - {b} / {c}"
-    expected = a - (b // c)
+    expected = a - (b / c)
     assert evaluate(expr) == expected
 
     # a / b + c should be (a / b) + c
     expr = f"{a} / {b} + {c}"
-    expected = (a // b) + c
+    expected = (a / b) + c
     assert evaluate(expr) == expected
 
     # a / b - c should be (a / b) - c
     expr = f"{a} / {b} - {c}"
-    expected = (a // b) - c
+    expected = (a / b) - c
     assert evaluate(expr) == expected
 
     # a * b / c should be (a * b) / c
     expr = f"{a} * {b} / {c}"
-    expected = (a * b) // c
+    expected = (a * b) / c
     assert evaluate(expr) == expected
 
     # a / b * c should be (a / b) * c
     expr = f"{a} / {b} * {c}"
-    expected = (a // b) * c
+    expected = (a / b) * c
     assert evaluate(expr) == expected
 
 # Add a hypothesis test for division by zero
@@ -373,7 +373,7 @@ def test_many_operations(numbers):
             expr += f" * {num}"
 
     # Calculate expected result using Python's eval to handle precedence correctly
-    expr_for_eval = expr.replace('/', '//')
+    expr_for_eval = expr  # Use true division for eval
     expected = eval(expr_for_eval)
 
     assert evaluate(expr) == expected
@@ -398,7 +398,7 @@ def test_negative_numbers(a, b):
     # Division with negative numbers (avoiding division by zero)
     if b != 0:
         expr = f"{a} / {b}"
-        assert evaluate(expr) == a // b
+        assert evaluate(expr) == a / b
 
 # Add a comment explaining the use of eval() for test expectations
 """

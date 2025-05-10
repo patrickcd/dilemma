@@ -22,34 +22,38 @@ except ImportError:
     def addition_expressions(draw):
         left = draw(integers_st)
         right = draw(integers_st)
-        return f"{left} + {right}", left + right
+        return f"{left} + {right}", float(left + right)
 
     @st.composite
     def subtraction_expressions(draw):
         left = draw(integers_st)
         right = draw(integers_st)
-        return f"{left} - {right}", left - right
+        return f"{left} - {right}", float(left - right)
 
     @st.composite
     def multiplication_expressions(draw):
         left = draw(integers_st)
         right = draw(integers_st)
-        return f"{left} * {right}", left * right
+        return f"{left} * {right}", float(left * right)
 
     @st.composite
     def division_expressions(draw):
         left = draw(integers_st)
         right = draw(st.integers(min_value=1, max_value=100))
-        return f"{left} / {right}", left // right
+        # Ensure right is not zero for division
+        if right == 0: # Should not happen with min_value=1, but as safeguard
+            right = 1
+        return f"{left} / {right}", left / right # Use float division
 
     @st.composite
     def complex_expressions(draw):
         # Simplified version if import fails
         a = draw(integers_st)
         b = draw(integers_st)
-        op = draw(st.sampled_from(["+", "-", "*"]))
+        op = draw(st.sampled_from(["+", "-", "*"])) # Division not included here
         expr = f"{a} {op} {b}"
-        expected = eval(expr)
+        # eval result for +,-,* with ints is int. Cast to float for consistency.
+        expected = float(eval(expr))
         return expr, expected
 
 try:
