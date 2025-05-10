@@ -406,3 +406,8 @@ def test_extract_variable_paths_with_non_iterable_children():
 
     # It should still extract the valid paths
     assert set(paths) == {"a.b", "c.d"}
+
+
+def test_dunder_vars():
+    with pytest.raises(ValueError):
+        compile_getter("__class__", None)

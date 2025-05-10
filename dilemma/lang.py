@@ -108,7 +108,7 @@ class ExpressionTransformer(Transformer):
             raise ZeroDivisionError("Division by zero")
         return items[0] / items[1]  # Now using true division
 
-    def paren(self, items: list) -> float | int | bool:
+    def paren(self, items: list) -> float:
         """Handle parenthesized expressions by returning the inner value"""
         return items[0]
 
