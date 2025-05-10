@@ -9,7 +9,13 @@ from lark import Token
 grammar = """
     ?start: expr
 
-    ?expr: comparison
+    ?expr: or_expr
+
+    ?or_expr: and_expr
+            | or_expr "or" and_expr -> or_op
+
+    ?and_expr: comparison
+             | and_expr "and" comparison -> and_op
 
     ?comparison: sum
                | sum "==" sum -> eq
@@ -29,6 +35,7 @@ grammar = """
 
     ?term: INTEGER -> number
          | "-" INTEGER -> negative_number
+         | "(" expr ")" -> paren
 
     INTEGER: /[0-9]+/
 
@@ -61,6 +68,10 @@ class ExpressionTransformer(Transformer):
             raise ZeroDivisionError("Division by zero")
         return items[0] // items[1]  # Using integer division
 
+    def paren(self, items: list) -> int:
+        """Handle parenthesized expressions by returning the inner value"""
+        return items[0]
+
     # Comparison operations
     def eq(self, items: list) -> bool:
         return items[0] == items[1]
@@ -79,6 +90,13 @@ class ExpressionTransformer(Transformer):
 
     def ge(self, items: list) -> bool:
         return items[0] >= items[1]
+
+    # Logical operations
+    def and_op(self, items: list) -> bool:
+        return bool(items[0]) and bool(items[1])
+
+    def or_op(self, items: list) -> bool:
+        return bool(items[0]) or bool(items[1])
 
 # Create the parser
 parser = Lark(grammar, start="expr", parser="lalr")
