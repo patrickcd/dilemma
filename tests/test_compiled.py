@@ -1,7 +1,7 @@
 import json
 import pytest
 from dilemma.compiled import create_optimized_evaluator, extract_variable_paths
-from dilemma.lang import parser
+from dilemma.lang import build_parser
 from dilemma.lookup import compile_getter
 
 
@@ -71,6 +71,7 @@ def test_nested_path_optimization():
 def test_extract_variable_paths():
     """Test that variable paths are correctly extracted from expressions."""
     expression = "a.b + c.d * (e.f - 10)"
+    parser = build_parser()
     tree = parser.parse(expression)
 
     paths = extract_variable_paths(tree)

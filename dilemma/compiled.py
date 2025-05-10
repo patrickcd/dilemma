@@ -1,5 +1,5 @@
 from .lookup import compile_getter
-from .lang import parser, ExpressionTransformer
+from .lang import build_parser, ExpressionTransformer
 
 
 class OptimizedExpressionTransformer(ExpressionTransformer):
@@ -42,6 +42,7 @@ def create_optimized_evaluator(expression, sample_variables_json=None):
         A function that evaluates the expression with given variables
     """
     # Parse the expression once
+    parser = build_parser()
     tree = parser.parse(expression)
 
     # If sample variables provided, compile getters for variable paths

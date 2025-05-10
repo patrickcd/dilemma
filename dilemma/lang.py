@@ -87,10 +87,9 @@ class ExpressionTransformer(Transformer):
     def variable(self, items: list[Token]) -> int | float | bool:
         var_path = items[0].value
         try:
-            # Use nested_getattr for resolving dot notation paths
             return nested_getattr(self.variables, var_path)
         except AttributeError:
-            msg = f"Variable '{var_path}' is not defined or path cannot be resolved"
+            msg = f"Variable '{var_path}' is not defined or path cannot be resolved. Available variables: {list(self.variables.keys())}"
             raise NameError(msg)
 
     def add(self, items: list) -> float:
@@ -131,7 +130,7 @@ class ExpressionTransformer(Transformer):
     def gt(self, items: list) -> bool:
         return items[0] > items[1]
 
-    def le(self, items: list) -> bool:
+    def le(self, items: list[int | float]) -> bool:
         return items[0] <= items[1]
 
     def ge(self, items: list) -> bool:
@@ -145,8 +144,10 @@ class ExpressionTransformer(Transformer):
         return bool(items[0]) or bool(items[1])
 
 
-# Create the parser
-parser = Lark(grammar, start="expr", parser="lalr")
+def build_parser() -> Lark:
+    return Lark(grammar, start="expr", parser="lalr")
+
+parser = build_parser()
 
 
 # Function to evaluate expressions
