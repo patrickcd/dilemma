@@ -98,12 +98,13 @@ class ExpressionTransformer(Transformer):
     def or_op(self, items: list) -> bool:
         return bool(items[0]) or bool(items[1])
 
+
 # Create the parser
 parser = Lark(grammar, start="expr", parser="lalr")
 
 
 # Function to evaluate expressions
-def evaluate(expression: str):
+def evaluate(expression: str) -> int | bool:
     """
     Evaluate an expression with integers, arithmetic operations, and comparisons
 
