@@ -1,4 +1,12 @@
-def nested_getattr(obj, attr) -> int | float:
+"""
+This module provides functions to perform attribute and item lookups on objects
+and mappings, including nested lookups using dot-separated paths.
+It also includes a function to compile getters for optimized access paths.
+"""
+
+import json
+
+def nested_getattr(obj, attr) -> int | float | bool:
     """
     Given:
       - obj: an object or mapping
@@ -24,7 +32,7 @@ def nested_getattr(obj, attr) -> int | float:
                     raise AttributeError(
                         f"Cannot resolve segment '{name}' on {obj!r} - not subscriptable"
                     )
-                obj = obj[name]
+                obj = obj[name] # type: ignore[assignment]
             except (KeyError, TypeError):
                 raise AttributeError(
                     f"Cannot resolve segment '{name}' on {obj!r}"
@@ -42,37 +50,47 @@ def check_numeric(value):
         raise TypeError(f"Expected numeric or boolean value, got {type(value).__name__}")
 
 
-def compile_getter(ref, sample_context):
+def compile_getter(ref, sample_context_json):
     """
     Given:
-      - ref:    a dot-separated path, e.g. "things.that.inspire"
-      - sample_context: an object/mapping whose shape matches what you'll later pass in
+      - ref: a dot-separated path, e.g. "things.that.inspire"
+      - sample_context_json: a JSON string representing the structure of the data
+        that will be passed to the getter function
+
     Returns:
-      - a function getter(context) that does exactly the same chain
-        of attribute/item lookups you just validated against sample_context.
+      - a function getter(context) that performs the chain of attribute/item lookups
+
+    Using JSON for sample data ensures we don't execute property getters
+    with side effects.
     """
+    # Parse the JSON string to get a safe sample context
+    try:
+        sample_context = json.loads(sample_context_json)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in sample_context_json: {e}")
+
     segments = ref.split(".")
     ops = []  # each entry will be ('attr', name) or ('item', name)
     cursor = sample_context
 
     # Figure out, at compile time, which lookup works for each segment
     for name in segments:
-        # try attribute access first
-        try:
-            getattr(cursor, name)
-            ops.append(("attr", name))
-            cursor = getattr(cursor, name)
-        except AttributeError:
-            # if that fails, try item lookup
-            try:
-                cursor[name]
+        # For JSON objects (dicts), use item lookup
+        if isinstance(cursor, dict):
+            if name in cursor:
                 ops.append(("item", name))
                 cursor = cursor[name]
-            except Exception as e:
-                raise ValueError(f"Cannot resolve segment {name!r} on {cursor!r}") from e
+            else:
+                raise ValueError(f"Key '{name}' not found in dictionary at this path")
+        # For JSON objects that might be accessed via attributes in Python
+        else:
+            # Default to attribute access for compatibility with Python objects
+            ops.append(("attr", name))
+            # Since we're working with JSON data, we can't actually resolve further
+            # Just assume the rest will be available at runtime
+            break
 
-    # Build a literal expression like
-    #    context.things['that'].inspire
+    # Build a literal expression like context.things['that'].inspire
     expr = "context"
     for kind, name in ops:
         if kind == "attr":

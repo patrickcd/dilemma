@@ -33,7 +33,6 @@ grammar = r"""
     ?product: term
            | product "*" term -> mul
            | product "/" term -> div
-           | product "%" term -> mod  // Example of adding modulo, if desired
 
     ?term: INTEGER -> int_number
          | FLOAT -> float_number
@@ -41,13 +40,15 @@ grammar = r"""
          | "-" FLOAT -> negative_float
          | "True" -> true_value
          | "False" -> false_value
+         | "true" -> true_value
+         | "false" -> false_value
          | VARIABLE -> variable
          | "(" expr ")" -> paren
 
     // Define reserved keywords
     // But use string literals in rules above for "or", "and", "True", "False"
     // Use a negative lookahead in VARIABLE to exclude these as variable names
-    VARIABLE: /(?!or\b|and\b|True\b|False\b)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*/
+    VARIABLE: /(?!or\b|and\b|True\b|False\b|false\b|true)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*/
     INTEGER: /[0-9]+/
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i
 
@@ -107,7 +108,7 @@ class ExpressionTransformer(Transformer):
             raise ZeroDivisionError("Division by zero")
         return items[0] / items[1]  # Now using true division
 
-    def paren(self, items: list) -> float:
+    def paren(self, items: list) -> float | int | bool:
         """Handle parenthesized expressions by returning the inner value"""
         return items[0]
 
