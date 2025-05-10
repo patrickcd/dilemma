@@ -7,18 +7,28 @@ from lark import Token
 
 # Define the grammar for our simple expression language
 grammar = """
-    expr: sum
+    ?start: expr
 
-    sum: product
+    ?expr: comparison
+
+    ?comparison: sum
+               | sum "==" sum -> eq
+               | sum "!=" sum -> ne
+               | sum "<" sum -> lt
+               | sum ">" sum -> gt
+               | sum "<=" sum -> le
+               | sum ">=" sum -> ge
+
+    ?sum: product
        | sum "+" product -> add
        | sum "-" product -> sub
 
-    product: term
+    ?product: term
            | product "*" term -> mul
            | product "/" term -> div
 
-    term: INTEGER -> number
-        | "-" INTEGER -> negative_number
+    ?term: INTEGER -> number
+         | "-" INTEGER -> negative_number
 
     INTEGER: /[0-9]+/
 
@@ -31,6 +41,10 @@ grammar = """
 class ExpressionTransformer(Transformer):
     def number(self, items: list[Token]) -> int:
         return int(items[0])
+
+    def negative_number(self, items: list[Token]) -> int:
+        # Convert the token to a negative integer
+        return -int(items[0])
 
     def add(self, items: list[int]) -> int:
         return items[0] + items[1]
@@ -47,38 +61,39 @@ class ExpressionTransformer(Transformer):
             raise ZeroDivisionError("Division by zero")
         return items[0] // items[1]  # Using integer division
 
-    def expr(self, items: list[int]) -> int:
-        # Pass through the value from the sum node
-        return items[0]
+    # Comparison operations
+    def eq(self, items: list) -> bool:
+        return items[0] == items[1]
 
-    def sum(self, items: list[int]) -> int:
-        # Pass through the value from its child
-        return items[0]
+    def ne(self, items: list) -> bool:
+        return items[0] != items[1]
 
-    def product(self, items: list[int]) -> int:
-        # Pass through the value from its child
-        return items[0]
+    def lt(self, items: list) -> bool:
+        return items[0] < items[1]
 
-    def negative_number(self, items: list[Token]) -> int:
-        # Convert the token to a negative integer
-        return -int(items[0])
+    def gt(self, items: list) -> bool:
+        return items[0] > items[1]
 
+    def le(self, items: list) -> bool:
+        return items[0] <= items[1]
+
+    def ge(self, items: list) -> bool:
+        return items[0] >= items[1]
 
 # Create the parser
 parser = Lark(grammar, start="expr", parser="lalr")
 
 
 # Function to evaluate expressions
-def evaluate(expression: str) -> int:
+def evaluate(expression: str):
     """
-    Evaluate a simple arithmetic expression with integers, addition, subtraction,
-    multiplication, and division
+    Evaluate an expression with integers, arithmetic operations, and comparisons
 
     Args:
         expression: String containing the expression to evaluate
 
     Returns:
-        Integer result of the evaluation
+        Result of the evaluation (integer or boolean)
     """
     # First try to parse
     try:

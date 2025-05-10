@@ -88,6 +88,66 @@ def complex_expressions(draw):
 
     return expr, expected
 
+# Strategy for generating equality expressions
+@st.composite
+def equality_expressions(draw):
+    """Generate an equality comparison and its expected result"""
+    left = draw(integers_st)
+    right = draw(integers_st)
+    expr = f"{left} == {right}"
+    expected = left == right
+    return expr, expected
+
+# Strategy for generating inequality expressions
+@st.composite
+def inequality_expressions(draw):
+    """Generate an inequality comparison and its expected result"""
+    left = draw(integers_st)
+    right = draw(integers_st)
+    expr = f"{left} != {right}"
+    expected = left != right
+    return expr, expected
+
+# Strategy for generating less than expressions
+@st.composite
+def less_than_expressions(draw):
+    """Generate a less than comparison and its expected result"""
+    left = draw(integers_st)
+    right = draw(integers_st)
+    expr = f"{left} < {right}"
+    expected = left < right
+    return expr, expected
+
+# Strategy for generating greater than expressions
+@st.composite
+def greater_than_expressions(draw):
+    """Generate a greater than comparison and its expected result"""
+    left = draw(integers_st)
+    right = draw(integers_st)
+    expr = f"{left} > {right}"
+    expected = left > right
+    return expr, expected
+
+# Strategy for generating less than or equal expressions
+@st.composite
+def less_equal_expressions(draw):
+    """Generate a less than or equal comparison and its expected result"""
+    left = draw(integers_st)
+    right = draw(integers_st)
+    expr = f"{left} <= {right}"
+    expected = left <= right
+    return expr, expected
+
+# Strategy for generating greater than or equal expressions
+@st.composite
+def greater_equal_expressions(draw):
+    """Generate a greater than or equal comparison and its expected result"""
+    left = draw(integers_st)
+    right = draw(integers_st)
+    expr = f"{left} >= {right}"
+    expected = left >= right
+    return expr, expected
+
 # Strategy for generating various whitespace variations
 @st.composite
 def whitespace_variations(draw):
@@ -96,8 +156,14 @@ def whitespace_variations(draw):
         integer_expressions(),
         addition_expressions(),
         subtraction_expressions(),
-        multiplication_expressions(),  # Added multiplication
-        division_expressions()         # Added division
+        multiplication_expressions(),
+        division_expressions(),
+        equality_expressions(),
+        inequality_expressions(),
+        less_than_expressions(),
+        greater_than_expressions(),
+        less_equal_expressions(),
+        greater_equal_expressions()
     ))
 
     # Create variations with different whitespace
@@ -154,6 +220,42 @@ def test_complex_expressions(expr_tuple):
 @given(whitespace_variations())
 def test_whitespace_handling(expr_tuple):
     """Test that expressions with varied whitespace are handled correctly"""
+    expr, expected = expr_tuple
+    assert evaluate(expr) == expected
+
+@given(equality_expressions())
+def test_equality(expr_tuple):
+    """Test that equality comparisons are evaluated correctly"""
+    expr, expected = expr_tuple
+    assert evaluate(expr) == expected
+
+@given(inequality_expressions())
+def test_inequality(expr_tuple):
+    """Test that inequality comparisons are evaluated correctly"""
+    expr, expected = expr_tuple
+    assert evaluate(expr) == expected
+
+@given(less_than_expressions())
+def test_less_than(expr_tuple):
+    """Test that less than comparisons are evaluated correctly"""
+    expr, expected = expr_tuple
+    assert evaluate(expr) == expected
+
+@given(greater_than_expressions())
+def test_greater_than(expr_tuple):
+    """Test that greater than comparisons are evaluated correctly"""
+    expr, expected = expr_tuple
+    assert evaluate(expr) == expected
+
+@given(less_equal_expressions())
+def test_less_equal(expr_tuple):
+    """Test that less than or equal comparisons are evaluated correctly"""
+    expr, expected = expr_tuple
+    assert evaluate(expr) == expected
+
+@given(greater_equal_expressions())
+def test_greater_equal(expr_tuple):
+    """Test that greater than or equal comparisons are evaluated correctly"""
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
 
