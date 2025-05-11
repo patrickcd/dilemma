@@ -29,6 +29,7 @@ grammar = r"""
                | sum "<=" sum -> le
                | sum ">=" sum -> ge
                | sum "in" sum -> contains
+               | sum "contains" sum -> contained_in
                | sum "is" "past" -> date_is_past
                | sum "is" "future" -> date_is_future
                | sum "is" "today" -> date_is_today
@@ -177,6 +178,11 @@ class ExpressionTransformer(Transformer, DateMethods):
     def contains(self, items: list) -> bool:
         if isinstance(items[0], str) and isinstance(items[1], str):
             return items[0] in items[1]
+        raise TypeError("'in' operator is only supported for strings")
+
+    def contained_in(self, items: list) -> bool:
+        if isinstance(items[0], str) and isinstance(items[1], str):
+            return items[1] in items[0]
         raise TypeError("'in' operator is only supported for strings")
 
 
