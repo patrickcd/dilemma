@@ -60,6 +60,7 @@ grammar = r"""
          | "true" -> true_value
          | "false" -> false_value
          | VARIABLE -> variable
+         | JQ_EXPR -> jq_expression
          | "(" expr ")" -> paren
 
     // Define reserved keywords
@@ -69,6 +70,9 @@ grammar = r"""
     // Leading forward slash in paths is optional, e.g. both "user/name" and "/user/name" work
     VARIABLE: /(?!or\b|and\b|True\b|False\b|false\b|true\b)(([a-zA-Z][a-zA-Z0-9_]*)(\/[a-zA-Z0-9_]+)*|(\/[a-zA-Z0-9_]+)+)/
 
+    // JQ expression syntax: <expression> - must be matched as a single token
+    // Define this before the STRING token to give it higher precedence
+    JQ_EXPR: /\<[^>]*\>/
 
     INTEGER: /[0-9]+/
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i
@@ -218,6 +222,23 @@ class ExpressionTransformer(Transformer, DateMethods):
             raise TypeError(
                 "'contains' operator requires a collection (string, list, dict) as the left operand"
             )
+
+    def jq_expression(self, items: list[Token]) -> int | float | bool | str | list | dict | datetime:
+        """Process a raw JQ expression to access data in the variables"""
+        # Extract the JQ expression from the token: <expression> -> expression
+        jq_expr = items[0].value[1:-1]  # Remove < prefix and > suffix
+
+        # Import here to avoid circular imports
+        from dilemma.lookup import evaluate_jq_expression
+
+        # Evaluate the JQ expression against the processed JSON
+        value = evaluate_jq_expression(jq_expr, self.processed_json)
+
+        # Handle datetime reconstruction
+        if isinstance(value, dict) and "__datetime__" in value:
+            return datetime.fromisoformat(value["__datetime__"])
+
+        return value
 
 
 # Thread-local storage for the parser

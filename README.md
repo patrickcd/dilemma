@@ -54,16 +54,32 @@ is_adult = evaluate("user.profile.age >= settings.min_age", variables)  # Return
 
 Dilemma uses a powerful path lookup system based on [JQ](https://stedolan.github.io/jq/) to access nested data within variables. This allows you to:
 
-- Navigate deeply nested structures with dot notation (`user.profile.preferences.theme`)
-- Access elements in arrays using index notation (`items[0]`, `users[2].name`)
-- Use JQ-compatible path expressions for powerful data access
+- Navigate deeply nested structures with slash notation (`user/profile/preferences/theme`)
+- Access elements in arrays using numeric indices in the path (`users/0/name`)
+- Leading forward slash is optional (both `user/name` and `/user/name` work)
 
-The path resolution works by converting your dot notation paths into JQ expressions and executing them against the variable context. This provides several benefits:
+#### Advanced: Direct JQ Expressions
 
-- Robust handling of missing values and null checks
-- Consistent behavior across different data structures (dicts, lists)
-- Efficient lookup of deeply nested values
-- Familiar syntax for developers used to JavaScript/Python object access
+For advanced users who need more powerful data access patterns, Dilemma supports direct JQ expressions using angle brackets `< ... >`:
+
+```python
+# Basic JQ expression to access array elements
+evaluate('<.users[0].name> == "Alice"', variables)
+
+# Complex JQ filtering and transformation
+evaluate('<.users[] | select(.roles | contains(["admin"]))[].name> == "Alice"', variables)
+
+# Combine with regular Dilemma expressions
+evaluate('<.users | length> > 2 and settings/active == true', variables)
+```
+
+This provides full access to JQ's powerful features:
+- Array filtering and iteration
+- Object transformation
+- Mathematical operations
+- Conditionals and complex selections
+
+The angle bracket syntax offers an escape hatch for complex data access patterns while still benefiting from Dilemma's expression evaluation environment.
 
 #### Supported Operations
 
