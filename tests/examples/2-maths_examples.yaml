@@ -31,7 +31,7 @@
 - name: variable_references
   category: maths
   description: "Use variables in expressions"
-  expression: "banana/price * order/quantity"
+  expression: "banana.price * order.quantity"
   expected: 16
   context:
     banana:

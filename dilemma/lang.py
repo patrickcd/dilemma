@@ -69,10 +69,6 @@ grammar = r"""
 
     VARIABLE: /(?!or\b|and\b|True\b|False\b|false\b|true)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
 
-    // JQ expression syntax: <expression> - must be matched as a single token
-    // Define this before the STRING token to give it higher precedence
-    JQ_EXPR: /\<[^>]*\>/
-
     // JQ expression syntax: `expression` - must be matched as a single token
     // Define this before the STRING token to give it higher precedence
     JQ_EXPR: /`[^`]*`/

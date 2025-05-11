@@ -8,7 +8,6 @@ from dilemma.lookup import lookup_variable
 import jq
 
 
-# --- Tests to cover missing branches in dilemma/lang.py ---
 
 def test_lang_paren_expression():
     """
@@ -28,7 +27,6 @@ def test_lang_nested_arithmetic():
     expected = ((10 - 3) * 2) + 5
     assert result == expected
 
-# --- Tests to cover missing branches in dilemma/lookup.py ---
 
 def test_evaluate_returns_datetime():
     """

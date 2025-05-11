@@ -226,7 +226,7 @@ def test_compiled_expression_with_path_variables():
     from dilemma.lang import compile
 
     # Compile an expression with paths
-    expr = compile("project/status == 'active' and project/team/size >= 3")
+    expr = compile("project.status == 'active' and project.team.size >= 3")
 
     # Test with different variable contexts
     variables1 = {
@@ -305,7 +305,7 @@ def test_jq_expressions():
         ('`.users[1].roles` contains "admin" or `.settings.features.beta`', False),
 
         # Mixed with regular variable paths
-        ('users/0/name == `.users[0].name`', True),
+        ('users[0].name == `.users[0].name`', True),
     ]
 
     for expr, expected in expressions:

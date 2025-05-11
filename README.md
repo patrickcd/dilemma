@@ -5,12 +5,12 @@ A friendly yet powerful expression evaluation engine  for Python applications.
 ## Features
 
 - Secure evaluation of mathematical and logical expressions
-- Support for variables with path notation for nested structure (e.g., `user/profile/settings/enabled`)
+- Support for variables with nested structure (e.g., `user.profile.settings.enabled`)
 - Rich comparison operations with proper handling of floating-point values
 - Logical operations (`and`, `or`) for boolean expressions
 - Performance optimization strategies for repeated evaluations
 
-```
+```javascript
 # It's 22:15
 
 {
@@ -72,11 +72,11 @@ is_adult = evaluate("user.profile.age >= settings.min_age", variables)  # Return
 
 ### Paths
 
-Dilemma uses a powerful path lookup system based on [JQ](https://stedolan.github.io/jq/) to access nested data within variables. This allows you to:
+Dilemma uses a powerful path lookup system based on [JQ](https://stedolan.github.io/jq/) to access
+nested data within variables. This allows you to:
 
-- Navigate deeply nested structures with slash notation (`user/profile/preferences/theme`)
-- Access elements in arrays using numeric indices in the path (`users/0/name`)
-- Leading forward slash is optional (both `user/name` and `/user/name` work)
+- Navigate deeply nested structures with slash notation (`user.profile.preferences.theme`)
+- Access elements in arrays using numeric indices in the path (`users[0].name`)
 
 #### Advanced: Direct JQ Expressions
 
@@ -90,7 +90,7 @@ evaluate('`.users[0].name` == "Alice"', variables)
 evaluate('`.users[] | select(.roles | contains(["admin"]))[].name` == "Alice"', variables)
 
 # Combine with regular Dilemma expressions
-evaluate('`.users | length` > 2 and settings/active == true', variables)
+evaluate('`.users | length` > 2 and settings.active == true', variables)
 ```
 
 This provides full access to JQ's powerful features:
@@ -99,7 +99,8 @@ This provides full access to JQ's powerful features:
 - Mathematical operations
 - Conditionals and complex selections
 
-The angle bracket syntax offers an escape hatch for complex data access patterns while still benefiting from Dilemma's expression evaluation environment.
+The angle bracket syntax offers an escape hatch for complex data access patterns while still benefiting from
+Dilemma's expression evaluation environment.
 
 #### Supported Operations
 
@@ -142,16 +143,16 @@ Examples:
 
 ```python
 # Check if account has expired
-evaluate("user/subscription/end_date is past", context)
+evaluate("user.subscription.end_date is past", context)
 
 # Check for recent activity - leading forward slash is optional
-evaluate("/user/last_login within 24 hours", context)
+evaluate("user.last_login within 24 hours", context)
 
 # Check if a date range contains today
 evaluate("start_date before today and end_date after today", context)
 
 # Check account age
-evaluate("user/created_at older than 1 year", context)
+evaluate("user.created_at older than 1 year", context)
 ```
 
 ### Optimization Details
@@ -169,14 +170,14 @@ For the best performance when evaluating the same expression multiple times with
 from dilemma.lang import compile
 
 # Compile the expression once (parse tree is created and stored)
-age_check = compile("user/age >= 18")
+age_check = compile("user.age >= 18")
 
 # Evaluate with different variable contexts
 result1 = age_check.evaluate({"user": {"age": 25}})  # Returns True
 result2 = age_check.evaluate({"user": {"age": 16}})  # Returns False
 
 # Works with complex expressions and nested paths
-eligibility = compile("user/account/is_active and (user/subscription/level == 'premium' or user/account/credits > 100)")
+eligibility = compile("user.account.is_active and (user.subscription.level == 'premium' or user.account.credits > 100)")
 
 # Apply to different users
 user1_eligible = eligibility.evaluate(user1_data)

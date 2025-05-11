@@ -58,7 +58,7 @@
 - name: jq_with_regular_expression
   category: jq_mixed
   description: "Combine JQ with regular Dilemma expressions"
-  expression: "`.user.membership.level` == 'gold' and /user/account/active == true"
+  expression: "`.user.membership.level` == 'gold' and user.account.active == true"
   expected: true
   context:
     user:

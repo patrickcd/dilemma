@@ -67,7 +67,7 @@ def gendocs(output):
         if not yaml_files:
             click.echo("No YAML files found in the examples directory", err=True)
             raise click.Abort()
-        print(list(sorted(yaml_files, key=lambda x: x.stem)))
+
         for yaml_file in sorted(yaml_files, key=lambda x: x.stem):
             with open(yaml_file, 'r') as f:
                 examples = yaml.safe_load(f)
