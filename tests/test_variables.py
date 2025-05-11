@@ -1,6 +1,97 @@
+from datetime import datetime, timezone, timedelta
+
 import pytest
 from hypothesis import given, strategies as st
+
 from dilemma.lang import evaluate
+from dilemma.lookup import lookup_variable
+import jq
+
+
+# --- Tests to cover missing branches in dilemma/lang.py ---
+
+def test_lang_paren_expression():
+    """
+    Test parenthesized expressions to exercise the grammar's paren rule.
+    (Covers missing lines in lang.py, e.g. handling of "( expr )")
+    """
+    # Simple arithmetic expression in parentheses
+    result = evaluate("(2 + 3) * 4", {})
+    assert result == 20
+
+def test_lang_nested_arithmetic():
+    """
+    Test a complex nested arithmetic expression that uses multiple grammar branches.
+    """
+    # This forces use of the addition, subtraction, multiplication, and paren rules.
+    result = evaluate("((10 - 3) * 2) + 5", {})
+    expected = ((10 - 3) * 2) + 5
+    assert result == expected
+
+# --- Tests to cover missing branches in dilemma/lookup.py ---
+
+def test_lookup_returns_datetime():
+    """
+    Test that lookup_variable reconstructs datetime objects correctly.
+    This ensures the __datetime__ branch is covered.
+    """
+    dt = datetime(2025, 5, 11, 14, 30, tzinfo=timezone.utc)
+    context = {"event": dt}
+    result = lookup_variable(context, "event")
+    assert isinstance(result, datetime)
+    # Compare ISO strings to account for potential microsecond differences.
+    assert result.isoformat() == dt.isoformat()
+
+def test_lookup_error_nonexistent_path():
+    """
+    Test that lookup_variable raises a NameError when the requested path does not exist.
+    Covers branch where jq returns an empty result.
+    """
+    context = {"a": {"b": 123}}
+    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
+        lookup_variable(context, "a.x")
+
+
+def test_lookup_null_result_for_key():
+    """
+    Test that lookup_variable raises NameError when the JSON conversion
+    of a defined key produces a null result.
+    In this case, context contains a key with a value of None.
+    """
+    context = {"a": {"x": None}}
+    # "a.x" is defined in Python, but json.dumps will convert None to null,
+    # causing jq to return [None] and thus triggering the error branch.
+    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
+        lookup_variable(context, "a.x")
+
+
+
+def test_lookup_top_level_variable():
+    """
+    Test the optimization for top-level variables in lookup_variable.
+    Covers line 21: `if "." not in path and path in obj:`.
+    """
+    context = {"a": 42}
+    result = lookup_variable(context, "a")
+    assert result == 42
+
+def test_lookup_top_level_variable_no_dot():
+    """
+    Test the optimization for top-level variables in lookup_variable.
+    Covers line 21: `if "." not in path and path in obj:`.
+    """
+    context = {"simple_key": "simple_value"}
+    result = lookup_variable(context, "simple_key")
+    assert result == "simple_value"
+
+def test_lookup_null_result():
+    """
+    Test that lookup_variable returns None when the value in the context is None.
+    """
+    context = {"a": None}
+    result = lookup_variable(context, "a")
+    assert result is None
+
 
 # Strategy for generating valid variable names (alphanumeric, starting with
 # a letter or underscore)
@@ -128,3 +219,4 @@ def test_evaluate_undefined_variable_with_valid_name(var_name):
     # because variable_names_st already excludes them.
     with pytest.raises(NameError, match=f"Variable '{var_name}' is not defined."):
         evaluate(var_name, {})
+

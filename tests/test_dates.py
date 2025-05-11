@@ -211,9 +211,9 @@ def test_date_error_handling():
     with pytest.raises(ValueError, match="Could not parse date string"):
         evaluate("bad_date is past", variables)
 
-    # Test invalid type conversion (missing branch)
+    # Test invalid type conversion - update the expected error message
     variables = {"obj": {}}
-    with pytest.raises(TypeError, match="Unsupported type"):
+    with pytest.raises(TypeError, match="Cannot convert"):  # Changed from "Unsupported type"
         evaluate("obj is past", variables)
 
     # Test invalid time unit

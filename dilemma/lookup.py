@@ -1,140 +1,58 @@
 """
 This module provides functions to perform attribute and item lookups on objects
-and mappings, including nested lookups using dot-separated paths.
+and mappings, using jq for powerful path resolution.
 It also includes a function to compile getters for optimized access paths.
 """
 
+import jq
 import json
 from datetime import datetime
 
-# These types are acceptable as variable values passed
-#  in as context to an expression's evaluation
-SUPPORTED_TYPES = (int, float, bool, str, datetime)
+# These types are acceptable as variable values
+# Updated to include dict and list, which are valid JSON types.
+SUPPORTED_TYPES = (int, float, bool, str, datetime, dict, list)
 
-def nested_getattr(obj, attr) -> int | float | bool:
+# Custom JSON encoder for datetime objects
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        return {"__datetime__": obj.isoformat()}
+
+def lookup_variable(obj, path) -> int | float | bool | str | datetime | dict | list:
     """
+    Look up a variable in a context using a dot-separated path via jq.
+
     Given:
-      - obj: an object or mapping
-      - attr: a dot-separated path, e.g. "things.that.inspire"
+      - obj: the context object (typically a dictionary)
+      - path: a dot-separated path, e.g. "user.profile.age"
     Returns:
-      - the value at that path, or raises an AttributeError if it doesn't exist.
+      - the value at that path, or raises a NameError if it doesn't exist or is invalid.
     """
-    segments = attr.split(".")
-    for i, name in enumerate(segments):
-        # If this is not the last segment, check if obj is a container
-        if i < len(segments) - 1:
-            # For non-final segments, check if obj can contain other objects
-            if not isinstance(obj, (dict, object)) or isinstance(obj, (int, float, bool)):
-                msg = f"Segment '{name}' refers to a non-container: {obj!r}"
-                raise AttributeError(msg)
+    # Handle top-level variables directly for optimization
+    if "." not in path:
+        if path in obj:
+            return obj[path]
+        raise NameError(f"Variable '{path}' is not defined or path cannot be resolved.")
 
-        try:
-            # Prioritize dict keys for lookup
-            if isinstance(obj, dict) and name in obj:
-                obj = obj[name]  # Prioritize dict keys
-            else:
-                obj = getattr(obj, name)
-        except AttributeError:
-            try:
-                # Check if the object is subscriptable before attempting item access
-                if not hasattr(obj, "__getitem__"):
-                    raise AttributeError(
-                        f"Cannot resolve segment '{name}' on {obj!r} - not subscriptable"
-                    )
-                obj = obj[name]  # type: ignore[assignment]
-            except (KeyError, TypeError):
-                raise AttributeError(
-                    f"Cannot resolve segment '{name}' on {obj!r}"
-                ) from None
-
-    # Validate the type of the final value
-    validate_supported_type(obj)
-
-    return obj
-
-
-def validate_supported_type(value) -> None:
-    """Check if value is of supported type"""
-    if not isinstance(value, SUPPORTED_TYPES):
-        raise TypeError(f"Unsupported type: {type(value).__name__}")
-
-
-def compile_getter(ref, sample_context_json):
-    """
-    Given:
-      - ref: a dot-separated path, e.g. "things.that.inspire"
-      - sample_context_json: a JSON string representing the structure of the data
-        that will be passed to the getter function
-
-    Returns:
-      - a function getter(context) that performs the chain of attribute/item lookups
-
-    Using JSON for sample data ensures we don't execute property getters
-    with side effects.
-    """
-    # Security check: don't allow segments with double underscores at beginning or end
-    segments = ref.split(".")
-    for segment in segments:
-        if segment.startswith("__") or segment.endswith("__"):
-            raise ValueError(
-                "Security restriction: double underscores not allowed at"
-                f" beginning or end of path segments: '{segment}'"
-            )
-
-    # Parse the JSON string to get a safe sample context
-    try:
-        sample_context = json.loads(sample_context_json)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON in sample_context_json: {e}")
-
-    segments = ref.split(".")
-    ops = []  # each entry will be ('attr', name) or ('item', name)
-    cursor = sample_context
-
-    # Figure out, at compile time, which lookup works for each segment
-    for name in segments:
-        # For JSON objects (dicts), use item lookup
-        if isinstance(cursor, dict):
-            if name in cursor:
-                ops.append(("item", name))
-                cursor = cursor[name]
-            else:
-                raise ValueError(f"Key '{name}' not found in dictionary at this path")
-        # For JSON objects that might be accessed via attributes in Python
-        else:
-            # Default to attribute access for compatibility with Python objects
-            ops.append(("attr", name))
-            # Since we're working with JSON data, we can't actually resolve further
-            # Just assume the rest will be available at runtime
-            break
-
-    # Build a literal expression like context.things['that'].inspire
-    expr = "context"
-    for kind, name in ops:
-        if kind == "attr":
-            expr += f".{name}"
-        else:
-            expr += f"[{name!r}]"
-
-    # Wrap it in a lambda that takes a context parameter
-    src = f"lambda context: {expr}"
+    # Convert to jq path
+    jq_path = "." + path
 
     try:
-        # SECURITY NOTE: This use of eval is considered safe because:
-        # 1. The source code (src) is generated entirely within this function and is not
-        #     influenced by external input
-        # 2. We're only creating simple attribute/item access expressions
-        #    like "lambda context: context['a']['b']"
-        # 3. The eval is executed with empty globals, restricting access to
-        #    Python's built-in functions
-        # 4. The result is a pure function with no side effects beyond the intended lookup
-        # 5. Double underscores are not allowed in the path segments, preventing
-        #    access to special methods or attributes
-        #
-        # Bandit or other security scanners may flag this, but it's a false positive
-        # in this specific case.
-        getter = eval(src, {})  # use empty globals
-    except Exception as e:
-        raise ValueError(f"Failed to compile {src!r}: {e}")
+        # Convert object to JSON-compatible structure
+        json_obj = json.loads(json.dumps(obj, cls=DateTimeEncoder))
+        # Execute jq query
+        results = jq.compile(jq_path).input(json_obj).all()
 
-    return getter
+        # Handle missing or null results
+        if not results or results[0] is None:
+            raise NameError(f"Variable '{path}' is not defined or path cannot be resolved.")
+
+        result = results[0]
+
+        # Handle datetime reconstruction
+        if isinstance(result, dict) and "__datetime__" in result:
+            return datetime.fromisoformat(result["__datetime__"])
+
+        return result
+    except Exception:
+        # Treat all errors as NameError for consistency
+        raise NameError(f"Variable '{path}' is not defined or path cannot be resolved.")

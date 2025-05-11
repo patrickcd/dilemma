@@ -2,11 +2,12 @@
 Expression language implementation using Lark
 """
 import threading
+from datetime import datetime
 
 from lark import Lark, Transformer, exceptions as lark_exceptions
 from lark import Token
 
-from dilemma.lookup import nested_getattr, validate_supported_type
+from dilemma.lookup import lookup_variable
 from dilemma.dates import DateMethods
 # ruff: noqa: E501
 grammar = r"""
@@ -110,14 +111,9 @@ class ExpressionTransformer(Transformer, DateMethods):
     def false_value(self, _) -> bool:
         return False
 
-    def variable(self, items: list[Token]) -> int | float | bool | str:
+    def variable(self, items: list[Token]) -> int | float | bool | str| list | dict | datetime:
         var_path = items[0].value
-        try:
-            # nested_getattr already validates the type
-            return nested_getattr(self.variables, var_path)
-        except AttributeError:
-            msg = f"Variable '{var_path}' is not defined or path cannot be resolved. Available variables: {list(self.variables.keys())}"
-            raise NameError(msg)
+        return lookup_variable(self.variables, var_path)
 
     def add(self, items: list) -> float:
         return items[0] + items[1]
@@ -222,8 +218,6 @@ def evaluate(expression: str, variables: dict | None = None) -> int | float | bo
     try:
         transformer = ExpressionTransformer(variables=variables)
         result = transformer.transform(tree)
-        # Final validation to ensure result is of supported type
-        validate_supported_type(result)
         return result
     except lark_exceptions.VisitError as e:
         # Check if the underlying error is a ZeroDivisionError, NameError, or TypeError

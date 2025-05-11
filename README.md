@@ -48,51 +48,6 @@ variables = {
 is_adult = evaluate("user.profile.age >= settings.min_age", variables)  # Returns True
 ```
 
-## Optimized Usage
-
-For expressions that are evaluated repeatedly, you can create an optimized evaluator to gain significant performance benefits:
-
-```python
-import json
-from dilemma.compiled import create_optimized_evaluator
-
-# Define a sample JSON structure
-sample_json = json.dumps({
-    "user": {
-        "profile": {
-            "age": 25
-        }
-    },
-    "settings": {
-        "min_age": 18
-    }
-})
-
-# Create an optimized evaluator
-expr = "user.profile.age >= settings.min_age"
-optimized_eval = create_optimized_evaluator(expr, sample_json)
-
-# Use for repeated evaluations with different data
-for user_data in users:
-    if optimized_eval(user_data):
-        # Process adult users
-        pass
-```
-
-## Performance
-
-Dilemma provides impressive performance for expression evaluation. Our benchmarks show:
-
-| Evaluation Method | Time (1000 evaluations) | Relative Speed |
-|-------------------|-------------------------|----------------|
-| Direct evaluation | 0.120462s               | 1x             |
-| Pre-parsed        | 0.028149s               | 4.28x faster   |
-| Fully optimized   | 0.016621s               | 7.25x faster   |
-
-These benchmarks were run using an expression with multiple variable references:
-```
-a.x + a.y + a.z + b.x + b.y + b.z
-```
 
 ## Optimization Details
 
