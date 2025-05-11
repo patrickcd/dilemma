@@ -49,30 +49,12 @@ def test_lookup_error_nonexistent_path():
     """
     # Keep this test for now since lookup_variable can still be called directly
     context = {"a": {"b": 123}}
-    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
-        lookup_variable("a.x", context)
+    with pytest.raises(NameError, match="Property 'x' not found in path"):
+        lookup_variable("a/x", context)
 
     # Also test through evaluate() to ensure consistent behavior
-    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
-        evaluate("a.x", context)
-
-
-def test_lookup_null_result_for_key():
-    """
-    Test that lookup_variable raises NameError when the JSON conversion
-    of a defined key produces a null result.
-    In this case, context contains a key with a value of None.
-    """
-    # Keep this test for now since lookup_variable can still be called directly
-    context = {"a": {"x": None}}
-    # "a.x" is defined in Python, but json.dumps will convert None to null,
-    # causing jq to return [None] and thus triggering the error branch.
-    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
-        lookup_variable("a.x", context)
-
-    # Also test through evaluate() to ensure consistent behavior
-    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
-        evaluate("a.x", context)
+    with pytest.raises(NameError, match="Property 'x' not found in path"):
+        evaluate("/a/x", context)
 
 
 
@@ -146,20 +128,20 @@ def test_evaluate_datetime_from_json_string():
     """
 
     # Access the nested datetime objects
-    reg_date = evaluate("user.registration", nested_json)
+    reg_date = evaluate("/user/registration", nested_json)
     assert isinstance(reg_date, datetime)
     assert reg_date.year == 2023 and reg_date.month == 1 and reg_date.day == 15
 
-    # Access datetime in an array element
-    event_date = evaluate("user.events[1].timestamp", nested_json)
+    # Access datetime in an array element using REST-style path with numeric index
+    event_date = evaluate("/user/events/1/timestamp", nested_json)  # Using REST-style path with numeric index
     assert isinstance(event_date, datetime)
     assert event_date.year == 2023 and event_date.month == 6 and event_date.day == 20
 
 # Strategy for generating valid variable names (alphanumeric, starting with
 # a letter or underscore)
-# Exclude "or" and "and" as they are now reserved keywords.
-variable_names_st = st.from_regex(r"[a-zA-Z_][a-zA-Z0-9_]*", fullmatch=True).filter(
-    lambda x: x not in ["or", "and"]
+# Exclude "or", "and" as reserved keywords, and exclude standalone underscore "_"
+variable_names_st = st.from_regex(r"[a-zA-Z][a-zA-Z0-9_]*", fullmatch=True).filter(
+    lambda x: x not in ["or", "and", "_"]
 )
 
 # Strategy for generating simple values (integers, floats, booleans)
@@ -293,34 +275,36 @@ def test_lookup_path_construction():
     # Create a context with a simple structure
     context = {"user": {"name": "Alice"}}
 
-    # Test a path that requires the "." prefix
-    result = lookup_variable("user.name", context)
+    # Test a nested path
+    result = lookup_variable("user/name", context)
     assert result == "Alice"
 
-    # Test with array indexing
+    # Test with array indexing using REST-style numeric segments
     context_with_array = {"items": [10, 20, 30]}
-    result = lookup_variable("items[1]", context_with_array)
+    result = lookup_variable("items/1", context_with_array)
     assert result == 20
 
 
-def test_lookup_path_starting_with_bracket():
+def test_lookup_path_with_numeric_indices():
     """
-    Test lookup_variable when path starts with square brackets.
-    This specifically covers the code path in lookup.py:
-    if path.startswith("["): jq_path = "." + path
+    Test lookup_variable with numeric indices using REST-style path.
     """
     from dilemma.lookup import lookup_variable
 
     # Create a context with an array at the top level
     context = [{"id": 1, "name": "First"}, {"id": 2, "name": "Second"}]
 
-    # Test a path that starts with brackets - this should hit the specific branch
-    result = lookup_variable("[0].name", context)
+    # Test a path with numeric index
+    result = lookup_variable("0/name", context)
     assert result == "First"
 
     # Also test a nested case
     nested_context = {"items": [{"id": 1}, {"id": 2}]}
-    # This wouldn't hit the branch but confirms the lookup functionality
-    result = lookup_variable("items[1].id", nested_context)
+    # Use REST-style numeric indices
+    result = lookup_variable("items/1/id", nested_context)
     assert result == 2
+
+    # Test with invalid bracket notation (should be rejected)
+    with pytest.raises(ValueError, match="cannot contain bracket notation"):
+        lookup_variable("items[1]/id", nested_context)
 

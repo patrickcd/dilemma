@@ -3,7 +3,7 @@
 - name: list_basic_membership
   category: list_operations
   description: "Check if an element exists in a list using 'in'"
-  expression: "'admin' in user.roles"
+  expression: "'admin' in /user/roles"
   expected: true
   context:
     user:
@@ -30,7 +30,7 @@
 - name: list_membership_missing_element
   category: list_operations
   description: "Check behavior when element is not in list"
-  expression: "'superadmin' in user.roles"
+  expression: "'superadmin' in /user/roles"
   expected: false
   context:
     user:
@@ -39,7 +39,7 @@
 - name: dict_key_membership
   category: dict_operations
   description: "Check if a key exists in a dictionary"
-  expression: "'address' in user.profile"
+  expression: "'address' in /user/profile"
   expected: true
   context:
     user:
@@ -76,7 +76,7 @@
 - name: nested_list_in_dict
   category: mixed_collections
   description: "Check membership in a list nested within a dictionary"
-  expression: "'python' in user.skills.programming"
+  expression: "'python' in /user/skills/programming"
   expected: true
   context:
     user:
@@ -88,7 +88,7 @@
 - name: combined_collection_operations
   category: mixed_collections
   description: "Combine collection operators with other logical operators"
-  expression: "'admin' in user.roles and user.settings contains 'notifications' and user.settings.notifications"
+  expression: "'admin' in /user/roles and /user/settings contains 'notifications' and /user/settings/notifications"
   expected: true
   context:
     user:
@@ -101,7 +101,7 @@
 - name: list_equality_comparison
   category: collection_equality
   description: "Compare two lists for equality"
-  expression: "user.permissions == required_permissions"
+  expression: "/user/permissions == required_permissions"
   expected: true
   context:
     user:
@@ -111,7 +111,7 @@
 - name: dict_equality_comparison
   category: collection_equality
   description: "Compare two dictionaries for equality"
-  expression: "user.preferences == default_preferences"
+  expression: "/user/preferences == default_preferences"
   expected: false
   context:
     user:
@@ -125,7 +125,7 @@
 - name: membership_with_composite_expression
   category: complex_scenarios
   description: "Use membership test with a composite condition"
-  expression: "(user.role in admin_roles) or (user.domain in approved_domains and user.verified)"
+  expression: "(/user/role in admin_roles) or (/user/domain in approved_domains and /user/verified)"
   expected: true
   context:
     user:
@@ -139,7 +139,7 @@
 - name: array_indexing_lookup
   category: path_syntax
   description: "Look up elements in arrays using indexing"
-  expression: "teams[0].name == 'Frontend'"
+  expression: "/teams/0/name == 'Frontend'"
   expected: true
   context:
     teams:
@@ -151,7 +151,7 @@
 - name: nested_array_lookups
   category: path_syntax
   description: "Use nested array indexing in paths"
-  expression: "departments[0].teams[1].name == 'Backend'"
+  expression: "/departments/0/teams/1/name == 'Backend'"
   expected: true
   context:
     departments:
@@ -169,7 +169,7 @@
 - name: array_element_property_test
   category: path_syntax
   description: "Test property of an element accessed through indexing"
-  expression: "users[1].role == 'admin' and users[1].verified"
+  expression: "/users/1/role == 'admin' and /users/1/verified"
   expected: true
   context:
     users:
@@ -183,7 +183,7 @@
 - name: array_lookup_with_membership
   category: path_syntax
   description: "Combine array indexing with membership test"
-  expression: "'testing' in projects[0].tags and projects[1].status == 'completed'"
+  expression: "'testing' in /projects/0/tags and /projects/1/status == 'completed'"
   expected: true
   context:
     projects:
@@ -197,7 +197,7 @@
 - name: combined_lookup_expression
   category: complex_path_operations
   description: "Complex expression combining array lookups with object properties"
-  expression: "organization.departments[0].teams[0].members[1] == 'Bob' and organization.departments[1].teams[0].members[0] == 'Eve'"
+  expression: "/organization/departments/0/teams/0/members/1 == 'Bob' and /organization/departments/1/teams/0/members/0 == 'Eve'"
   expected: true
   context:
     organization:

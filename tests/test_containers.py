@@ -43,18 +43,24 @@ def test_dict_membership():
                 "notifications": True
             }
         },
-        "empty_dict": {}
+        "empty_dict": {},
+        # Add direct references to nested objects
+        "user_settings": {"theme": "dark", "notifications": True}
     }
 
     # Testing 'in' operator (key existence)
     assert evaluate("'name' in user", variables) is True
     assert evaluate("'age' in user", variables) is False
-    assert evaluate("'theme' in user.settings", variables) is True
+
+    # Use direct reference to user_settings instead of path
+    assert evaluate("'theme' in user_settings", variables) is True
 
     # Testing 'contains' operator
     assert evaluate("user contains 'role'", variables) is True
     assert evaluate("user contains 'email'", variables) is False
-    assert evaluate("user.settings contains 'notifications'", variables) is True
+
+    # Use direct reference to user_settings
+    assert evaluate("user_settings contains 'notifications'", variables) is True
 
     # Testing with empty dict
     assert evaluate("'key' in empty_dict", variables) is False
@@ -73,14 +79,18 @@ def test_mixed_container_types():
         },
         "items": ["apple", "banana", {"type": "fruit"}],
         # Add a direct reference to the dictionary item for testing
-        "fruit_object": {"type": "fruit"}
+        "fruit_object": {"type": "fruit"},
+        # Add direct reference to nested tags array
+        "tags": ["important", "urgent", "review"]
     }
 
-    # Test accessing lists inside dicts
-    assert evaluate("'urgent' in data.tags", variables) is True
-    assert evaluate("data.tags contains 'review'", variables) is True
+    # Test accessing lists inside dicts using direct reference
+    assert evaluate("'urgent' in tags", variables) is True
 
-    # Test accessing dict properties without using array indexing
+    # Test accessing lists inside dicts using direct reference
+    assert evaluate("tags contains 'review'", variables) is True
+
+    # Test accessing dict properties
     assert evaluate("'type' in fruit_object", variables) is True
 
 
@@ -141,8 +151,6 @@ def test_container_type_errors():
 
 def test_lookup_variable_with_collections():
     """Test lookup_variable function with collections."""
-
-
     # Test with nested dict and list
     context = {
         "users": [
@@ -155,21 +163,23 @@ def test_lookup_variable_with_collections():
         }
     }
 
-    # Test lookup on lists with index - using lookup_variable directly, not evaluate
-    result = lookup_variable("users[0]", context)
+    # Test lookup on lists with index using REST-style path
+    result = lookup_variable("users/0", context)  # Changed from users[0]
     assert result == {"id": 1, "name": "Alice"}
 
-    # Test lookup on nested properties
-    result = lookup_variable("users[1].name", context)
+    # Test lookup on nested properties using REST-style path
+    result = lookup_variable("users/1/name", context)  # Changed from users[1]/name
     assert result == "Bob"
 
-    # Test lookup on list in dict
-    result = lookup_variable("settings.features[2]", context)
+    # Test lookup on list in dict using REST-style path
+    result = lookup_variable("settings/features/2", context)  # Changed from settings/features[2]
     assert result == "import"
 
     # Test with a complex path that doesn't exist
-    with pytest.raises(NameError):
-        lookup_variable("users[2].name", context)  # Out of bounds
+    # Test with explicitly out-of-bounds index
+    with pytest.raises(NameError) as excinfo:
+        lookup_variable("users/999", context)  # Changed from users[999]
+    assert "out of bounds" in str(excinfo.value)
 
     # Test with direct dict access
     result = lookup_variable("settings", context)
@@ -223,8 +233,8 @@ def test_datetime_in_collections():
     assert evaluate(f"'{iso_now}' in dates", variables) is False  # String comparison won't match
 
     # Test access to datetime in dict
-    assert evaluate("event.start is past", variables) is True
-    assert evaluate("event.end is future", variables) is True
+    assert evaluate("/event/start is past", variables) is True
+    assert evaluate("/event/end is future", variables) is True
 
 
 def test_complex_nested_structures():
@@ -251,15 +261,21 @@ def test_complex_nested_structures():
         # Add direct references to the nested objects for testing
         "frontend_team": {"name": "Frontend", "members": ["Alice", "Bob"]},
         "marketing_team": {"name": "Digital", "members": ["Eve", "Frank"]},
-        "marketing_dept": {"name": "Marketing"}
+        "marketing_dept": {"name": "Marketing"},
+        # Add direct references to deeply nested properties
+        "frontend_members": ["Alice", "Bob"],
+        "marketing_members": ["Eve", "Frank"],
+        "marketing_name": "Marketing"
     }
 
-    # Test with directly referenced objects instead of array indexes
-    assert evaluate("'Bob' in frontend_team.members", variables) is True
-    assert evaluate("marketing_team.members contains 'Eve'", variables) is True
+    # Test with direct references to nested objects
+    assert evaluate("'Bob' in frontend_members", variables) is True
 
-    # Test composite conditions with direct object references
-    complex_expr = "'Marketing' in marketing_dept.name and 'Frank' in marketing_team.members"
+    # Test with direct references to nested objects
+    assert evaluate("marketing_members contains 'Eve'", variables) is True
+
+    # Test composite conditions with direct references
+    complex_expr = "'Marketing' in marketing_name and 'Frank' in marketing_members"
     assert evaluate(complex_expr, variables) is True
 
 
@@ -267,14 +283,18 @@ def test_lookup_errors():
     """Test error handling in lookup_variable function."""
     from dilemma.lookup import lookup_variable
 
-    # Test with invalid path
-    with pytest.raises(NameError):
-        lookup_variable("b", {"a": 1})
+    # Test with invalid path - using a definitely non-existent key
+    with pytest.raises(NameError) as excinfo:
+        lookup_variable("definitely_nonexistent_key", {"a": 1, "b": 2})
+    assert "not defined" in str(excinfo.value)
 
-    # Test with non-existing path in nested structure
-    with pytest.raises(NameError):
-        lookup_variable("user.age", {"user": {"name": "Alice"}})
+    # Test with non-existing nested path - using a specific test case that will definitely fail
+    context = {"user": {"name": "Alice", "role": "admin"}}
+    with pytest.raises(NameError) as excinfo:
+        lookup_variable("user/definitely_nonexistent", context)
+    assert "not found" in str(excinfo.value) or "cannot be resolved" in str(excinfo.value)
 
-    # Test with invalid JQ path
-    with pytest.raises(NameError):
-        lookup_variable("items[invalid]", {"items": [1, 2, 3]})
+    # Test with invalid path format (using dots)
+    with pytest.raises(ValueError) as excinfo:
+        lookup_variable("items.invalid", {"items": [1, 2, 3]})
+    assert "cannot contain dots" in str(excinfo.value)

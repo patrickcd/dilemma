@@ -65,8 +65,9 @@ grammar = r"""
     // Define reserved keywords
     // But use string literals in rules above for "or", "and", "True", "False"
     // Use a negative lookahead in VARIABLE to exclude these as variable names
-    // Added support for array indexing with [n] patterns
-    VARIABLE: /(?!or\b|and\b|True\b|False\b|false\b|true)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
+    // Support both simple variables and slash-notation paths
+    VARIABLE: /(?!or\b|and\b|True\b|False\b|false\b|true\b)([a-zA-Z][a-zA-Z0-9_]*|(\/[a-zA-Z0-9_]+)+|(\/)?[a-zA-Z][a-zA-Z0-9_]*(\/[a-zA-Z0-9_]+)*)/
+
     INTEGER: /[0-9]+/
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i
     STRING: /"(\\.|[^\\"])*"|\'(\\.|[^\\\'])*\'/
@@ -236,13 +237,6 @@ def evaluate(expression: str, variables: dict | str | None = None) -> int | floa
     """
     Evaluate an expression with integers, arithmetic operations, comparisons,
     and variables.
-
-    Args:
-        expression: String containing the expression to evaluate
-        variables: Optional dictionary or JSON string of variable names to their values
-
-    Returns:
-        Result of the evaluation (integer, float, boolean, or string)
     """
     # Single point of JSON processing
     processed_json = {}
@@ -258,11 +252,13 @@ def evaluate(expression: str, variables: dict | str | None = None) -> int | floa
             raise ValueError(f"Failed to process variables: {e}")
 
     # Parse the expression
+    parser = build_parser()
     try:
-        parser = build_parser()
         tree = parser.parse(expression)
-    except Exception as e:
-        raise ValueError(f"Invalid expression syntax: {expression}") from e
+    except lark_exceptions.UnexpectedToken as e:
+        raise ValueError(f"Invalid expression syntax: {e}")
+    except lark_exceptions.UnexpectedCharacters as e:
+        raise ValueError(f"Invalid expression syntax: {e}")
 
     # Evaluate with processed JSON
     try:
