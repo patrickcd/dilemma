@@ -2,6 +2,7 @@
 
 import pytest
 from dilemma.lang import evaluate, ExpressionTransformer
+from dilemma.lookup import lookup_variable
 
 
 def test_list_membership():
@@ -137,9 +138,10 @@ def test_container_type_errors():
         evaluate("boolean contains 'r'", variables)
 
 
+
 def test_lookup_variable_with_collections():
     """Test lookup_variable function with collections."""
-    from dilemma.lookup import lookup_variable
+
 
     # Test with nested dict and list
     context = {
@@ -154,23 +156,23 @@ def test_lookup_variable_with_collections():
     }
 
     # Test lookup on lists with index - using lookup_variable directly, not evaluate
-    result = lookup_variable(context, "users[0]")
+    result = lookup_variable("users[0]", context)
     assert result == {"id": 1, "name": "Alice"}
 
     # Test lookup on nested properties
-    result = lookup_variable(context, "users[1].name")
+    result = lookup_variable("users[1].name", context)
     assert result == "Bob"
 
     # Test lookup on list in dict
-    result = lookup_variable(context, "settings.features[2]")
+    result = lookup_variable("settings.features[2]", context)
     assert result == "import"
 
     # Test with a complex path that doesn't exist
     with pytest.raises(NameError):
-        lookup_variable(context, "users[2].name")  # Out of bounds
+        lookup_variable("users[2].name", context)  # Out of bounds
 
     # Test with direct dict access
-    result = lookup_variable(context, "settings")
+    result = lookup_variable("settings", context)
     assert "features" in result
     assert "theme" in result
 
@@ -197,27 +199,6 @@ def test_direct_transformer_methods():
 
     with pytest.raises(TypeError):
         transformer.contained_in([42, "test"])
-
-
-def test_lookup_with_json_string():
-    """Test lookup_variable with JSON string input."""
-    from dilemma.lookup import lookup_variable
-
-    # Create a JSON string context
-    json_string = '{"users": [{"name": "Alice", "role": "admin"}, {"name": "Bob", "role": "user"}]}'
-
-    # Test lookup in a JSON string
-    result = lookup_variable(json_string, "users[0].name")
-    assert result == "Alice"
-
-    # Test lookup for collection in JSON string
-    result = lookup_variable(json_string, "users")
-    assert isinstance(result, list)
-    assert len(result) == 2
-
-    # Test error handling with invalid JSON
-    with pytest.raises(ValueError, match="Invalid JSON string"):
-        lookup_variable("{invalid json", "key")
 
 
 def test_datetime_in_collections():
@@ -288,12 +269,12 @@ def test_lookup_errors():
 
     # Test with invalid path
     with pytest.raises(NameError):
-        lookup_variable({"a": 1}, "b")
+        lookup_variable("b", {"a": 1})
 
     # Test with non-existing path in nested structure
     with pytest.raises(NameError):
-        lookup_variable({"user": {"name": "Alice"}}, "user.age")
+        lookup_variable("user.age", {"user": {"name": "Alice"}})
 
     # Test with invalid JQ path
     with pytest.raises(NameError):
-        lookup_variable({"items": [1, 2, 3]}, "items[invalid]")
+        lookup_variable("items[invalid]", {"items": [1, 2, 3]})

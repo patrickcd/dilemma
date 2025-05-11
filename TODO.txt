@@ -2,7 +2,7 @@
 2:  Implement robust date handling in nested structures (done)
 3:  Add more descriptive error messages for nested path failures (done)
 4:  Parse context data once per expression, not per lookup (done)
-5:  Drop support for attribute access - json only
+5:  Drop support for attribute access - json only  (done)
 6:  Add support for direct JQ expressions using 'jq' keyword
 7:  click command for a repl interface which optionally takes a path to json file for context
 8:  click command to generate markdown docs from yaml examples

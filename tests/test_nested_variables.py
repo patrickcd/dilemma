@@ -105,8 +105,8 @@ def test_evaluate_undefined_nested_variable(var_path, context):
     context=nested_dicts_st,
 )
 @example(var_path="a.b", value=42, context={})
-def test_nested_getattr(var_path, value, context):
-    """Test resolving nested variable names using nested_getattr."""
+def test_nested_lookup_variable(var_path, value, context):
+    """Test resolving nested variable names using lookup_variable."""
     # Inject the value into the context at the specified path
     segments = var_path.split(".")
 
@@ -122,5 +122,5 @@ def test_nested_getattr(var_path, value, context):
     current[segments[-1]] = value
 
     # Resolve the variable path
-    result = lookup_variable(modified_context, var_path)
+    result = lookup_variable(var_path, modified_context)
     assert result == value

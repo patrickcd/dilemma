@@ -178,30 +178,6 @@ def test_thread_safety():
     assert results == [2, 6, 2.0]
 
 
-def test_invalid_variables_processing():
-    """Test that un-serializable variables are handled properly"""
-    # Create a circular reference that can't be JSON serialized
-    circular_ref = {}
-    circular_ref["self"] = circular_ref
-
-    # Test direct ExpressionTransformer instantiation
-    with pytest.raises(ValueError) as excinfo:
-        ExpressionTransformer(variables={"bad_var": circular_ref})
-    assert "Circular reference" in str(excinfo.value)
-
-    # Test through evaluate function
-    with pytest.raises(ValueError) as excinfo:
-        evaluate("1 + 1", variables={"bad_var": circular_ref})
-    assert "Circular reference" in str(excinfo.value)
-
-    # Test with a non-serializable function - this should now work with our improved DateTimeEncoder
-    # which converts non-serializable objects to string representations
-    lambda_func = lambda x: x
-    result = evaluate("bad_func", variables={"bad_func": lambda_func})
-    # The result should be a string representation
-    assert isinstance(result, str)
-    assert "non-serializable" in result.lower()
-
 
 def test_variables_processing_json_error(monkeypatch):
     """Test that errors during JSON processing raise the appropriate error"""

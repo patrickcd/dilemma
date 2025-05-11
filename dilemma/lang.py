@@ -94,18 +94,9 @@ class ExpressionTransformer(Transformer, DateMethods):
     # Epsilon value for float comparison
     EPSILON = 1e-10
 
-    def __init__(self, variables: dict | None = None):
+    def __init__(self, processed_json: dict | None = None):
         super().__init__()
-        self.variables = variables if variables is not None else {}
-        # Pre-process the context object once for all variable lookups
-        self.json_variables = None
-        if variables:
-            try:
-                self.json_variables = json.loads(
-                    json.dumps(variables, cls=DateTimeEncoder)
-                )
-            except (TypeError, json.JSONDecodeError) as e:
-                raise ValueError(f"Failed to process variables: {e}")
+        self.processed_json = processed_json or {}
 
     def int_number(self, items: list[Token]) -> int:
         return int(items[0])
@@ -129,9 +120,13 @@ class ExpressionTransformer(Transformer, DateMethods):
         self, items: list[Token]
     ) -> int | float | bool | str | list | dict | datetime:
         var_path = items[0].value
-        return lookup_variable(
-            self.variables, var_path, precomputed_json=self.json_variables
-        )
+        value = lookup_variable(var_path, self.processed_json)
+
+        # Handle datetime reconstruction
+        if isinstance(value, dict) and "__datetime__" in value:
+            return datetime.fromisoformat(value["__datetime__"])
+
+        return value
 
     def add(self, items: list) -> float:
         return items[0] + items[1]
@@ -237,33 +232,45 @@ def build_parser() -> Lark:
 
 
 # Function to evaluate expressions
-def evaluate(expression: str, variables: dict | None = None) -> int | float | bool | str:
+def evaluate(expression: str, variables: dict | str | None = None) -> int | float | bool | str:
     """
     Evaluate an expression with integers, arithmetic operations, comparisons,
     and variables.
 
     Args:
         expression: String containing the expression to evaluate
-        variables: Optional dictionary of variable names to their values
+        variables: Optional dictionary or JSON string of variable names to their values
 
     Returns:
         Result of the evaluation (integer, float, boolean, or string)
     """
-    # First try to parse
+    # Single point of JSON processing
+    processed_json = {}
+    if variables:
+        try:
+            if isinstance(variables, str):
+                # Parse JSON string directly
+                processed_json = json.loads(variables)
+            else:
+                # Convert dictionary to JSON-compatible structure
+                processed_json = json.loads(json.dumps(variables, cls=DateTimeEncoder))
+        except (TypeError, json.JSONDecodeError) as e:
+            raise ValueError(f"Failed to process variables: {e}")
+
+    # Parse the expression
     try:
-        parser = build_parser()  # Use thread-local parser
+        parser = build_parser()
         tree = parser.parse(expression)
     except Exception as e:
-        # Handle parse errors
         raise ValueError(f"Invalid expression syntax: {expression}") from e
 
-    # Then try to evaluate
+    # Evaluate with processed JSON
     try:
-        transformer = ExpressionTransformer(variables=variables)
+        transformer = ExpressionTransformer(processed_json=processed_json)
         result = transformer.transform(tree)
         return result
     except lark_exceptions.VisitError as e:
-        # Check if the underlying error is a ZeroDivisionError, NameError, or TypeError
+        # Error handling logic remains unchanged
         if isinstance(e.__context__, ZeroDivisionError):
             raise ZeroDivisionError("Division by zero") from e
         if isinstance(e.__context__, NameError):

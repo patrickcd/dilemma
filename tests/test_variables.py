@@ -30,14 +30,14 @@ def test_lang_nested_arithmetic():
 
 # --- Tests to cover missing branches in dilemma/lookup.py ---
 
-def test_lookup_returns_datetime():
+def test_evaluate_returns_datetime():
     """
-    Test that lookup_variable reconstructs datetime objects correctly.
-    This ensures the __datetime__ branch is covered.
+    Test that evaluate reconstructs datetime objects correctly.
+    This ensures the __datetime__ branch is covered in ExpressionTransformer.variable().
     """
     dt = datetime(2025, 5, 11, 14, 30, tzinfo=timezone.utc)
     context = {"event": dt}
-    result = lookup_variable(context, "event")
+    result = evaluate("event", context)
     assert isinstance(result, datetime)
     # Compare ISO strings to account for potential microsecond differences.
     assert result.isoformat() == dt.isoformat()
@@ -47,9 +47,14 @@ def test_lookup_error_nonexistent_path():
     Test that lookup_variable raises a NameError when the requested path does not exist.
     Covers branch where jq returns an empty result.
     """
+    # Keep this test for now since lookup_variable can still be called directly
     context = {"a": {"b": 123}}
     with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
-        lookup_variable(context, "a.x")
+        lookup_variable("a.x", context)
+
+    # Also test through evaluate() to ensure consistent behavior
+    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
+        evaluate("a.x", context)
 
 
 def test_lookup_null_result_for_key():
@@ -58,11 +63,16 @@ def test_lookup_null_result_for_key():
     of a defined key produces a null result.
     In this case, context contains a key with a value of None.
     """
+    # Keep this test for now since lookup_variable can still be called directly
     context = {"a": {"x": None}}
     # "a.x" is defined in Python, but json.dumps will convert None to null,
     # causing jq to return [None] and thus triggering the error branch.
     with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
-        lookup_variable(context, "a.x")
+        lookup_variable("a.x", context)
+
+    # Also test through evaluate() to ensure consistent behavior
+    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
+        evaluate("a.x", context)
 
 
 
@@ -71,8 +81,13 @@ def test_lookup_top_level_variable():
     Test the optimization for top-level variables in lookup_variable.
     Covers line 21: `if "." not in path and path in obj:`.
     """
+    # Keep this test for now since lookup_variable can still be called directly
     context = {"a": 42}
-    result = lookup_variable(context, "a")
+    result = lookup_variable("a", context)
+    assert result == 42
+
+    # Also test through evaluate()
+    result = evaluate("a", context)
     assert result == 42
 
 def test_lookup_top_level_variable_no_dot():
@@ -80,8 +95,13 @@ def test_lookup_top_level_variable_no_dot():
     Test the optimization for top-level variables in lookup_variable.
     Covers line 21: `if "." not in path and path in obj:`.
     """
+    # Keep this test for now since lookup_variable can still be called directly
     context = {"simple_key": "simple_value"}
-    result = lookup_variable(context, "simple_key")
+    result = lookup_variable("simple_key", context)
+    assert result == "simple_value"
+
+    # Also test through evaluate()
+    result = evaluate("simple_key", context)
     assert result == "simple_value"
 
 def test_lookup_null_result():
@@ -89,21 +109,22 @@ def test_lookup_null_result():
     Test that lookup_variable returns None when the value in the context is None.
     """
     context = {"a": None}
-    result = lookup_variable(context, "a")
+    result = lookup_variable("a", context)
     assert result is None
 
 
-def test_lookup_datetime_from_json_string():
+def test_evaluate_datetime_from_json_string():
     """
-    Test that lookup_variable can correctly reconstruct datetime objects from JSON string.
-    This specifically targets the datetime reconstruction from serialized JSON strings.
+    Test that evaluate can correctly reconstruct datetime objects from JSON string.
+    This specifically targets the datetime reconstruction from serialized JSON strings,
+    which was moved from lookup_variable to ExpressionTransformer.variable().
     """
     # Create a JSON string with a serialized datetime in the exact format expected by the code
     # This format must match what DateTimeEncoder.default() produces
     json_string = '{"event": {"__datetime__": "2025-05-11T14:30:00+00:00"}}'
 
-    # Test lookup directly from the JSON string
-    result = lookup_variable(json_string, "event")
+    # Test evaluation using the JSON string as variables
+    result = evaluate("event", json_string)
 
     # Verify the result is a datetime object with the expected value
     assert isinstance(result, datetime)
@@ -125,12 +146,12 @@ def test_lookup_datetime_from_json_string():
     """
 
     # Access the nested datetime objects
-    reg_date = lookup_variable(nested_json, "user.registration")
+    reg_date = evaluate("user.registration", nested_json)
     assert isinstance(reg_date, datetime)
     assert reg_date.year == 2023 and reg_date.month == 1 and reg_date.day == 15
 
     # Access datetime in an array element
-    event_date = lookup_variable(nested_json, "user.events[1].timestamp")
+    event_date = evaluate("user.events[1].timestamp", nested_json)
     assert isinstance(event_date, datetime)
     assert event_date.year == 2023 and event_date.month == 6 and event_date.day == 20
 
@@ -203,7 +224,7 @@ def test_evaluate_variable_as_boolean(var_name, value):
 def test_evaluate_undefined_variable(var_name):
     """Test that evaluating an undefined variable raises a NameError."""
     expression = var_name
-    with pytest.raises(NameError, match=f"Variable '{var_name}' is not defined."):
+    with pytest.raises(NameError, match=f"Variable '{var_name}' is not defined"):
         evaluate(expression, {})  # Empty variables dictionary
 
 
@@ -223,7 +244,7 @@ def test_evaluate_variable_case_sensitive():
     variables = {"myVar": 10, "myvar": 20}
     assert evaluate("myVar", variables) == 10
     assert evaluate("myvar", variables) == 20
-    with pytest.raises(NameError, match="Variable 'MYVAR' is not defined."):
+    with pytest.raises(NameError, match="Variable 'MYVAR' is not defined"):
         evaluate("MYVAR", variables)
 
 
@@ -258,7 +279,7 @@ def test_evaluate_undefined_variable_with_valid_name(var_name):
     """Test NameError for valid (non-reserved) but undefined variable names."""
     # The filter `lambda x: x not in ["or", "and"]` is no longer needed here
     # because variable_names_st already excludes them.
-    with pytest.raises(NameError, match=f"Variable '{var_name}' is not defined."):
+    with pytest.raises(NameError, match=f"Variable '{var_name}' is not defined"):
         evaluate(var_name, {})
 
 
@@ -273,17 +294,12 @@ def test_lookup_path_construction():
     context = {"user": {"name": "Alice"}}
 
     # Test a path that requires the "." prefix
-    result = lookup_variable(context, "user.name")
+    result = lookup_variable("user.name", context)
     assert result == "Alice"
-
-    # Test with a JSON string, which also uses the path construction
-    json_string = '{"data": {"value": 42}}'
-    result = lookup_variable(json_string, "data.value")
-    assert result == 42
 
     # Test with array indexing
     context_with_array = {"items": [10, 20, 30]}
-    result = lookup_variable(context_with_array, "items[1]")
+    result = lookup_variable("items[1]", context_with_array)
     assert result == 20
 
 
@@ -299,12 +315,12 @@ def test_lookup_path_starting_with_bracket():
     context = [{"id": 1, "name": "First"}, {"id": 2, "name": "Second"}]
 
     # Test a path that starts with brackets - this should hit the specific branch
-    result = lookup_variable(context, "[0].name")
+    result = lookup_variable("[0].name", context)
     assert result == "First"
 
     # Also test a nested case
     nested_context = {"items": [{"id": 1}, {"id": 2}]}
     # This wouldn't hit the branch but confirms the lookup functionality
-    result = lookup_variable(nested_context, "items[1].id")
+    result = lookup_variable("items[1].id", nested_context)
     assert result == 2
 
