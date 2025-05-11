@@ -317,22 +317,22 @@ def test_jq_expressions():
     # Test expressions with angle bracket syntax
     expressions = [
         # Basic JQ expressions
-        ('<.users[0].name> == "Alice"', True),
-        ('<.users[1].name> == "Bob"', True),
+        ('`.users[0].name` == "Alice"', True),
+        ('`.users[1].name` == "Bob"', True),
 
         # Array access
-        ('<.users[0].roles[0]> == "admin"', True),
+        ('`.users[0].roles[0]` == "admin"', True),
 
         # Nested property access
-        ('<.settings.features.advanced>', True),
-        ('<.settings.features.beta>', False),
+        ('`.settings.features.advanced`', True),
+        ('`.settings.features.beta`', False),
 
         # JQ expressions in complex conditions
-        ('<.users[0].roles> contains "admin" and <.settings.features.advanced>', True),
-        ('<.users[1].roles> contains "admin" or <.settings.features.beta>', False),
+        ('`.users[0].roles` contains "admin" and `.settings.features.advanced`', True),
+        ('`.users[1].roles` contains "admin" or `.settings.features.beta`', False),
 
         # Mixed with regular variable paths
-        ('users/0/name == <.users[0].name>', True),
+        ('users/0/name == `.users[0].name`', True),
     ]
 
     for expr, expected in expressions:
@@ -345,13 +345,13 @@ def test_jq_expression_errors():
 
     # Invalid JQ syntax
     with pytest.raises(NameError) as excinfo:
-        evaluate('<invalid[syntax>', variables)
+        evaluate('`invalid[syntax`', variables)
     assert "Failed to evaluate JQ expression" in str(excinfo.value)
 
     # Path that doesn't exist
-    assert evaluate('<.user.age>', variables) is None
+    assert evaluate('`.user.age`', variables) is None
 
     # Empty JQ expression
     with pytest.raises(NameError) as excinfo:
-        evaluate('<>', variables)
+        evaluate('``', variables)
     assert "Failed to evaluate JQ expression" in str(excinfo.value)

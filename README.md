@@ -1,18 +1,38 @@
 # Dilemma Expression Engine
 
-A lightweight yet powerful expression evaluation engine with optimized performance for Python applications.
+A friendly yet powerful expression evaluation engine  for Python applications.
 
 ## Features
 
 - Secure evaluation of mathematical and logical expressions
-- Support for variables with dot notation (e.g., `user.profile.settings.enabled`)
+- Support for variables with path notation for nested structure (e.g., `user/profile/settings/enabled`)
 - Rich comparison operations with proper handling of floating-point values
 - Logical operations (`and`, `or`) for boolean expressions
 - Performance optimization strategies for repeated evaluations
 
-## Async Note
+```
+# It's 22:15
 
-The current implementation is **not** suitable for async code because it using threading.local to
+{
+    bar: {
+      closing_time: "23:30",
+      distance: "2 miles"
+    },
+    bike{
+      speed: "10",
+      units: "mph"
+    }
+}
+
+# dilemma expression:
+
+>  bar.closing_time after one hour and bike.speed > 2
+Result: True
+```
+
+#### Async Note
+
+The current implementation is **not** suitable for async code because it uses a thread local to
 maintain different parsers per thread.
 
 ## Installation
@@ -60,17 +80,17 @@ Dilemma uses a powerful path lookup system based on [JQ](https://stedolan.github
 
 #### Advanced: Direct JQ Expressions
 
-For advanced users who need more powerful data access patterns, Dilemma supports direct JQ expressions using the `jq{...}` syntax:
+For advanced users who need more powerful data access patterns, Dilemma supports direct JQ expressions using backtick syntax:
 
 ```python
 # Basic JQ expression to access array elements
-evaluate('jq{.users[0].name} == "Alice"', variables)
+evaluate('`.users[0].name` == "Alice"', variables)
 
 # Complex JQ filtering and transformation
-evaluate('jq{.users[] | select(.roles | contains(["admin"]))[].name} == "Alice"', variables)
+evaluate('`.users[] | select(.roles | contains(["admin"]))[].name` == "Alice"', variables)
 
 # Combine with regular Dilemma expressions
-evaluate('jq{.users | length} > 2 and settings/active == true', variables)
+evaluate('`.users | length` > 2 and settings/active == true', variables)
 ```
 
 This provides full access to JQ's powerful features:
@@ -95,7 +115,7 @@ Behind the scenes, the path lookups are optimized to provide the best performanc
 
 #### Date Comparisons
 
-Dilemma provides powerful date and time comparison operations that make it easy to work with temporal data:
+Dilemma provides convenient date and time comparison operations that make it easy to work with temporal data:
 
 - **State comparisons**:
   - `date is past` - Checks if a date is in the past
@@ -134,14 +154,14 @@ evaluate("start_date before today and end_date after today", context)
 evaluate("user/created_at older than 1 year", context)
 ```
 
-## Optimization Details
+### Optimization Details
 
 Dilemma offers two levels of optimization:
 
 1. **Pre-parsed evaluation**: Parses the expression once and reuses the parse tree for subsequent evaluations (4.28x speedup)
 2. **Compiled expressions**: Compile expressions once and evaluate them multiple times with different contexts
 
-### Using Compiled Expressions
+#### Using Compiled Expressions
 
 For the best performance when evaluating the same expression multiple times with different variable contexts:
 
