@@ -148,7 +148,7 @@ def test_array_access_with_rest_paths():
         }
     }
     assert lookup_variable("/data/items/0/id", context) == 1
-    assert lookup_variable("/data/items/1/value", context) == "second"
+    assert lookup_variable("data/items/1/value", context) == "second"
 
     # Verify invalid array access raises proper error
     with pytest.raises(NameError):

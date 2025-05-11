@@ -66,7 +66,9 @@ grammar = r"""
     // But use string literals in rules above for "or", "and", "True", "False"
     // Use a negative lookahead in VARIABLE to exclude these as variable names
     // Support both simple variables and slash-notation paths
-    VARIABLE: /(?!or\b|and\b|True\b|False\b|false\b|true\b)([a-zA-Z][a-zA-Z0-9_]*|(\/[a-zA-Z0-9_]+)+|(\/)?[a-zA-Z][a-zA-Z0-9_]*(\/[a-zA-Z0-9_]+)*)/
+    // Leading forward slash in paths is optional, e.g. both "user/name" and "/user/name" work
+    VARIABLE: /(?!or\b|and\b|True\b|False\b|false\b|true\b)(([a-zA-Z][a-zA-Z0-9_]*)(\/[a-zA-Z0-9_]+)*|(\/[a-zA-Z0-9_]+)+)/
+
 
     INTEGER: /[0-9]+/
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i

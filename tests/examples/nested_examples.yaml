@@ -18,7 +18,7 @@
 - name: project_status_evaluation
   category: nested_objects
   description: "Evaluate complex project status conditions"
-  expression: "/project/status == 'in_progress' and (/project/metrics/completion > 50 or (/project/team/size >= 3 and /project/priority == 'high'))"
+  expression: "/project/status == 'in_progress' and (/project/metrics/completion > 50 or (project/team/size >= 3 and /project/priority == 'high'))"
   expected: true
   context:
     project:

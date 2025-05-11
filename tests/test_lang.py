@@ -178,7 +178,6 @@ def test_thread_safety():
     assert results == [2, 6, 2.0]
 
 
-
 def test_variables_processing_json_error(monkeypatch):
     """Test that errors during JSON processing raise the appropriate error"""
     import json
@@ -203,3 +202,32 @@ def test_variables_processing_json_error(monkeypatch):
     # Check the error message matches what we expect
     assert "Failed to process variables" in str(excinfo.value)
     assert "Mock JSON processing error" in str(excinfo.value)
+
+
+def test_variable_paths_with_and_without_leading_slash():
+    """Test that variable paths work with and without leading slashes"""
+    # Test data
+    variables = {
+        "project": {
+            "status": "active",
+            "team": {
+                "size": 5
+            }
+        }
+    }
+
+    # Test expressions with and without leading slashes
+    expressions = [
+        ("/project/status == 'active'", True),
+        ("project/status == 'active'", True),
+        ("/project/team/size == 5", True),
+        ("project/team/size == 5", True),
+        ("(/project/team/size > 3 and /project/status == 'active')", True),
+        ("(project/team/size > 3 and project/status == 'active')", True),
+        # Mixed paths
+        ("(/project/team/size > 3 and project/status == 'active')", True),
+        ("(project/team/size > 3 and /project/status == 'active')", True),
+    ]
+
+    for expr, expected in expressions:
+        assert evaluate(expr, variables) == expected
