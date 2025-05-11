@@ -1,10 +1,20 @@
-- Drop support for attribute access - json only
-- Possibly delegate to something like jsonpath for looking up data?
-- Add support for lookups in containers, e.g string value in list or key in dict
-- Implement robust date handling in nested structures
-- Add more descriptive error messages for nested path failures
+- Add support for lookups in containers, e.g string value in list or key in dict (done)
+- Implement robust date handling in nested structures (done)
+- Add more descriptive error messages for nested path failures (done)
+- Add support for direct JQ expressions using 'jq' keyword
+- Add support for array slicing in paths (e.g. users[1:3])
+- Support function calls in expressions (e.g. length(array), sum(values))
+- Add string manipulation functions (concat, replace, etc.)
 - Create regression tests for method-name keys (items, keys, values)
+- Implement support for null/None values in expressions
+- Add caching for frequent lookups to improve performance
+- Consider lazy evaluation for boolean expressions
+- Drop support for attribute access - json only
 - Consider adding array operations (filter, map, reduce) for more powerful data manipulation
 - Add type validation to ensure consistent behavior across different data structures
-- Document the expression language grammar and limitations clearly
-- Consider a custom path expression parser to replace the string-splitting approach
+- Provide explicit type conversion functions (toInt, toFloat, etc.)
+- Consider a custom path expression parser to replace JQ dependency for better control
+- Create CLI improvements to accept context from stdin/files
+- Add async support as an alternative to the current thread-local implementation
+- Build documentation site with comprehensive examples and patterns
+- Consider JSON Schema integration for type validation
