@@ -59,3 +59,40 @@ def lookup_variable(path: str, json_obj: dict) -> int | float | bool | str | dat
         return results[0]
     except Exception as e:
         raise NameError(f"Variable '{path}' cannot be resolved: {str(e)}")
+
+
+def evaluate_jq_expression(jq_expr: str, json_obj: dict) -> int | float | bool | str | datetime | dict | list:
+    """
+    Evaluate a raw JQ expression against a JSON object.
+
+    Args:
+        jq_expr: Raw JQ expression (e.g., ".user.profile.age")
+        json_obj: JSON object to query
+
+    Returns:
+        The value resulting from the JQ query
+
+    Raises:
+        NameError: If the JQ expression cannot be resolved
+    """
+    try:
+        # Validate the jq syntax before compiling
+        if not jq_expr.strip():
+            raise NameError("Empty JQ expression")
+
+        # Compile and execute the JQ expression
+        compiled_jq = jq.compile(jq_expr)
+        results = list(compiled_jq.input(json_obj))
+
+        # jq always returns a list of results
+        if not results:
+            raise NameError(f"JQ expression '{jq_expr}' returned no results")
+
+        # For consistency with lookup_variable, just return the first result
+        return results[0]
+    except Exception as e:
+        # Instead of trying to catch specific jq exceptions, catch all exceptions
+        # and convert them to NameError with a descriptive message
+        error_msg = str(e)
+        raise NameError(f"Failed to evaluate JQ expression '{jq_expr}': {error_msg}")
+
