@@ -73,6 +73,9 @@ grammar = r"""
     // Define this before the STRING token to give it higher precedence
     JQ_EXPR: /\<[^>]*\>/
 
+    // JQ expression syntax: <expression> - must be matched as a single token
+    // Define this before the STRING token to give it higher precedence
+    JQ_EXPR: /\<[^>]*\>/
 
     INTEGER: /[0-9]+/
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i
