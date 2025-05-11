@@ -36,8 +36,8 @@
     user:
       roles: [ "user", "admin", "editor" ]
 
-- name: dict_key_membership
-  category: dict_operations
+- name: object_key_membership
+  category: object_operations
   description: "Check if a key exists in a dictionary"
   expression: "'address' in /user/profile"
   expected: true
@@ -49,8 +49,8 @@
         address: "123 Main St"
         phone: "555-1234"
 
-- name: dict_key_membership_with_variable
-  category: dict_operations
+- name: object_key_membership_with_variable
+  category: object_operations
   description: "Use a variable to check dictionary key membership"
   expression: "required_field in form_data"
   expected: false
@@ -61,8 +61,8 @@
       email: "info@company.com"
       address: "456 Business Ave"
 
-- name: dict_contains_operator
-  category: dict_operations
+- name: object_contains_operator
+  category: object_operations
   description: "Use contains operator with dictionary"
   expression: "config contains 'debug_mode'"
   expected: true
@@ -108,7 +108,7 @@
       permissions: [ "read", "write", "delete" ]
     required_permissions: [ "read", "write", "delete" ]
 
-- name: dict_equality_comparison
+- name: object_equality_comparison
   category: collection_equality
   description: "Compare two dictionaries for equality"
   expression: "/user/preferences == default_preferences"

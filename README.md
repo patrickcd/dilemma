@@ -60,17 +60,17 @@ Dilemma uses a powerful path lookup system based on [JQ](https://stedolan.github
 
 #### Advanced: Direct JQ Expressions
 
-For advanced users who need more powerful data access patterns, Dilemma supports direct JQ expressions using angle brackets `< ... >`:
+For advanced users who need more powerful data access patterns, Dilemma supports direct JQ expressions using the `jq{...}` syntax:
 
 ```python
 # Basic JQ expression to access array elements
-evaluate('<.users[0].name> == "Alice"', variables)
+evaluate('jq{.users[0].name} == "Alice"', variables)
 
 # Complex JQ filtering and transformation
-evaluate('<.users[] | select(.roles | contains(["admin"]))[].name> == "Alice"', variables)
+evaluate('jq{.users[] | select(.roles | contains(["admin"]))[].name} == "Alice"', variables)
 
 # Combine with regular Dilemma expressions
-evaluate('<.users | length> > 2 and settings/active == true', variables)
+evaluate('jq{.users | length} > 2 and settings/active == true', variables)
 ```
 
 This provides full access to JQ's powerful features:
