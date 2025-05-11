@@ -106,16 +106,16 @@ Examples:
 
 ```python
 # Check if account has expired
-evaluate("user.subscription.end_date is past", context)
+evaluate("user/subscription/end_date is past", context)
 
-# Check for recent activity
-evaluate("user.last_login within 24 hours", context)
+# Check for recent activity - leading forward slash is optional
+evaluate("/user/last_login within 24 hours", context)
 
 # Check if a date range contains today
 evaluate("start_date before today and end_date after today", context)
 
 # Check account age
-evaluate("user.created_at older than 1 year", context)
+evaluate("user/created_at older than 1 year", context)
 ```
 
 ## Optimization Details
@@ -123,7 +123,31 @@ evaluate("user.created_at older than 1 year", context)
 Dilemma offers two levels of optimization:
 
 1. **Pre-parsed evaluation**: Parses the expression once and reuses the parse tree for subsequent evaluations (4.28x speedup)
+2. **Compiled expressions**: Compile expressions once and evaluate them multiple times with different contexts
 
+### Using Compiled Expressions
+
+For the best performance when evaluating the same expression multiple times with different variable contexts:
+
+```python
+from dilemma.lang import compile
+
+# Compile the expression once (parse tree is created and stored)
+age_check = compile("user/age >= 18")
+
+# Evaluate with different variable contexts
+result1 = age_check.evaluate({"user": {"age": 25}})  # Returns True
+result2 = age_check.evaluate({"user": {"age": 16}})  # Returns False
+
+# Works with complex expressions and nested paths
+eligibility = compile("user/account/is_active and (user/subscription/level == 'premium' or user/account/credits > 100)")
+
+# Apply to different users
+user1_eligible = eligibility.evaluate(user1_data)
+user2_eligible = eligibility.evaluate(user2_data)
+```
+
+This approach is significantly more efficient than repeatedly calling `evaluate()` with the same expression string, as it eliminates the parsing overhead for each evaluation.
 
 ## Use Cases
 
