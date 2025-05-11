@@ -5,7 +5,11 @@ It also includes a function to compile getters for optimized access paths.
 """
 
 import json
+from datetime import datetime
 
+# These types are acceptable as variable values passed
+#  in as context to an expression's evaluation
+SUPPORTED_TYPES = (int, float, bool, str, datetime)
 
 def nested_getattr(obj, attr) -> int | float | bool:
     """
@@ -25,7 +29,11 @@ def nested_getattr(obj, attr) -> int | float | bool:
                 raise AttributeError(msg)
 
         try:
-            obj = getattr(obj, name)
+            # Prioritize dict keys for lookup
+            if isinstance(obj, dict) and name in obj:
+                obj = obj[name]  # Prioritize dict keys
+            else:
+                obj = getattr(obj, name)
         except AttributeError:
             try:
                 # Check if the object is subscriptable before attempting item access
@@ -45,25 +53,9 @@ def nested_getattr(obj, attr) -> int | float | bool:
     return obj
 
 
-def validate_supported_type(value):
-    """
-    Validate that the value is of a supported type.
-
-    Supported types:
-    - int
-    - float
-    - bool
-    - str
-
-    Args:
-        value: The value to validate.
-
-    Raises:
-        TypeError: If the value is not of a supported type.
-    """
-    supported_types = (int, float, bool, str)
-
-    if not isinstance(value, supported_types):
+def validate_supported_type(value) -> None:
+    """Check if value is of supported type"""
+    if not isinstance(value, SUPPORTED_TYPES):
         raise TypeError(f"Unsupported type: {type(value).__name__}")
 
 

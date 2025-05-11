@@ -1,0 +1,23 @@
+- name: string_equality
+  category: string
+  description: "Check if two words are equal"
+  expression: "'hello' == 'hello'"
+  expected: true
+- name: string_inequality
+  category: string
+  description: "Check if two words are not equal"
+  expression: "'hello' != 'world'"
+  expected: true
+- name: string_contains
+  category: string
+  description: "Check if a phrase contains a word"
+  expression: "'world' in 'hello world'"
+  expected: true
+- name: string_variable_equality
+  category: string
+  description: "Check if two variables are equal"
+  expression: "var1 == var2"
+  expected: true
+  context:
+    var1: "hello"
+    var2: "hello"

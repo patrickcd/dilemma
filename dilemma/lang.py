@@ -1,12 +1,13 @@
 """
 Expression language implementation using Lark
 """
+import threading
 
 from lark import Lark, Transformer, exceptions as lark_exceptions
 from lark import Token
-from dilemma.lookup import nested_getattr, validate_supported_type
-import threading
 
+from dilemma.lookup import nested_getattr, validate_supported_type
+from dilemma.dates import DateMethods
 # ruff: noqa: E501
 grammar = r"""
     ?start: expr
@@ -27,6 +28,14 @@ grammar = r"""
                | sum "<=" sum -> le
                | sum ">=" sum -> ge
                | sum "in" sum -> contains
+               | sum "is" "past" -> date_is_past
+               | sum "is" "future" -> date_is_future
+               | sum "is" "today" -> date_is_today
+               | sum "within" INTEGER time_unit -> date_within
+               | sum "older" "than" INTEGER time_unit -> date_older_than
+               | sum "before" sum -> date_before
+               | sum "after" sum -> date_after
+               | sum "same_day_as" sum -> date_same_day
 
     ?sum: product
        | sum "+" product -> add
@@ -56,13 +65,26 @@ grammar = r"""
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i
     STRING: /"(\\.|[^\\"])*"|\'(\\.|[^\\\'])*\'/
 
+    ?time_unit: "minute" -> minute_unit
+             | "minutes" -> minute_unit
+             | "hour" -> hour_unit
+             | "hours" -> hour_unit
+             | "day" -> day_unit
+             | "days" -> day_unit
+             | "week" -> week_unit
+             | "weeks" -> week_unit
+             | "month" -> month_unit
+             | "months" -> month_unit
+             | "year" -> year_unit
+             | "years" -> year_unit
+
     %import common.WS
     %ignore WS
 """
 
 
 # Transformer to evaluate expressions
-class ExpressionTransformer(Transformer):
+class ExpressionTransformer(Transformer, DateMethods):
     # Epsilon value for float comparison
     EPSILON = 1e-10
 
@@ -211,5 +233,9 @@ def evaluate(expression: str, variables: dict | None = None) -> int | float | bo
             raise NameError(str(e.__context__)) from e
         if isinstance(e.__context__, TypeError):
             raise TypeError(str(e.__context__)) from e
-        # Re-raise other VisitErrors
-        raise ValueError(f"Error evaluating expression: {expression}") from e
+
+        # Show the actual error rather than a generic message
+        print(f"DEBUG - Original error: {type(e.__context__).__name__}: {e.__context__}")
+
+        # Re-raise other VisitErrors with the original cause
+        raise ValueError(f"Error evaluating expression: {expression} - Caused by: {type(e.__context__).__name__}: {e.__context__}") from e

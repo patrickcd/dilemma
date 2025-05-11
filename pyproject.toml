@@ -34,6 +34,7 @@ test = [
     "pytest-cov",
     "codecov",
     "pre-commit",
+    "pyyaml"
 ]
 doc = [
     "mkdocs",

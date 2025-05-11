@@ -1,0 +1,10 @@
+- Drop support for attribute access - json only
+- Possibly delegate to something like jsonpath for looking up data?
+- Add support for lookups in containers, e.g string value in list or key in dict
+- Implement robust date handling in nested structures
+- Add more descriptive error messages for nested path failures
+- Create regression tests for method-name keys (items, keys, values)
+- Consider adding array operations (filter, map, reduce) for more powerful data manipulation
+- Add type validation to ensure consistent behavior across different data structures
+- Document the expression language grammar and limitations clearly
+- Consider a custom path expression parser to replace the string-splitting approach
