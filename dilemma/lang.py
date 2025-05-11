@@ -231,20 +231,66 @@ def build_parser() -> Lark:
     return _thread_local.parser
 
 
-# Function to evaluate expressions
-def evaluate(expression: str, variables: dict | str | None = None) -> int | float | bool | str:
+class CompiledExpression:
     """
-    Evaluate an expression with integers, arithmetic operations, comparisons,
-    and variables.
+    Represents a pre-compiled expression that can be evaluated multiple times
+    with different variable contexts for improved performance.
+    """
+
+    def __init__(self, expression: str, parse_tree):
+        self.expression = expression
+        self.parse_tree = parse_tree
+
+    def evaluate(self, variables: dict | str | None = None) -> int | float | bool | str:
+        """
+        Evaluate this compiled expression with the provided variables.
+
+        Args:
+            variables: Dictionary or JSON string containing variable values
+
+        Returns:
+            The result of evaluating the expression
+        """
+        # Use the helper function to process variables
+        processed_json = _process_variables(variables)
+
+        # Evaluate with processed JSON
+        try:
+            transformer = ExpressionTransformer(processed_json=processed_json)
+            result = transformer.transform(self.parse_tree)
+            return result
+        except lark_exceptions.VisitError as e:
+            # Error handling logic remains unchanged
+            if isinstance(e.__context__, ZeroDivisionError):
+                raise ZeroDivisionError("Division by zero") from e
+            if isinstance(e.__context__, NameError):
+                raise NameError(str(e.__context__)) from e
+            if isinstance(e.__context__, TypeError):
+                raise TypeError(str(e.__context__)) from e
+
+            # Show the actual error rather than a generic message
+            print(f"DEBUG - Original error: {type(e.__context__).__name__}: {e.__context__}")
+
+            # Re-raise other VisitErrors with the original cause
+            raise ValueError(
+                f"Error evaluating expression: {self.expression} - Caused by: {type(e.__context__).__name__}: {e.__context__}"
+            ) from e
+
+
+# Helper function to process variables
+def _process_variables(variables: dict | str | None = None) -> dict:
+    """
+    Process variables into a standardized JSON-compatible format.
 
     Args:
-        expression: String containing the expression to evaluate
-        variables: Optional dictionary or JSON string of variable names to their values
+        variables: Dictionary or JSON string containing variable values
 
     Returns:
-        Result of the evaluation (integer, float, boolean, or string)
+        Processed JSON object ready for expression evaluation
+
+    Raises:
+        ValueError: If the variables cannot be processed
     """
-    # Single point of JSON processing
     processed_json = {}
     if variables:
         try:
@@ -256,6 +302,44 @@ def evaluate(expression: str, variables: dict | str | None = None) -> int | floa
                 processed_json = json.loads(json.dumps(variables, cls=DateTimeEncoder))
         except (TypeError, json.JSONDecodeError) as e:
             raise ValueError(f"Failed to process variables: {e}")
+    return processed_json
+
+
+def compile(expression: str) -> CompiledExpression:
+    """
+    Compile an expression into a reusable CompiledExpression object that can be
+    evaluated multiple times with different variable contexts.
+
+    Args:
+        expression: The expression string to compile
+
+    Returns:
+        A CompiledExpression object that can be evaluated with different contexts
+
+    Raises:
+        ValueError: If the expression has invalid syntax
+    """
+    parser = build_parser()
+    try:
+        tree = parser.parse(expression)
+        return CompiledExpression(expression, tree)
+    except lark_exceptions.UnexpectedToken as e:
+        raise ValueError(f"Invalid expression syntax: {e}")
+    except lark_exceptions.UnexpectedCharacters as e:
+        raise ValueError(f"Invalid expression syntax: {e}")
+
+
+# Function to evaluate expressions
+def evaluate(expression: str, variables: dict | str | None = None) -> int | float | bool | str:
+    """
+    Evaluate an expression with integers, arithmetic operations, comparisons,
+    and variables.
+
+    For better performance when evaluating the same expression multiple times with
+    different variable contexts, use the compile() function instead.
+    """
+    # Use the helper function to process variables
+    processed_json = _process_variables(variables)
 
     # Parse the expression
     try:

@@ -203,3 +203,69 @@ def test_variables_processing_json_error(monkeypatch):
     # Check the error message matches what we expect
     assert "Failed to process variables" in str(excinfo.value)
     assert "Mock JSON processing error" in str(excinfo.value)
+
+
+
+def test_compiled_expression():
+    """Test that compiled expressions work correctly"""
+    from dilemma.lang import compile
+
+    # Compile the expression
+    expr = compile("x + y * 2")
+
+    # Test with different variable contexts
+    variables1 = {"x": 1, "y": 2}
+    variables2 = {"x": 10, "y": 5}
+
+    assert expr.evaluate(variables1) == 5.0  # 1 + 2*2 = 5
+    assert expr.evaluate(variables2) == 20.0  # 10 + 5*2 = 20
+
+
+def test_compiled_expression_with_path_variables():
+    """Test that compiled expressions work with path variables"""
+    from dilemma.lang import compile
+
+    # Compile an expression with paths
+    expr = compile("project/status == 'active' and project/team/size >= 3")
+
+    # Test with different variable contexts
+    variables1 = {
+        "project": {
+            "status": "active",
+            "team": {"size": 5}
+        }
+    }
+    variables2 = {
+        "project": {
+            "status": "active",
+            "team": {"size": 2}
+        }
+    }
+    variables3 = {
+        "project": {
+            "status": "inactive",
+            "team": {"size": 10}
+        }
+    }
+
+    assert expr.evaluate(variables1) == True   # active and size(5) >= 3
+    assert expr.evaluate(variables2) == False  # active but size(2) < 3
+    assert expr.evaluate(variables3) == False  # inactive and size(10) >= 3
+
+
+def test_compiled_expression_error_handling():
+    """Test that compiled expressions handle errors correctly"""
+    from dilemma.lang import compile
+
+    # Compile an expression
+    expr = compile("x / y")
+
+    # Test division by zero error
+    variables = {"x": 10, "y": 0}
+    with pytest.raises(ZeroDivisionError):
+        expr.evaluate(variables)
+
+    # Test missing variable error
+    variables = {"x": 10}  # Missing y
+    with pytest.raises(NameError):
+        expr.evaluate(variables)
