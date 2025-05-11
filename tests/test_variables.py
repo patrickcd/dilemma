@@ -93,6 +93,47 @@ def test_lookup_null_result():
     assert result is None
 
 
+def test_lookup_datetime_from_json_string():
+    """
+    Test that lookup_variable can correctly reconstruct datetime objects from JSON string.
+    This specifically targets the datetime reconstruction from serialized JSON strings.
+    """
+    # Create a JSON string with a serialized datetime in the exact format expected by the code
+    # This format must match what DateTimeEncoder.default() produces
+    json_string = '{"event": {"__datetime__": "2025-05-11T14:30:00+00:00"}}'
+
+    # Test lookup directly from the JSON string
+    result = lookup_variable(json_string, "event")
+
+    # Verify the result is a datetime object with the expected value
+    assert isinstance(result, datetime)
+    expected_dt = datetime(2025, 5, 11, 14, 30, tzinfo=timezone.utc)
+    assert result.isoformat() == expected_dt.isoformat()
+
+    # Test a more complex case with nested datetime objects
+    nested_json = """
+    {
+        "user": {
+            "name": "Test User",
+            "registration": {"__datetime__": "2023-01-15T10:30:00+00:00"},
+            "events": [
+                {"id": 1, "timestamp": {"__datetime__": "2023-05-10T15:45:00+00:00"}},
+                {"id": 2, "timestamp": {"__datetime__": "2023-06-20T09:15:00+00:00"}}
+            ]
+        }
+    }
+    """
+
+    # Access the nested datetime objects
+    reg_date = lookup_variable(nested_json, "user.registration")
+    assert isinstance(reg_date, datetime)
+    assert reg_date.year == 2023 and reg_date.month == 1 and reg_date.day == 15
+
+    # Access datetime in an array element
+    event_date = lookup_variable(nested_json, "user.events[1].timestamp")
+    assert isinstance(event_date, datetime)
+    assert event_date.year == 2023 and event_date.month == 6 and event_date.day == 20
+
 # Strategy for generating valid variable names (alphanumeric, starting with
 # a letter or underscore)
 # Exclude "or" and "and" as they are now reserved keywords.
@@ -219,4 +260,51 @@ def test_evaluate_undefined_variable_with_valid_name(var_name):
     # because variable_names_st already excludes them.
     with pytest.raises(NameError, match=f"Variable '{var_name}' is not defined."):
         evaluate(var_name, {})
+
+
+def test_lookup_path_construction():
+    """
+    Test the path construction in lookup_variable function.
+    This directly tests line 55 in lookup.py: jq_path = "." + path
+    """
+    from dilemma.lookup import lookup_variable
+
+    # Create a context with a simple structure
+    context = {"user": {"name": "Alice"}}
+
+    # Test a path that requires the "." prefix
+    result = lookup_variable(context, "user.name")
+    assert result == "Alice"
+
+    # Test with a JSON string, which also uses the path construction
+    json_string = '{"data": {"value": 42}}'
+    result = lookup_variable(json_string, "data.value")
+    assert result == 42
+
+    # Test with array indexing
+    context_with_array = {"items": [10, 20, 30]}
+    result = lookup_variable(context_with_array, "items[1]")
+    assert result == 20
+
+
+def test_lookup_path_starting_with_bracket():
+    """
+    Test lookup_variable when path starts with square brackets.
+    This specifically covers the code path in lookup.py:
+    if path.startswith("["): jq_path = "." + path
+    """
+    from dilemma.lookup import lookup_variable
+
+    # Create a context with an array at the top level
+    context = [{"id": 1, "name": "First"}, {"id": 2, "name": "Second"}]
+
+    # Test a path that starts with brackets - this should hit the specific branch
+    result = lookup_variable(context, "[0].name")
+    assert result == "First"
+
+    # Also test a nested case
+    nested_context = {"items": [{"id": 1}, {"id": 2}]}
+    # This wouldn't hit the branch but confirms the lookup functionality
+    result = lookup_variable(nested_context, "items[1].id")
+    assert result == 2
 

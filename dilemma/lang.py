@@ -62,7 +62,8 @@ grammar = r"""
     // Define reserved keywords
     // But use string literals in rules above for "or", "and", "True", "False"
     // Use a negative lookahead in VARIABLE to exclude these as variable names
-    VARIABLE: /(?!or\b|and\b|True\b|False\b|false\b|true)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*/
+    // Added support for array indexing with [n] patterns
+    VARIABLE: /(?!or\b|and\b|True\b|False\b|false\b|true)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
     INTEGER: /[0-9]+/
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i
     STRING: /"(\\.|[^\\"])*"|\'(\\.|[^\\\'])*\'/
@@ -146,6 +147,9 @@ class ExpressionTransformer(Transformer, DateMethods):
         # Handle floating point comparisons with a small epsilon
         if isinstance(items[0], float) or isinstance(items[1], float):
             return abs(items[0] - items[1]) < self.EPSILON
+        # Handle collections (lists, dicts)
+        if isinstance(items[0], (list, dict)) or isinstance(items[1], (list, dict)):
+            return items[0] == items[1]
         return items[0] == items[1]
 
     def ne(self, items: list) -> bool:
@@ -176,14 +180,26 @@ class ExpressionTransformer(Transformer, DateMethods):
         return bool(items[0]) or bool(items[1])
 
     def contains(self, items: list) -> bool:
-        if isinstance(items[0], str) and isinstance(items[1], str):
+        # Check if second operand (container) is a collection or string
+        if isinstance(items[1], (list, tuple)):
             return items[0] in items[1]
-        raise TypeError("'in' operator is only supported for strings")
+        elif isinstance(items[1], dict):
+            return items[0] in items[1]  # Check if key exists in dict
+        elif isinstance(items[0], str) and isinstance(items[1], str):
+            return items[0] in items[1]  # String in string
+        else:
+            raise TypeError("'in' operator requires a collection (string, list, dict) as the right operand")
 
     def contained_in(self, items: list) -> bool:
-        if isinstance(items[0], str) and isinstance(items[1], str):
+        # Check if first operand (container) is a collection or string
+        if isinstance(items[0], (list, tuple)):
             return items[1] in items[0]
-        raise TypeError("'in' operator is only supported for strings")
+        elif isinstance(items[0], dict):
+            return items[1] in items[0]  # Check if key exists in dict
+        elif isinstance(items[0], str) and isinstance(items[1], str):
+            return items[1] in items[0]  # String contains string
+        else:
+            raise TypeError("'contains' operator requires a collection (string, list, dict) as the left operand")
 
 
 # Thread-local storage for the parser

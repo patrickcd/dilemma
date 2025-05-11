@@ -6,11 +6,15 @@ It also includes a function to compile getters for optimized access paths.
 
 import jq
 import json
+import re
 from datetime import datetime
 
 # These types are acceptable as variable values
 # Updated to include dict and list, which are valid JSON types.
 SUPPORTED_TYPES = (int, float, bool, str, datetime, dict, list)
+
+# Regular expression to detect array indexing in paths
+ARRAY_INDEX_PATTERN = re.compile(r'(\[\d+\])')
 
 # Custom JSON encoder for datetime objects
 class DateTimeEncoder(json.JSONEncoder):
@@ -23,13 +27,13 @@ def lookup_variable(obj, path) -> int | float | bool | str | datetime | dict | l
 
     Given:
       - obj: the context object (a dictionary, list, or JSON string)
-      - path: a dot-separated path, e.g. "user.profile.age"
+      - path: a path expression, e.g. "user.profile.age" or "users[0].name"
     Returns:
       - the value at that path, or raises a NameError if it doesn't exist or is invalid.
     """
 
-    # Handle top-level variables directly for optimization
-    if "." not in path and not isinstance(obj, str):
+    # Handle top-level variables directly for optimization (when no complex path is present)
+    if "." not in path and "[" not in path and not isinstance(obj, str):
         if isinstance(obj, dict) and path in obj:
             return obj[path]
         raise NameError(f"Variable '{path}' is not defined or path cannot be resolved.")
@@ -42,11 +46,15 @@ def lookup_variable(obj, path) -> int | float | bool | str | datetime | dict | l
             raise ValueError(f"Invalid JSON string provided: {e}")
     else:
         # Convert object to JSON-compatible structure and ensure
-        # it;s safe
+        # it's safe
         json_obj = json.loads(json.dumps(obj, cls=DateTimeEncoder))
 
-    # Conver expression patht to jq path
-    jq_path = "." + path
+    # Convert expression path to jq path
+    # For paths that start with array indexing like users[0], add leading dot
+    if path.startswith("["):
+        jq_path = "." + path
+    else:
+        jq_path = "." + path
 
     try:
         # Execute jq query
@@ -63,6 +71,6 @@ def lookup_variable(obj, path) -> int | float | bool | str | datetime | dict | l
             return datetime.fromisoformat(result["__datetime__"])
 
         return result
-    except Exception:
+    except Exception as e:
         # Treat all errors as NameError for consistency
-        raise NameError(f"Variable '{path}' is not defined or path cannot be resolved.")
+        raise NameError(f"Variable '{path}' is not defined or path cannot be resolved. Error: {str(e)}")

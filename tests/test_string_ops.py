@@ -41,7 +41,7 @@ def test_string_comparison_with_arithmetic():
         evaluate("5 + 'hello'")
 
 def test_invalid_contains_operation():
-    with pytest.raises(TypeError, match="'in' operator is only supported for strings"):
+    with pytest.raises(TypeError, match="'in' operator requires a collection"):
         evaluate("5 in 10")
-    with pytest.raises(TypeError, match="'in' operator is only supported for strings"):
+    with pytest.raises(TypeError, match="'in' operator requires a collection"):
         evaluate("5 in 'hello'")
