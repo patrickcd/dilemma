@@ -73,9 +73,9 @@ grammar = r"""
     // Define this before the STRING token to give it higher precedence
     JQ_EXPR: /\<[^>]*\>/
 
-    // JQ expression syntax: <expression> - must be matched as a single token
+    // JQ expression syntax: `expression` - must be matched as a single token
     // Define this before the STRING token to give it higher precedence
-    JQ_EXPR: /\<[^>]*\>/
+    JQ_EXPR: /`[^`]*`/
 
     INTEGER: /[0-9]+/
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i
@@ -228,8 +228,8 @@ class ExpressionTransformer(Transformer, DateMethods):
 
     def jq_expression(self, items: list[Token]) -> int | float | bool | str | list | dict | datetime:
         """Process a raw JQ expression to access data in the variables"""
-        # Extract the JQ expression from the token: <expression> -> expression
-        jq_expr = items[0].value[1:-1]  # Remove < prefix and > suffix
+        # Extract the JQ expression from the token: `expression` -> expression
+        jq_expr = items[0].value[1:-1]  # Remove ` prefix and ` suffix
 
         # Import here to avoid circular imports
         from dilemma.lookup import evaluate_jq_expression
