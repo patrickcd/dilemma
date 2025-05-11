@@ -176,3 +176,54 @@ def test_thread_safety():
         thread.join()
 
     assert results == [2, 6, 2.0]
+
+
+def test_invalid_variables_processing():
+    """Test that un-serializable variables are handled properly"""
+    # Create a circular reference that can't be JSON serialized
+    circular_ref = {}
+    circular_ref["self"] = circular_ref
+
+    # Test direct ExpressionTransformer instantiation
+    with pytest.raises(ValueError) as excinfo:
+        ExpressionTransformer(variables={"bad_var": circular_ref})
+    assert "Circular reference" in str(excinfo.value)
+
+    # Test through evaluate function
+    with pytest.raises(ValueError) as excinfo:
+        evaluate("1 + 1", variables={"bad_var": circular_ref})
+    assert "Circular reference" in str(excinfo.value)
+
+    # Test with a non-serializable function - this should now work with our improved DateTimeEncoder
+    # which converts non-serializable objects to string representations
+    lambda_func = lambda x: x
+    result = evaluate("bad_func", variables={"bad_func": lambda_func})
+    # The result should be a string representation
+    assert isinstance(result, str)
+    assert "non-serializable" in result.lower()
+
+
+def test_variables_processing_json_error(monkeypatch):
+    """Test that errors during JSON processing raise the appropriate error"""
+    import json
+    import dilemma.lang
+
+    # Create a mock json.dumps that raises an error
+    original_dumps = json.dumps
+
+    def mock_dumps(*args, **kwargs):
+        # Only raise the error for our specific test case
+        if args and isinstance(args[0], dict) and "trigger_error" in args[0]:
+            raise TypeError("Mock JSON processing error")
+        return original_dumps(*args, **kwargs)
+
+    # Apply the monkeypatch
+    monkeypatch.setattr(json, "dumps", mock_dumps)
+
+    # Test that the error path in ExpressionTransformer.__init__ is triggered
+    with pytest.raises(ValueError) as excinfo:
+        evaluate("1 + 1", variables={"trigger_error": "value"})
+
+    # Check the error message matches what we expect
+    assert "Failed to process variables" in str(excinfo.value)
+    assert "Mock JSON processing error" in str(excinfo.value)

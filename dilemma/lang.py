@@ -1,14 +1,17 @@
 """
 Expression language implementation using Lark
 """
+
 import threading
+import json
 from datetime import datetime
 
 from lark import Lark, Transformer, exceptions as lark_exceptions
 from lark import Token
 
-from dilemma.lookup import lookup_variable
+from dilemma.lookup import lookup_variable, DateTimeEncoder
 from dilemma.dates import DateMethods
+
 # ruff: noqa: E501
 grammar = r"""
     ?start: expr
@@ -94,6 +97,15 @@ class ExpressionTransformer(Transformer, DateMethods):
     def __init__(self, variables: dict | None = None):
         super().__init__()
         self.variables = variables if variables is not None else {}
+        # Pre-process the context object once for all variable lookups
+        self.json_variables = None
+        if variables:
+            try:
+                self.json_variables = json.loads(
+                    json.dumps(variables, cls=DateTimeEncoder)
+                )
+            except (TypeError, json.JSONDecodeError) as e:
+                raise ValueError(f"Failed to process variables: {e}")
 
     def int_number(self, items: list[Token]) -> int:
         return int(items[0])
@@ -113,9 +125,13 @@ class ExpressionTransformer(Transformer, DateMethods):
     def false_value(self, _) -> bool:
         return False
 
-    def variable(self, items: list[Token]) -> int | float | bool | str| list | dict | datetime:
+    def variable(
+        self, items: list[Token]
+    ) -> int | float | bool | str | list | dict | datetime:
         var_path = items[0].value
-        return lookup_variable(self.variables, var_path)
+        return lookup_variable(
+            self.variables, var_path, precomputed_json=self.json_variables
+        )
 
     def add(self, items: list) -> float:
         return items[0] + items[1]
@@ -138,7 +154,7 @@ class ExpressionTransformer(Transformer, DateMethods):
 
     def string_literal(self, items: list[Token]) -> str:
         # Remove surrounding quotes and unescape
-        return items[0][1:-1].encode('utf-8').decode('unicode_escape')
+        return items[0][1:-1].encode("utf-8").decode("unicode_escape")
 
     # Comparison operations
     def eq(self, items: list) -> bool:
@@ -188,7 +204,9 @@ class ExpressionTransformer(Transformer, DateMethods):
         elif isinstance(items[0], str) and isinstance(items[1], str):
             return items[0] in items[1]  # String in string
         else:
-            raise TypeError("'in' operator requires a collection (string, list, dict) as the right operand")
+            raise TypeError(
+                "'in' operator requires a collection (string, list, dict) as the right operand"
+            )
 
     def contained_in(self, items: list) -> bool:
         # Check if first operand (container) is a collection or string
@@ -199,11 +217,14 @@ class ExpressionTransformer(Transformer, DateMethods):
         elif isinstance(items[0], str) and isinstance(items[1], str):
             return items[1] in items[0]  # String contains string
         else:
-            raise TypeError("'contains' operator requires a collection (string, list, dict) as the left operand")
+            raise TypeError(
+                "'contains' operator requires a collection (string, list, dict) as the left operand"
+            )
 
 
 # Thread-local storage for the parser
 _thread_local = threading.local()
+
 
 def build_parser() -> Lark:
     """
@@ -254,4 +275,6 @@ def evaluate(expression: str, variables: dict | None = None) -> int | float | bo
         print(f"DEBUG - Original error: {type(e.__context__).__name__}: {e.__context__}")
 
         # Re-raise other VisitErrors with the original cause
-        raise ValueError(f"Error evaluating expression: {expression} - Caused by: {type(e.__context__).__name__}: {e.__context__}") from e
+        raise ValueError(
+            f"Error evaluating expression: {expression} - Caused by: {type(e.__context__).__name__}: {e.__context__}"
+        ) from e
