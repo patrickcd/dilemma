@@ -213,3 +213,17 @@
         teams:
         - name: "Digital"
           members: [ "Eve", "Frank" ]
+
+- name: container_emptiness_check
+  category: container_operations
+  description: "Check if containers are empty using 'is $empty'"
+  expression: "ghost_crew is $empty and deserted_mansion is $empty and (treasure_chest is $empty) == false"
+  expected: true
+  context:
+    ghost_crew: [] # Empty list
+    treasure_chest: [ "ancient coin", "golden chalice", "ruby necklace" ]
+    deserted_mansion: {} # Empty dictionary
+    dragon_hoard:
+      golden_crown: 1500
+      enchanted_sword: 3000
+      crystal_orb: 750

@@ -263,3 +263,39 @@ def test_lookup_errors():
     # Test with invalid JQ path
     with pytest.raises(NameError):
         lookup_variable("items[invalid]", {"items": [1, 2, 3]})
+
+
+def test_empty_containers():
+    """Test the 'is $empty' operation for checking empty containers."""
+    variables = {
+        "empty_list": [],
+        "filled_list": [1, 2, 3],
+        "empty_dict": {},
+        "filled_dict": {"a": 1, "b": 2},
+        "string": "hello",
+        "number": 42,
+        "boolean": True,
+    }
+
+    # Test with empty containers
+    assert evaluate("empty_list is $empty", variables) is True
+    assert evaluate("empty_dict is $empty", variables) is True
+
+    # Test with non-empty containers
+    assert evaluate("filled_list is $empty", variables) is False
+    assert evaluate("filled_dict is $empty", variables) is False
+
+    # Test with non-container types (should raise TypeError)
+    with pytest.raises(TypeError, match="can only be used with container types"):
+        evaluate("string is $empty", variables)
+
+    with pytest.raises(TypeError, match="can only be used with container types"):
+        evaluate("number is $empty", variables)
+
+    with pytest.raises(TypeError, match="can only be used with container types"):
+        evaluate("boolean is $empty", variables)
+
+    # Test with complex expressions - using valid syntax
+    assert evaluate("empty_list is $empty and empty_dict is $empty", variables) is True
+    assert evaluate("filled_list is $empty or empty_list is $empty", variables) is True
+    assert evaluate("(filled_dict is $empty) == False", variables) is True

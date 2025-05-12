@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)
 
 # ruff: noqa: E501
 grammar = r"""
+
     ?start: expr
 
     ?expr: or_expr
@@ -42,6 +43,7 @@ grammar = r"""
                | sum "is" "past" -> date_is_past
                | sum "is" "future" -> date_is_future
                | sum "is" "today" -> date_is_today
+               | sum "is" "$empty" -> is_empty
                | sum "within" INTEGER time_unit -> date_within
                | sum "older" "than" INTEGER time_unit -> date_older_than
                | sum "before" sum -> date_before
@@ -73,7 +75,7 @@ grammar = r"""
     // But use string literals in rules above for "or", "and", "True", "False"
     // Use a negative lookahead in VARIABLE to exclude these as variable names
 
-    VARIABLE: /(?!or\b|and\b|True\b|False\b|false\b|true)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
+    VARIABLE: /(?!or\b|and\b|True\b|False\b|true\b|false\b|is\b|contains\b|like\b|in\b)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
 
     // JQ expression syntax: `expression` - must be matched as a single token
     // Define this before the STRING token to give it higher precedence
@@ -280,6 +282,16 @@ class ExpressionTransformer(Transformer, DateMethods):
         pattern = items[1].lower()
 
         return fnmatch.fnmatch(string, pattern)
+
+    def is_empty(self, items: list) -> bool:
+        """Check if a container (list or dict) is empty."""
+        value = items[0]
+        if isinstance(value, (list, tuple, dict)):
+            return len(value) == 0
+        else:
+            raise TypeError(
+                "'is $empty' can only be used with container types (list, dict)"
+            )
 
 
 # Thread-local storage for the parser
