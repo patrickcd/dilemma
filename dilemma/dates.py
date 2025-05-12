@@ -1,5 +1,7 @@
+import logging
 from datetime import datetime, timedelta, timezone
 
+log = logging.getLogger(__name__)
 
 class DateMethods:
     def date_is_past(self, items: list) -> bool:
@@ -110,7 +112,7 @@ class DateMethods:
     def _create_timedelta(self, quantity, unit) -> timedelta:
         """Create a timedelta object based on quantity and unit"""
         # Now unit should be a simple string from one of our unit methods
-        print(f"DEBUG - Unit received: {unit} (type: {type(unit)})")
+        log.debug(f"Unit received: {unit} (type: {type(unit)})")
 
         if unit == "minute":
             return timedelta(minutes=quantity)

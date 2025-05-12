@@ -8,6 +8,8 @@ A friendly yet powerful expression evaluation engine  for Python applications.
 - Support for variables with nested structure (e.g., `user.profile.settings.enabled`)
 - Rich comparison operations with proper handling of floating-point values
 - Logical operations (`and`, `or`) for boolean expressions
+- Friendly date comparisons
+- Wildcard text matching
 - Performance optimization strategies for repeated evaluations
 
 ```javascript

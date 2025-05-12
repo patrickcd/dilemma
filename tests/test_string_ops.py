@@ -50,3 +50,40 @@ def test_invalid_contains_operation():
         evaluate("5 in 10")
     with pytest.raises(TypeError, match="'in' operator requires a collection"):
         evaluate("5 in 'hello'")
+
+
+def test_string_pattern_matching():
+    """Test wildcard pattern matching with the 'like' operator."""
+    test_cases = [
+        # Basic wildcard patterns
+        ("'file.txt' like '*.txt'", True),
+        ("'image.jpg' like '*.png'", False),
+        ("'hello.py' like '*.py'", True),
+
+        # Question mark wildcard
+        ("'file1.txt' like 'file?.txt'", True),
+        ("'file10.txt' like 'file?.txt'", False),
+
+        # Multiple wildcards
+        ("'hello_world.py' like '*_*.py'", True),
+        ("'helloworld.py' like '*_*.py'", False),
+
+        # Beginning and end matches
+        ("'test_string.py' like 'test_*'", True),
+        ("'string_test.py' like 'test_*'", False),
+
+        # Character classes
+        ("'file1.txt' like 'file[0-9].txt'", True),
+        ("'fileA.txt' like 'file[0-9].txt'", False),
+
+        # Mixed patterns
+        ("'user123' like 'user???'", True),
+        ("'user1' like 'user???'", False),
+        ("'document-2023.pdf' like 'document-*.pdf'", True),
+    ]
+
+    for expr, expected in test_cases:
+        assert evaluate(expr) == expected, f"Failed on: {expr}"
+
+    # Test case insensitivity (fnmatch is case-sensitive by default)
+    assert evaluate("'Hello.txt' like '*hello.txt'") == True

@@ -5,6 +5,7 @@ Expression language implementation using Lark
 import json
 import threading
 import logging
+import fnmatch
 from datetime import datetime
 
 from lark import Token
@@ -37,6 +38,7 @@ grammar = r"""
                | sum ">=" sum -> ge
                | sum "in" sum -> contains
                | sum "contains" sum -> contained_in
+               | sum "like" sum -> pattern_match
                | sum "is" "past" -> date_is_past
                | sum "is" "future" -> date_is_future
                | sum "is" "today" -> date_is_today
@@ -241,6 +243,20 @@ class ExpressionTransformer(Transformer, DateMethods):
             return datetime.fromisoformat(value["__datetime__"])
 
         return value
+
+    def pattern_match(self, items: list) -> bool:
+        """
+        Implements case-insensitive wildcard pattern matching using fnmatch.
+
+        Example: 'filename.txt' matches '*.txt'
+        """
+        if not isinstance(items[0], str) or not isinstance(items[1], str):
+            raise TypeError("Pattern matching requires string operands")
+
+        string = items[0].lower()
+        pattern = items[1].lower()
+
+        return fnmatch.fnmatch(string, pattern)
 
 
 # Thread-local storage for the parser
