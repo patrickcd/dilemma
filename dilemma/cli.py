@@ -149,7 +149,6 @@ def generate_markdown_docs(examples_by_category, time_values, output_path):
                 doc.writeTextLine("")
 
                 if example.get("context"):
-                    doc.addHeader(4, "Context")
 
                     # Process context to replace time placeholders with real dates
                     context = process_time_values_for_docs(

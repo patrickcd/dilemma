@@ -36,8 +36,6 @@ Check if two variables are equal
 |:---:|:---:|  
 | `var1 == var2` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "var1": "hello",
@@ -80,8 +78,6 @@ Match a variable against a pattern
 |:---:|:---:|  
 | `filename like '*.jpg'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "filename": "vacation-photo.JPG"
@@ -143,8 +139,6 @@ Use variables in expressions
 |:---:|:---:|  
 | `banana.price * order.quantity` | `16` |  
   
-  
-#### Context  
 ```json
 {
   "banana": {
@@ -166,11 +160,9 @@ Verify a date in the past
 |:---:|:---:|  
 | `past_date is $past` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "past_date": "2025-05-11 13:01:53 UTC"
+  "past_date": "2025-05-11 13:56:39 UTC"
 }
 ```  
 
@@ -182,11 +174,9 @@ Verify a date in the future
 |:---:|:---:|  
 | `future_date is $future` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "future_date": "2025-05-13 13:01:53 UTC"
+  "future_date": "2025-05-13 13:56:39 UTC"
 }
 ```  
 
@@ -198,11 +188,9 @@ Verify a date is $today
 |:---:|:---:|  
 | `today_date is $today` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "today_date": "2025-05-12 13:01:53 UTC"
+  "today_date": "2025-05-12 13:56:39 UTC"
 }
 ```  
 
@@ -216,11 +204,9 @@ Check event within recent hours
 |:---:|:---:|  
 | `recent_event within 12 hours` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "recent_event": "2025-05-12 12:01:53 UTC"
+  "recent_event": "2025-05-12 12:56:39 UTC"
 }
 ```  
 
@@ -232,11 +218,9 @@ Check event older than a week
 |:---:|:---:|  
 | `old_event older than 1 week` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "old_event": "2025-05-05 13:01:53 UTC"
+  "old_event": "2025-05-05 13:56:39 UTC"
 }
 ```  
 
@@ -248,11 +232,9 @@ Check event within minutes (not hours)
 |:---:|:---:|  
 | `very_recent within 30 minutes` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "very_recent": "2025-05-12 13:01:53 UTC"
+  "very_recent": "2025-05-12 13:56:39 UTC"
 }
 ```  
 
@@ -266,12 +248,10 @@ Compare two dates with before
 |:---:|:---:|  
 | `start_date before end_date` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "start_date": "2025-05-11 13:01:53 UTC",
-  "end_date": "2025-05-13 13:01:53 UTC"
+  "start_date": "2025-05-11 13:56:39 UTC",
+  "end_date": "2025-05-13 13:56:39 UTC"
 }
 ```  
 
@@ -283,12 +263,10 @@ Compare two dates with after
 |:---:|:---:|  
 | `end_date after start_date` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "start_date": "2025-05-11 13:01:53 UTC",
-  "end_date": "2025-05-13 13:01:53 UTC"
+  "start_date": "2025-05-11 13:56:39 UTC",
+  "end_date": "2025-05-13 13:56:39 UTC"
 }
 ```  
 
@@ -300,8 +278,6 @@ Check same day (should be true)
 |:---:|:---:|  
 | `same_day_morning same_day_as same_day_evening` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "same_day_morning": "2023-05-10T08:00:00Z",
@@ -317,8 +293,6 @@ Check same day (should be false)
 |:---:|:---:|  
 | `different_days same_day_as other_day` | `False` |  
   
-  
-#### Context  
 ```json
 {
   "different_days": "2023-05-10T08:00:00Z",
@@ -336,12 +310,10 @@ Check if project is currently active
 |:---:|:---:|  
 | `project_start is $past and project_end is $future` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "project_start": "2025-05-11 13:01:53 UTC",
-  "project_end": "2025-05-13 13:01:53 UTC"
+  "project_start": "2025-05-11 13:56:39 UTC",
+  "project_end": "2025-05-13 13:56:39 UTC"
 }
 ```  
 
@@ -353,12 +325,10 @@ Recent login but account not new
 |:---:|:---:|  
 | `last_login within 4 hours and signup_date older than 1 day` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "last_login": "2025-05-12 12:01:53 UTC",
-  "signup_date": "2025-05-11 13:01:53 UTC"
+  "last_login": "2025-05-12 12:56:39 UTC",
+  "signup_date": "2025-05-11 13:56:39 UTC"
 }
 ```  
 
@@ -372,8 +342,6 @@ Compare ISO formatted date string
 |:---:|:---:|  
 | `iso_date before '2030-01-01'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "iso_date": "2023-05-10T00:00:00Z"
@@ -408,11 +376,9 @@ Use hours time unit
 |:---:|:---:|  
 | `hour_ago within 2 hours` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "hour_ago": "2025-05-12 12:01:53 UTC"
+  "hour_ago": "2025-05-12 12:56:39 UTC"
 }
 ```  
 
@@ -424,11 +390,9 @@ Use minutes time unit
 |:---:|:---:|  
 | `hour_ago within 120 minutes` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "hour_ago": "2025-05-12 12:01:53 UTC"
+  "hour_ago": "2025-05-12 12:56:39 UTC"
 }
 ```  
 
@@ -440,11 +404,9 @@ Use days time unit
 |:---:|:---:|  
 | `week_ago older than 6 days` | `True` |  
   
-  
-#### Context  
 ```json
 {
-  "week_ago": "2025-05-05 13:01:53 UTC"
+  "week_ago": "2025-05-05 13:56:39 UTC"
 }
 ```  
 
@@ -458,8 +420,6 @@ Check if an element exists in a list using &#x27;in&#x27;
 |:---:|:---:|  
 | `'admin' in user.roles` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -481,8 +441,6 @@ Use a variable as the item to check in a list
 |:---:|:---:|  
 | `requested_role in available_roles` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "requested_role": "manager",
@@ -503,8 +461,6 @@ Alternative contains syntax for list membership
 |:---:|:---:|  
 | `permissions contains 'delete'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "permissions": [
@@ -524,8 +480,6 @@ Check behavior when element is not in list
 |:---:|:---:|  
 | `'superadmin' in user.roles` | `False` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -548,8 +502,6 @@ Check if a key exists in a dictionary
 |:---:|:---:|  
 | `'address' in user.profile` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -571,8 +523,6 @@ Use a variable to check dictionary key membership
 |:---:|:---:|  
 | `required_field in form_data` | `False` |  
   
-  
-#### Context  
 ```json
 {
   "required_field": "tax_id",
@@ -592,8 +542,6 @@ Use contains operator with dictionary
 |:---:|:---:|  
 | `config contains 'debug_mode'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "config": {
@@ -615,8 +563,6 @@ Check membership in a list nested within a dictionary
 |:---:|:---:|  
 | `'python' in user.skills.programming` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -644,8 +590,6 @@ Combine collection operators with other logical operators
 |:---:|:---:|  
 | `'admin' in user.roles and user.settings contains 'notifications' and user.settings.notifications` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -672,8 +616,6 @@ Compare two lists for equality
 |:---:|:---:|  
 | `user.permissions == required_permissions` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -699,8 +641,6 @@ Compare two dictionaries for equality
 |:---:|:---:|  
 | `user.preferences == default_preferences` | `False` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -726,8 +666,6 @@ Use membership test with a composite condition
 |:---:|:---:|  
 | `(user.role in admin_roles) or (user.domain in approved_domains and user.verified)` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -757,8 +695,6 @@ Look up elements in arrays using indexing
 |:---:|:---:|  
 | `teams[0].name == 'Frontend'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "teams": [
@@ -788,8 +724,6 @@ Use nested array indexing in paths
 |:---:|:---:|  
 | `departments[0].teams[1].name == 'Backend'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "departments": [
@@ -836,8 +770,6 @@ Test property of an element accessed through indexing
 |:---:|:---:|  
 | `users[1].role == 'admin' and users[1].verified` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "users": [
@@ -863,8 +795,6 @@ Combine array indexing with membership test
 |:---:|:---:|  
 | `'testing' in projects[0].tags and projects[1].status == 'completed'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "projects": [
@@ -899,8 +829,6 @@ Complex expression combining array lookups with object properties
 |:---:|:---:|  
 | `organization.departments[0].teams[0].members[1] == 'Bob' and organization.departments[1].teams[0].members[0] == 'Eve'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "organization": {
@@ -952,8 +880,6 @@ Check if containers are empty using &#x27;is $empty&#x27;
 |:---:|:---:|  
 | `ghost_crew is $empty and deserted_mansion is $empty and (treasure_chest is $empty) == false` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "ghost_crew": [],
@@ -981,19 +907,17 @@ Check if user is eligible for premium features
 |:---:|:---:|  
 | `user.account.is_active and (user.subscription.level == 'premium' or user.account.credits > 100)` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
     "account": {
       "is_active": true,
       "credits": 150,
-      "created_at": "2025-05-05 13:01:53 UTC"
+      "created_at": "2025-05-05 13:56:39 UTC"
     },
     "subscription": {
       "level": "basic",
-      "renewal_date": "2025-06-11 13:01:53 UTC"
+      "renewal_date": "2025-06-11 13:56:39 UTC"
     }
   }
 }
@@ -1007,14 +931,12 @@ Evaluate complex project status conditions
 |:---:|:---:|  
 | `project.status == 'in_progress' and (project.metrics.completion > 50 or (project.team.size >= 3 and project.priority == 'high'))` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "project": {
     "status": "in_progress",
-    "start_date": "2025-05-05 13:01:53 UTC",
-    "deadline": "2025-06-11 13:01:53 UTC",
+    "start_date": "2025-05-05 13:56:39 UTC",
+    "deadline": "2025-06-11 13:56:39 UTC",
     "metrics": {
       "completion": 45,
       "quality": 98
@@ -1038,13 +960,11 @@ Check if order is eligible for express shipping
 |:---:|:---:|  
 | `order.status == 'confirmed' and order.created_at within 24 hours and (order.items.count < 5 or (order.customer.tier == 'gold' and order.total_value > 100))` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "order": {
     "status": "confirmed",
-    "created_at": "2025-05-12 12:01:53 UTC",
+    "created_at": "2025-05-12 12:56:39 UTC",
     "items": {
       "count": 7,
       "categories": [
@@ -1054,7 +974,7 @@ Check if order is eligible for express shipping
     },
     "customer": {
       "tier": "gold",
-      "since": "2025-05-05 13:01:53 UTC"
+      "since": "2025-05-05 13:56:39 UTC"
     },
     "total_value": 250
   }
@@ -1069,20 +989,18 @@ Multiple date conditions with nested properties
 |:---:|:---:|  
 | `(user.last_login within 7 days or user.auto_login) and (user.account.trial_ends is $future or user.account.subscription.status == 'active')` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
-    "last_login": "2025-05-05 13:01:53 UTC",
+    "last_login": "2025-05-05 13:56:39 UTC",
     "auto_login": true,
     "registration_date": "2023-01-15",
     "account": {
-      "trial_ends": "2025-05-11 13:01:53 UTC",
+      "trial_ends": "2025-05-11 13:56:39 UTC",
       "subscription": {
         "status": "active",
         "plan": "premium",
-        "next_payment": "2025-06-11 13:01:53 UTC"
+        "next_payment": "2025-06-11 13:56:39 UTC"
       }
     }
   }
@@ -1099,8 +1017,6 @@ Test operator precedence with mixed conditions
 |:---:|:---:|  
 | `user.settings.notifications.enabled and (user.last_seen older than 1 day or user.preferences.urgent_only) and ('admin' in user.roles or user.tasks.pending > 0)` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -1114,7 +1030,7 @@ Test operator precedence with mixed conditions
       },
       "theme": "dark"
     },
-    "last_seen": "2025-05-05 13:01:53 UTC",
+    "last_seen": "2025-05-05 13:56:39 UTC",
     "preferences": {
       "urgent_only": false,
       "language": "en"
@@ -1138,8 +1054,6 @@ Basic JQ expression to access a nested property
 |:---:|:---:|  
 | ``.user.profile.name` == 'Alice'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -1164,8 +1078,6 @@ Access elements in an array using JQ indexing
 |:---:|:---:|  
 | ``.team[1].role` == 'developer'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "team": [
@@ -1193,8 +1105,6 @@ Check array length using JQ pipe function
 |:---:|:---:|  
 | ``.products | length` > 2` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "products": [
@@ -1222,8 +1132,6 @@ Check if any array element matches a condition
 |:---:|:---:|  
 | ``.users[] | select(.role == "admin") | .name` == 'Eva'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "users": [
@@ -1253,8 +1161,6 @@ Filter array elements based on a condition
 |:---:|:---:|  
 | ``.orders[] | select(.status == "completed") | .id` == 1003` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "orders": [
@@ -1284,14 +1190,12 @@ Combine JQ with regular Dilemma expressions
 |:---:|:---:|  
 | ``.user.membership.level` == 'gold' and user.account.active == true` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
     "membership": {
       "level": "gold",
-      "since": "2025-05-05 13:01:53 UTC"
+      "since": "2025-05-05 13:56:39 UTC"
     },
     "account": {
       "active": true,
@@ -1311,8 +1215,6 @@ Complex data transformation with JQ
 |:---:|:---:|  
 | ``.departments[] | select(.name == "Engineering").employees | map(.salary) | add / length` > 75000` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "departments": [
@@ -1358,8 +1260,6 @@ Check if an array contains a specific value
 |:---:|:---:|  
 | ``.user.permissions | contains(["edit"])`` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -1382,8 +1282,6 @@ Use JQ to conditionally create and check an object
 |:---:|:---:|  
 | ``if .user.premium then {access: "full"} else {access: "limited"} end | .access` == 'full'` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "user": {
@@ -1401,8 +1299,6 @@ Complex JQ expression with deeply nested parentheses and operations
 |:---:|:---:|  
 | ``.employees | map( ((.performance.rating * 0.5) + ((.projects | map(select(.status == "completed") | .difficulty) | add // 0) * 0.3) + (if (.years_experience > 5) then ((.leadership_score // 0) * 0.2) else ((.learning_speed // 0) * 0.2) end) ) * (if .department == "Engineering" then 1.1 else 1 end) ) | add / length` > 75` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "employees": [
@@ -1483,8 +1379,6 @@ Use JQ to extract a date for comparison
 |:---:|:---:|  
 | ``.project.milestones[] | select(.name == "beta").date` is $past` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "project": {
@@ -1492,15 +1386,15 @@ Use JQ to extract a date for comparison
     "milestones": [
       {
         "name": "alpha",
-        "date": "2025-06-11 13:01:53 UTC"
+        "date": "2025-06-11 13:56:39 UTC"
       },
       {
         "name": "beta",
-        "date": "2025-05-11 13:01:53 UTC"
+        "date": "2025-05-11 13:56:39 UTC"
       },
       {
         "name": "release",
-        "date": "2025-05-12 15:01:53 UTC"
+        "date": "2025-05-12 15:56:39 UTC"
       }
     ]
   }
@@ -1517,8 +1411,6 @@ Simple JQ expression nested inside multiple levels of Dilemma parentheses
 |:---:|:---:|  
 | `(5 + ((`.users | length` * 2) - 1)) > 5` | `True` |  
   
-  
-#### Context  
 ```json
 {
   "users": [
