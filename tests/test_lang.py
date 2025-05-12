@@ -1,6 +1,8 @@
-import pytest
-from dilemma.lang import evaluate, ExpressionTransformer
 import threading
+
+import pytest
+
+from dilemma.lang import evaluate, MAX_STRING_LENGTH, ExpressionTransformer, compile_expression
 
 
 def test_specific_cases():
@@ -206,10 +208,9 @@ def test_variables_processing_json_error(monkeypatch):
 
 def test_compiled_expression():
     """Test that compiled expressions work correctly"""
-    from dilemma.lang import compile
 
     # Compile the expression
-    expr = compile("x + y * 2")
+    expr = compile_expression("x + y * 2")
 
     # Test with different variable contexts
     variables1 = {"x": 1, "y": 2}
@@ -221,10 +222,9 @@ def test_compiled_expression():
 
 def test_compiled_expression_with_path_variables():
     """Test that compiled expressions work with path variables"""
-    from dilemma.lang import compile
 
     # Compile an expression with paths
-    expr = compile("project.status == 'active' and project.team.size >= 3")
+    expr = compile_expression("project.status == 'active' and project.team.size >= 3")
 
     # Test with different variable contexts
     variables1 = {"project": {"status": "active", "team": {"size": 5}}}
@@ -238,10 +238,9 @@ def test_compiled_expression_with_path_variables():
 
 def test_compiled_expression_error_handling():
     """Test that compiled expressions handle errors correctly"""
-    from dilemma.lang import compile
 
     # Compile an expression
-    expr = compile("x / y")
+    expr = compile_expression("x / y")
 
     # Test division by zero error
     variables = {"x": 10, "y": 0}
@@ -302,3 +301,42 @@ def test_jq_expression_errors():
     with pytest.raises(NameError) as excinfo:
         evaluate("``", variables)
     assert "Failed to evaluate JQ expression" in str(excinfo.value)
+
+
+def test_valid_string_concatenation():
+    """Test valid string concatenation operations"""
+    test_cases = [
+        ("'hello' + ' world'", "hello world"),
+        ("'a' + 'b' + 'c'", "abc"),
+    ]
+
+    for expr, expected in test_cases:
+        assert evaluate(expr) == expected
+
+
+@pytest.mark.parametrize("expr,error_type,error_msg", [
+    # String length limit test
+    (f"'{'a' * (MAX_STRING_LENGTH // 2)}' + '{'b' * (MAX_STRING_LENGTH // 2 + 1)}'",
+     ValueError, "String result exceeds maximum allowed length"),
+
+    # Mixing strings with other types
+    ("'hello' + 5", TypeError, "'+' operator cannot mix string and non-string types"),
+    ("5 + 'hello'", TypeError, "'+' operator cannot mix string and non-string types"),
+
+    # Subtraction with strings
+    ("'hello' - 'h'", TypeError, "'-' operator not supported with string operands"),
+    ("'hello' - 5", TypeError, "'-' operator not supported with string operands"),
+
+    # Multiplication with strings
+    ("'hello' * 3", TypeError, "'*' operator not supported with string operands"),
+    ("3 * 'hello'", TypeError, "'*' operator not supported with string operands"),
+
+    # Division with strings
+    ("'hello' / 'h'", TypeError, "'/' operator not supported with string operands"),
+    ("'hello' / 5", TypeError, "'/' operator not supported with string operands"),
+])
+def test_string_math_restrictions(expr, error_type, error_msg):
+    """Test restrictions on mathematical operations with strings"""
+    with pytest.raises(error_type) as excinfo:
+        evaluate(expr)
+    assert error_msg in str(excinfo.value)

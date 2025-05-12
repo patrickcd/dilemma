@@ -100,6 +100,7 @@ grammar = r"""
     %ignore WS
 """
 
+MAX_STRING_LENGTH = 10000  # Define a reasonable maximum length
 
 # Transformer to evaluate expressions
 class ExpressionTransformer(Transformer, DateMethods):
@@ -140,16 +141,38 @@ class ExpressionTransformer(Transformer, DateMethods):
 
         return value
 
-    def add(self, items: list) -> float:
+    def add(self, items: list):
+        """Addition operator (+) - allows string concatenation with limits"""
+        # Allow string concatenation only when both operands are strings
+        if isinstance(items[0], str) and isinstance(items[1], str):
+            result = items[0] + items[1]
+            if len(result) > MAX_STRING_LENGTH:
+                raise ValueError(f"String result exceeds maximum allowed length ({MAX_STRING_LENGTH})")
+            return result
+
+        # Prevent mixing strings with other types
+        if isinstance(items[0], str) or isinstance(items[1], str):
+            raise TypeError("'+' operator cannot mix string and non-string types")
+
+        # Regular addition for non-string types
         return items[0] + items[1]
 
-    def sub(self, items: list) -> float:
+    def sub(self, items: list):
+        """Subtraction operator (-) - deny for strings"""
+        if isinstance(items[0], str) or isinstance(items[1], str):
+            raise TypeError("'-' operator not supported with string operands")
         return items[0] - items[1]
 
-    def mul(self, items: list) -> float:
+    def mul(self, items: list):
+        """Multiplication operator (*) - deny for strings"""
+        if isinstance(items[0], str) or isinstance(items[1], str):
+            raise TypeError("'*' operator not supported with string operands")
         return items[0] * items[1]
 
-    def div(self, items: list) -> float:
+    def div(self, items: list):
+        """Division operator (/) - deny for strings"""
+        if isinstance(items[0], str) or isinstance(items[1], str):
+            raise TypeError("'/' operator not supported with string operands")
         # Handle division by zero
         if items[1] == 0:
             raise ZeroDivisionError("Division by zero")
@@ -345,7 +368,7 @@ def _process_variables(variables: dict | str | None = None) -> dict:
     return processed_json
 
 
-def compile(expression: str) -> CompiledExpression:
+def compile_expression(expression: str) -> CompiledExpression:
     """
     Compile an expression into a reusable CompiledExpression object that can be
     evaluated multiple times with different variable contexts.
