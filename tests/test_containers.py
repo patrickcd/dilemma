@@ -298,4 +298,4 @@ def test_empty_containers():
     # Test with complex expressions - using valid syntax
     assert evaluate("empty_list is $empty and empty_dict is $empty", variables) is True
     assert evaluate("filled_list is $empty or empty_list is $empty", variables) is True
-    assert evaluate("(filled_dict is $empty) == False", variables) is True
+    assert evaluate("(filled_dict is $empty) == false", variables) is True

@@ -29,7 +29,7 @@ A friendly yet powerful expression evaluation engine  for Python applications.
 # dilemma expression:
 
 >  bar.closing_time after one hour and (bar.distance / bike.speed) < 1
-Result: True (last orders very possible)
+Result: true (last orders very possible)
 ```
 
 #### Async Note
@@ -67,7 +67,7 @@ variables = {
 }
 
 # Evaluate with variables
-is_adult = evaluate("user.profile.age >= settings.min_age", variables)  # Returns True
+is_adult = evaluate("user.profile.age >= settings.min_age", variables)  # Returns true
 ```
 
 ## Language
@@ -161,16 +161,16 @@ evaluate("meeting.start_time > $now", context)
 
 Dilemma provides a convenient way to check if containers (lists and dictionaries) are empty:
 
-- `container is $empty` - Returns `True` if the container has no elements
+- `container is $empty` - Returns `true` if the container has no elements
 
 Examples:
 
 ```python
 # Check if a user has any roles
-evaluate("user.roles is $empty", context)  # True if roles list is empty
+evaluate("user.roles is $empty", context)  # true if roles list is empty
 
 # Check if search results exist
-evaluate("search_results is $empty", context)  # True if no results
+evaluate("search_results is $empty", context)  # true if no results
 
 # Combine with other conditions
 evaluate("user.is_active and not (user.permissions is $empty)", context)
@@ -194,8 +194,8 @@ from dilemma.lang import compile
 age_check = compile("user.age >= 18")
 
 # Evaluate with different variable contexts
-result1 = age_check.evaluate({"user": {"age": 25}})  # Returns True
-result2 = age_check.evaluate({"user": {"age": 16}})  # Returns False
+result1 = age_check.evaluate({"user": {"age": 25}})  # Returns true
+result2 = age_check.evaluate({"user": {"age": 16}})  # Returns false
 
 # Works with complex expressions and nested paths
 eligibility = compile("user.account.is_active and (user.subscription.level == 'premium' or user.account.credits > 100)")

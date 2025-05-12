@@ -102,13 +102,13 @@ def test_hypothesis_logical_operations(a, b):
 
 
 def test_boolean_literals():
-    """Test boolean literals True/False and true/false."""
+    """Test boolean literals true/false and true/false."""
     # Test literal False values
-    assert evaluate("False") is False
+    assert evaluate("true") is True
     assert evaluate("false") is False
 
     # Test in logical expressions
-    assert evaluate("False and True") is False
-    assert evaluate("True and False") is False
-    assert evaluate("False or False") is False
-    assert evaluate("False or True") is True
+    assert evaluate("false and true") is False
+    assert evaluate("true and false") is False
+    assert evaluate("false or false") is False
+    assert evaluate("false or true") is True

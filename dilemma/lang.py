@@ -63,8 +63,6 @@ grammar = r"""
          | STRING -> string_literal
          | "-" INTEGER -> negative_int
          | "-" FLOAT -> negative_float
-         | "True" -> true_value
-         | "False" -> false_value
          | "true" -> true_value
          | "false" -> false_value
          | "$now" -> now_value
@@ -76,7 +74,7 @@ grammar = r"""
     // But use string literals in rules above for "or", "and", "True", "False"
     // Use a negative lookahead in VARIABLE to exclude these as variable names
 
-    VARIABLE: /(?!or\b|and\b|True\b|False\b|true\b|false\b|is\b|contains\b|like\b|in\b)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
+    VARIABLE: /(?!or\b|and\b|true\b|false\b|is\b|contains\b|like\b|in\b)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
 
     // JQ expression syntax: `expression` - must be matched as a single token
     // Define this before the STRING token to give it higher precedence
