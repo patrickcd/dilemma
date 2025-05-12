@@ -14,7 +14,8 @@ from datetime import datetime
 SUPPORTED_TYPES = (int, float, bool, str, datetime, dict, list)
 
 # Regular expression to detect array indexing in paths
-ARRAY_INDEX_PATTERN = re.compile(r'(\[\d+\])')
+ARRAY_INDEX_PATTERN = re.compile(r"(\[\d+\])")
+
 
 # Custom JSON encoder for datetime objects
 class DateTimeEncoder(json.JSONEncoder):
@@ -22,7 +23,9 @@ class DateTimeEncoder(json.JSONEncoder):
         return {"__datetime__": obj.isoformat()}
 
 
-def lookup_variable(path: str, json_obj: dict) -> int | float | bool | str | datetime | dict | list:
+def lookup_variable(
+    path: str, json_obj: dict
+) -> int | float | bool | str | datetime | dict | list:
     """
     Look up a variable in a preprocessed JSON object using a dot-separated path.
 
@@ -36,10 +39,8 @@ def lookup_variable(path: str, json_obj: dict) -> int | float | bool | str | dat
     # Handle top-level variables directly for optimization
     if "." not in path and "[" not in path:
         if isinstance(json_obj, dict) and path in json_obj:
-            value = json_obj[path]
-            if value is None:
-                return None
-            return value
+            return json_obj[path]
+
         raise NameError(f"Variable '{path}' is not defined")
 
     # Convert expression path to jq path
@@ -54,14 +55,18 @@ def lookup_variable(path: str, json_obj: dict) -> int | float | bool | str | dat
 
         # Handle missing or null results
         if not results or results[0] is None:
-            raise NameError(f"Variable '{path}' is not defined or path cannot be resolved.")
+            raise NameError(
+                f"Variable '{path}' is not defined or path cannot be resolved."
+            )
 
         return results[0]
     except Exception as e:
         raise NameError(f"Variable '{path}' cannot be resolved: {str(e)}")
 
 
-def evaluate_jq_expression(jq_expr: str, json_obj: dict) -> int | float | bool | str | datetime | dict | list:
+def evaluate_jq_expression(
+    jq_expr: str, json_obj: dict
+) -> int | float | bool | str | datetime | dict | list:
     """
     Evaluate a raw JQ expression against a JSON object.
 
@@ -95,39 +100,3 @@ def evaluate_jq_expression(jq_expr: str, json_obj: dict) -> int | float | bool |
         # and convert them to NameError with a descriptive message
         error_msg = str(e)
         raise NameError(f"Failed to evaluate JQ expression '{jq_expr}': {error_msg}")
-
-def evaluate_jq_expression(jq_expr: str, json_obj: dict) -> int | float | bool | str | datetime | dict | list:
-    """
-    Evaluate a raw JQ expression against a JSON object.
-
-    Args:
-        jq_expr: Raw JQ expression (e.g., ".user.profile.age")
-        json_obj: JSON object to query
-
-    Returns:
-        The value resulting from the JQ query
-
-    Raises:
-        NameError: If the JQ expression cannot be resolved
-    """
-    try:
-        # Validate the jq syntax before compiling
-        if not jq_expr.strip():
-            raise NameError("Empty JQ expression")
-
-        # Compile and execute the JQ expression
-        compiled_jq = jq.compile(jq_expr)
-        results = list(compiled_jq.input(json_obj))
-
-        # jq always returns a list of results
-        if not results:
-            raise NameError(f"JQ expression '{jq_expr}' returned no results")
-
-        # For consistency with lookup_variable, just return the first result
-        return results[0]
-    except Exception as e:
-        # Instead of trying to catch specific jq exceptions, catch all exceptions
-        # and convert them to NameError with a descriptive message
-        error_msg = str(e)
-        raise NameError(f"Failed to evaluate JQ expression '{jq_expr}': {error_msg}")
-

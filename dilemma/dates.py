@@ -2,7 +2,6 @@ from datetime import datetime, timedelta, timezone
 
 
 class DateMethods:
-
     def date_is_past(self, items: list) -> bool:
         """Handle 'is past' date comparison"""
         date_obj = self._ensure_datetime(items[0])
@@ -24,8 +23,8 @@ class DateMethods:
     def date_within(self, items: list) -> bool:
         """Check if date is within a specified time period from now"""
         date_obj = self._ensure_datetime(items[0])
-        quantity = int(items[1]) if hasattr(items[1], 'value') else items[1]
-        unit = items[2].value if hasattr(items[2], 'value') else items[2]
+        quantity = int(items[1]) if hasattr(items[1], "value") else items[1]
+        unit = items[2].value if hasattr(items[2], "value") else items[2]
 
         now = datetime.now(date_obj.tzinfo if date_obj.tzinfo else timezone.utc)
         delta = self._create_timedelta(quantity, unit)
@@ -35,8 +34,8 @@ class DateMethods:
     def date_older_than(self, items: list) -> bool:
         """Check if date is older than a specified time period from now"""
         date_obj = self._ensure_datetime(items[0])
-        quantity = int(items[1]) if hasattr(items[1], 'value') else items[1]
-        unit = items[2].value if hasattr(items[2], 'value') else items[2]
+        quantity = int(items[1]) if hasattr(items[1], "value") else items[1]
+        unit = items[2].value if hasattr(items[2], "value") else items[2]
 
         now = datetime.now(date_obj.tzinfo if date_obj.tzinfo else timezone.utc)
         delta = self._create_timedelta(quantity, unit)
@@ -87,7 +86,12 @@ class DateMethods:
             return value
         elif isinstance(value, str):
             # Try different formats
-            for fmt in ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%S%z"]:
+            for fmt in [
+                "%Y-%m-%d",
+                "%Y-%m-%d %H:%M:%S",
+                "%Y-%m-%dT%H:%M:%S",
+                "%Y-%m-%dT%H:%M:%S%z",
+            ]:
                 try:
                     dt = datetime.strptime(value, fmt)
                     # Make naive datetimes timezone-aware with UTC

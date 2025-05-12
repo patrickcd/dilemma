@@ -6,12 +6,15 @@ from hypothesis import given, strategies as st, settings
 from dilemma.lang import evaluate
 from dilemma.dates import DateMethods
 
+
 def test_date_is_comparisons():
     """Test 'is past/future/today' date comparisons."""
     now = datetime.now(timezone.utc)
     yesterday = now - timedelta(days=1)
     tomorrow = now + timedelta(days=1)
-    today_different_time = datetime(now.year, now.month, now.day, 23, 59, 59, tzinfo=timezone.utc)
+    today_different_time = datetime(
+        now.year, now.month, now.day, 23, 59, 59, tzinfo=timezone.utc
+    )
 
     variables = {
         "past_date": yesterday,
@@ -99,11 +102,7 @@ def test_date_before_after_comparisons():
     mid_date = datetime(2024, 6, 15, tzinfo=timezone.utc)
     end_date = datetime(2024, 12, 31, tzinfo=timezone.utc)
 
-    variables = {
-        "start": start_date,
-        "middle": mid_date,
-        "end": end_date
-    }
+    variables = {"start": start_date, "middle": mid_date, "end": end_date}
 
     # Test 'before'
     assert evaluate("start before middle", variables) is True
@@ -122,11 +121,7 @@ def test_date_same_day_comparison():
     day1_evening = datetime(2024, 5, 10, 20, 15, tzinfo=timezone.utc)
     day2 = datetime(2024, 5, 11, 12, 0, tzinfo=timezone.utc)
 
-    variables = {
-        "morning": day1_morning,
-        "evening": day1_evening,
-        "next_day": day2
-    }
+    variables = {"morning": day1_morning, "evening": day1_evening, "next_day": day2}
 
     # Test same day
     assert evaluate("morning same_day_as evening", variables) is True
@@ -140,10 +135,7 @@ def test_string_to_date_conversion():
     yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
     tomorrow = (now + timedelta(days=1)).strftime("%Y-%m-%d")
 
-    variables = {
-        "date_string": yesterday,
-        "future_string": tomorrow
-    }
+    variables = {"date_string": yesterday, "future_string": tomorrow}
 
     # Test with string dates
     assert evaluate("date_string is past", variables) is True
@@ -157,11 +149,7 @@ def test_timestamp_to_date_conversion():
     yesterday_ts = (datetime.now(timezone.utc) - timedelta(days=1)).timestamp()
     tomorrow_ts = (datetime.now(timezone.utc) + timedelta(days=1)).timestamp()
 
-    variables = {
-        "now": now_ts,
-        "yesterday": yesterday_ts,
-        "tomorrow": tomorrow_ts
-    }
+    variables = {"now": now_ts, "yesterday": yesterday_ts, "tomorrow": tomorrow_ts}
 
     # Test with timestamps
     assert evaluate("yesterday is past", variables) is True
@@ -178,14 +166,27 @@ def test_complex_date_expressions():
         "start_date": now - timedelta(days=30),
         "end_date": now + timedelta(days=10),
         "signup_date": now - timedelta(days=5),
-        "last_login": now - timedelta(hours=2)
+        "last_login": now - timedelta(hours=2),
     }
 
     # Test combined expressions
     assert evaluate("start_date is past and end_date is future", variables) is True
-    assert evaluate("signup_date within 7 days and last_login within 24 hours", variables) is True
-    assert evaluate("signup_date after start_date and signup_date before end_date", variables) is True
-    assert evaluate("signup_date older than 2 days or last_login older than 3 hours", variables) is True
+    assert (
+        evaluate("signup_date within 7 days and last_login within 24 hours", variables)
+        is True
+    )
+    assert (
+        evaluate(
+            "signup_date after start_date and signup_date before end_date", variables
+        )
+        is True
+    )
+    assert (
+        evaluate(
+            "signup_date older than 2 days or last_login older than 3 hours", variables
+        )
+        is True
+    )
 
 
 def test_date_conversion_edge_cases():
@@ -196,10 +197,7 @@ def test_date_conversion_edge_cases():
     assert evaluate("timestamp is past or timestamp is future", variables) is True
 
     # Test parsing different string formats
-    variables = {
-        "iso_date": "2023-05-10T14:30:00Z",
-        "simple_date": "2023-05-10"
-    }
+    variables = {"iso_date": "2023-05-10T14:30:00Z", "simple_date": "2023-05-10"}
     assert evaluate("iso_date before '2024-01-01'", variables) is True
     assert evaluate("simple_date before '2024-01-01'", variables) is True
 
@@ -213,7 +211,9 @@ def test_date_error_handling():
 
     # Test invalid type conversion - update the expected error message
     variables = {"obj": {}}
-    with pytest.raises(TypeError, match="Cannot convert"):  # Changed from "Unsupported type"
+    with pytest.raises(
+        TypeError, match="Cannot convert"
+    ):  # Changed from "Unsupported type"
         evaluate("obj is past", variables)
 
     # Test invalid time unit
@@ -243,7 +243,7 @@ def test_ensure_datetime_type_error():
 @settings(max_examples=10)
 @given(
     days_offset=st.integers(min_value=-1000, max_value=1000),
-    hours_offset=st.integers(min_value=-23, max_value=23)
+    hours_offset=st.integers(min_value=-23, max_value=23),
 )
 def test_date_before_after_property(days_offset, hours_offset):
     """Property test for date before/after comparisons."""
@@ -251,10 +251,7 @@ def test_date_before_after_property(days_offset, hours_offset):
     base = datetime.now(timezone.utc)
     other = base + timedelta(days=days_offset, hours=hours_offset)
 
-    variables = {
-        "base": base,
-        "other": other
-    }
+    variables = {"base": base, "other": other}
 
     # The expressions should match the Python comparison
     assert evaluate("base before other", variables) == (base < other)
@@ -262,22 +259,18 @@ def test_date_before_after_property(days_offset, hours_offset):
 
 
 @settings(max_examples=10)
-@given(
-    days_ago=st.integers(min_value=1, max_value=500)
-)
+@given(days_ago=st.integers(min_value=1, max_value=500))
 def test_date_older_than_within_property(days_ago):
     """Property test for date 'older than' and 'within' time periods."""
     now = datetime.now(timezone.utc)
     test_date = now - timedelta(days=days_ago)
 
-    variables = {
-        "test_date": test_date
-    }
+    variables = {"test_date": test_date}
 
     # Test older than
-    assert evaluate(f"test_date older than {days_ago-1} days", variables) is True
-    assert evaluate(f"test_date older than {days_ago+1} days", variables) is False
+    assert evaluate(f"test_date older than {days_ago - 1} days", variables) is True
+    assert evaluate(f"test_date older than {days_ago + 1} days", variables) is False
 
     # Test within
-    assert evaluate(f"test_date within {days_ago+1} days", variables) is True
-    assert evaluate(f"test_date within {days_ago-1} days", variables) is False
+    assert evaluate(f"test_date within {days_ago + 1} days", variables) is True
+    assert evaluate(f"test_date within {days_ago - 1} days", variables) is False

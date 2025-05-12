@@ -2,15 +2,19 @@
 Expression language implementation using Lark
 """
 
-import threading
 import json
+import threading
+import logging
 from datetime import datetime
 
-from lark import Lark, Transformer, exceptions as lark_exceptions
 from lark import Token
+from lark import Lark, Transformer, exceptions as lark_exceptions
 
-from dilemma.lookup import lookup_variable, DateTimeEncoder
+from dilemma.lookup import lookup_variable, DateTimeEncoder, evaluate_jq_expression
 from dilemma.dates import DateMethods
+
+
+log = logging.getLogger(__name__)
 
 # ruff: noqa: E501
 grammar = r"""
@@ -222,13 +226,12 @@ class ExpressionTransformer(Transformer, DateMethods):
                 "'contains' operator requires a collection (string, list, dict) as the left operand"
             )
 
-    def jq_expression(self, items: list[Token]) -> int | float | bool | str | list | dict | datetime:
+    def jq_expression(
+        self, items: list[Token]
+    ) -> int | float | bool | str | list | dict | datetime:
         """Process a raw JQ expression to access data in the variables"""
         # Extract the JQ expression from the token: `expression` -> expression
         jq_expr = items[0].value[1:-1]  # Remove ` prefix and ` suffix
-
-        # Import here to avoid circular imports
-        from dilemma.lookup import evaluate_jq_expression
 
         # Evaluate the JQ expression against the processed JSON
         value = evaluate_jq_expression(jq_expr, self.processed_json)
@@ -274,16 +277,13 @@ class CompiledExpression:
         Returns:
             The result of evaluating the expression
         """
-        # Use the helper function to process variables
         processed_json = _process_variables(variables)
 
-        # Evaluate with processed JSON
         try:
             transformer = ExpressionTransformer(processed_json=processed_json)
             result = transformer.transform(self.parse_tree)
             return result
         except lark_exceptions.VisitError as e:
-            # Error handling logic remains unchanged
             if isinstance(e.__context__, ZeroDivisionError):
                 raise ZeroDivisionError("Division by zero") from e
             if isinstance(e.__context__, NameError):
@@ -292,9 +292,10 @@ class CompiledExpression:
                 raise TypeError(str(e.__context__)) from e
 
             # Show the actual error rather than a generic message
-            print(f"DEBUG - Original error: {type(e.__context__).__name__}: {e.__context__}")
+            print(
+                f"DEBUG - Original error: {type(e.__context__).__name__}: {e.__context__}"
+            )
 
-            # Re-raise other VisitErrors with the original cause
             raise ValueError(
                 f"Error evaluating expression: {self.expression} - Caused by: {type(e.__context__).__name__}: {e.__context__}"
             ) from e
@@ -353,7 +354,9 @@ def compile(expression: str) -> CompiledExpression:
 
 
 # Function to evaluate expressions
-def evaluate(expression: str, variables: dict | str | None = None) -> int | float | bool | str:
+def evaluate(
+    expression: str, variables: dict | str | None = None
+) -> int | float | bool | str:
     """
     Evaluate an expression with integers, arithmetic operations, comparisons,
     and variables.
@@ -361,17 +364,15 @@ def evaluate(expression: str, variables: dict | str | None = None) -> int | floa
     For better performance when evaluating the same expression multiple times with
     different variable contexts, use the compile() function instead.
     """
-    # Use the helper function to process variables
+
     processed_json = _process_variables(variables)
 
-    # Parse the expression
     try:
         parser = build_parser()
         tree = parser.parse(expression)
     except Exception as e:
         raise ValueError(f"Invalid expression syntax: {expression}") from e
 
-    # Evaluate with processed JSON
     try:
         transformer = ExpressionTransformer(processed_json=processed_json)
         result = transformer.transform(tree)
@@ -385,10 +386,10 @@ def evaluate(expression: str, variables: dict | str | None = None) -> int | floa
         if isinstance(e.__context__, TypeError):
             raise TypeError(str(e.__context__)) from e
 
-        # Show the actual error rather than a generic message
-        print(f"DEBUG - Original error: {type(e.__context__).__name__}: {e.__context__}")
+        log.error(
+            f"DEBUG - Original error: {type(e.__context__).__name__}: {e.__context__}"
+        )
 
-        # Re-raise other VisitErrors with the original cause
         raise ValueError(
             f"Error evaluating expression: {expression} - Caused by: {type(e.__context__).__name__}: {e.__context__}"
         ) from e

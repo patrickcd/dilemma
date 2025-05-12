@@ -127,7 +127,7 @@ Verify a date in the past
 #### Context  
 ```json
 {
-  "past_date": "2025-05-10 23:51:14 UTC"
+  "past_date": "2025-05-11 00:57:20 UTC"
 }
 ```  
 
@@ -143,7 +143,7 @@ Verify a date in the future
 #### Context  
 ```json
 {
-  "future_date": "2025-05-12 23:51:14 UTC"
+  "future_date": "2025-05-13 00:57:20 UTC"
 }
 ```  
 
@@ -159,7 +159,7 @@ Verify a date is today
 #### Context  
 ```json
 {
-  "today_date": "2025-05-11 23:51:14 UTC"
+  "today_date": "2025-05-12 00:57:20 UTC"
 }
 ```  
 
@@ -177,7 +177,7 @@ Check event within recent hours
 #### Context  
 ```json
 {
-  "recent_event": "2025-05-11 22:51:14 UTC"
+  "recent_event": "2025-05-11 23:57:20 UTC"
 }
 ```  
 
@@ -193,7 +193,7 @@ Check event older than a week
 #### Context  
 ```json
 {
-  "old_event": "2025-05-04 23:51:14 UTC"
+  "old_event": "2025-05-05 00:57:20 UTC"
 }
 ```  
 
@@ -209,7 +209,7 @@ Check event within minutes (not hours)
 #### Context  
 ```json
 {
-  "very_recent": "2025-05-11 23:51:14 UTC"
+  "very_recent": "2025-05-12 00:57:20 UTC"
 }
 ```  
 
@@ -227,8 +227,8 @@ Compare two dates with before
 #### Context  
 ```json
 {
-  "start_date": "2025-05-10 23:51:14 UTC",
-  "end_date": "2025-05-12 23:51:14 UTC"
+  "start_date": "2025-05-11 00:57:20 UTC",
+  "end_date": "2025-05-13 00:57:20 UTC"
 }
 ```  
 
@@ -244,8 +244,8 @@ Compare two dates with after
 #### Context  
 ```json
 {
-  "start_date": "2025-05-10 23:51:14 UTC",
-  "end_date": "2025-05-12 23:51:14 UTC"
+  "start_date": "2025-05-11 00:57:20 UTC",
+  "end_date": "2025-05-13 00:57:20 UTC"
 }
 ```  
 
@@ -297,8 +297,8 @@ Check if project is currently active
 #### Context  
 ```json
 {
-  "project_start": "2025-05-10 23:51:14 UTC",
-  "project_end": "2025-05-12 23:51:14 UTC"
+  "project_start": "2025-05-11 00:57:20 UTC",
+  "project_end": "2025-05-13 00:57:20 UTC"
 }
 ```  
 
@@ -314,8 +314,8 @@ Recent login but account not new
 #### Context  
 ```json
 {
-  "last_login": "2025-05-11 22:51:14 UTC",
-  "signup_date": "2025-05-10 23:51:14 UTC"
+  "last_login": "2025-05-11 23:57:20 UTC",
+  "signup_date": "2025-05-11 00:57:20 UTC"
 }
 ```  
 
@@ -369,7 +369,7 @@ Use hours time unit
 #### Context  
 ```json
 {
-  "hour_ago": "2025-05-11 22:51:14 UTC"
+  "hour_ago": "2025-05-11 23:57:20 UTC"
 }
 ```  
 
@@ -385,7 +385,7 @@ Use minutes time unit
 #### Context  
 ```json
 {
-  "hour_ago": "2025-05-11 22:51:14 UTC"
+  "hour_ago": "2025-05-11 23:57:20 UTC"
 }
 ```  
 
@@ -401,7 +401,7 @@ Use days time unit
 #### Context  
 ```json
 {
-  "week_ago": "2025-05-04 23:51:14 UTC"
+  "week_ago": "2025-05-05 00:57:20 UTC"
 }
 ```  
 
@@ -409,7 +409,7 @@ Use days time unit
   
   
 ### List Operations  
-Check if an element exists in a list using 'in'  
+Check if an element exists in a list using &#x27;in&#x27;  
   
 | Expression | Expected Result |  
 |:---:|:---:|  
@@ -917,11 +917,11 @@ Check if user is eligible for premium features
     "account": {
       "is_active": true,
       "credits": 150,
-      "created_at": "2025-05-04 23:51:14 UTC"
+      "created_at": "2025-05-05 00:57:20 UTC"
     },
     "subscription": {
       "level": "basic",
-      "renewal_date": "2025-06-10 23:51:14 UTC"
+      "renewal_date": "2025-06-11 00:57:20 UTC"
     }
   }
 }
@@ -941,8 +941,8 @@ Evaluate complex project status conditions
 {
   "project": {
     "status": "in_progress",
-    "start_date": "2025-05-04 23:51:14 UTC",
-    "deadline": "2025-06-10 23:51:14 UTC",
+    "start_date": "2025-05-05 00:57:20 UTC",
+    "deadline": "2025-06-11 00:57:20 UTC",
     "metrics": {
       "completion": 45,
       "quality": 98
@@ -972,7 +972,7 @@ Check if order is eligible for express shipping
 {
   "order": {
     "status": "confirmed",
-    "created_at": "2025-05-11 22:51:14 UTC",
+    "created_at": "2025-05-11 23:57:20 UTC",
     "items": {
       "count": 7,
       "categories": [
@@ -982,7 +982,7 @@ Check if order is eligible for express shipping
     },
     "customer": {
       "tier": "gold",
-      "since": "2025-05-04 23:51:14 UTC"
+      "since": "2025-05-05 00:57:20 UTC"
     },
     "total_value": 250
   }
@@ -1002,15 +1002,15 @@ Multiple date conditions with nested properties
 ```json
 {
   "user": {
-    "last_login": "2025-05-04 23:51:14 UTC",
+    "last_login": "2025-05-05 00:57:20 UTC",
     "auto_login": true,
     "registration_date": "2023-01-15",
     "account": {
-      "trial_ends": "2025-05-10 23:51:14 UTC",
+      "trial_ends": "2025-05-11 00:57:20 UTC",
       "subscription": {
         "status": "active",
         "plan": "premium",
-        "next_payment": "2025-06-10 23:51:14 UTC"
+        "next_payment": "2025-06-11 00:57:20 UTC"
       }
     }
   }
@@ -1042,7 +1042,7 @@ Test operator precedence with mixed conditions
       },
       "theme": "dark"
     },
-    "last_seen": "2025-05-04 23:51:14 UTC",
+    "last_seen": "2025-05-05 00:57:20 UTC",
     "preferences": {
       "urgent_only": false,
       "language": "en"
@@ -1119,7 +1119,7 @@ Check array length using JQ pipe function
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| ``.products \| length` > 2` | `True` |  
+| ``.products | length` > 2` | `True` |  
   
   
 #### Context  
@@ -1148,7 +1148,7 @@ Check if any array element matches a condition
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| ``.users[] \| select(.role == \"admin\") \| .name` == 'Eva'` | `True` |  
+| ``.users[] | select(.role == "admin") | .name` == 'Eva'` | `True` |  
   
   
 #### Context  
@@ -1179,7 +1179,7 @@ Filter array elements based on a condition
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| ``.orders[] \| select(.status == \"completed\") \| .id` == 1003` | `True` |  
+| ``.orders[] | select(.status == "completed") | .id` == 1003` | `True` |  
   
   
 #### Context  
@@ -1219,7 +1219,7 @@ Combine JQ with regular Dilemma expressions
   "user": {
     "membership": {
       "level": "gold",
-      "since": "2025-05-04 23:51:14 UTC"
+      "since": "2025-05-05 00:57:20 UTC"
     },
     "account": {
       "active": true,
@@ -1237,7 +1237,7 @@ Complex data transformation with JQ
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| ``.departments[] \| select(.name == \"Engineering\").employees \| map(.salary) \| add / length` > 75000` | `True` |  
+| ``.departments[] | select(.name == "Engineering").employees | map(.salary) | add / length` > 75000` | `True` |  
   
   
 #### Context  
@@ -1284,7 +1284,7 @@ Check if an array contains a specific value
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| ``.user.permissions \| contains([\"edit\"])`` | `True` |  
+| ``.user.permissions | contains(["edit"])`` | `True` |  
   
   
 #### Context  
@@ -1308,7 +1308,7 @@ Use JQ to conditionally create and check an object
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| ``if .user.premium then {access: \"full\"} else {access: \"limited\"} end \| .access` == 'full'` | `True` |  
+| ``if .user.premium then {access: "full"} else {access: "limited"} end | .access` == 'full'` | `True` |  
   
   
 #### Context  
@@ -1327,7 +1327,7 @@ Complex JQ expression with deeply nested parentheses and operations
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| ``.employees \| map( ((.performance.rating * 0.5) + ((.projects \| map(select(.status == \"completed\") \| .difficulty) \| add // 0) * 0.3) + (if (.years_experience > 5) then ((.leadership_score // 0) * 0.2) else ((.learning_speed // 0) * 0.2) end) ) * (if .department == \"Engineering\" then 1.1 else 1 end) ) \| add / length` > 75` | `True` |  
+| ``.employees | map( ((.performance.rating * 0.5) + ((.projects | map(select(.status == "completed") | .difficulty) | add // 0) * 0.3) + (if (.years_experience > 5) then ((.leadership_score // 0) * 0.2) else ((.learning_speed // 0) * 0.2) end) ) * (if .department == "Engineering" then 1.1 else 1 end) ) | add / length` > 75` | `True` |  
   
   
 #### Context  
@@ -1409,7 +1409,7 @@ Use JQ to extract a date for comparison
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| ``.project.milestones[] \| select(.name == \"beta\").date` is past` | `True` |  
+| ``.project.milestones[] | select(.name == "beta").date` is past` | `True` |  
   
   
 #### Context  
@@ -1420,15 +1420,15 @@ Use JQ to extract a date for comparison
     "milestones": [
       {
         "name": "alpha",
-        "date": "2025-06-10 23:51:14 UTC"
+        "date": "2025-06-11 00:57:20 UTC"
       },
       {
         "name": "beta",
-        "date": "2025-05-10 23:51:14 UTC"
+        "date": "2025-05-11 00:57:20 UTC"
       },
       {
         "name": "release",
-        "date": "2025-05-12 01:51:14 UTC"
+        "date": "2025-05-12 02:57:20 UTC"
       }
     ]
   }
@@ -1443,7 +1443,7 @@ Simple JQ expression nested inside multiple levels of Dilemma parentheses
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| `(5 + ((`.users \| length` * 2) - 1)) > 5` | `True` |  
+| `(5 + ((`.users | length` * 2) - 1)) > 5` | `True` |  
   
   
 #### Context  

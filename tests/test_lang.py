@@ -178,7 +178,6 @@ def test_thread_safety():
     assert results == [2, 6, 2.0]
 
 
-
 def test_variables_processing_json_error(monkeypatch):
     """Test that errors during JSON processing raise the appropriate error"""
     import json
@@ -205,7 +204,6 @@ def test_variables_processing_json_error(monkeypatch):
     assert "Mock JSON processing error" in str(excinfo.value)
 
 
-
 def test_compiled_expression():
     """Test that compiled expressions work correctly"""
     from dilemma.lang import compile
@@ -229,26 +227,11 @@ def test_compiled_expression_with_path_variables():
     expr = compile("project.status == 'active' and project.team.size >= 3")
 
     # Test with different variable contexts
-    variables1 = {
-        "project": {
-            "status": "active",
-            "team": {"size": 5}
-        }
-    }
-    variables2 = {
-        "project": {
-            "status": "active",
-            "team": {"size": 2}
-        }
-    }
-    variables3 = {
-        "project": {
-            "status": "inactive",
-            "team": {"size": 10}
-        }
-    }
+    variables1 = {"project": {"status": "active", "team": {"size": 5}}}
+    variables2 = {"project": {"status": "active", "team": {"size": 2}}}
+    variables3 = {"project": {"status": "inactive", "team": {"size": 10}}}
 
-    assert expr.evaluate(variables1) == True   # active and size(5) >= 3
+    assert expr.evaluate(variables1) == True  # active and size(5) >= 3
     assert expr.evaluate(variables2) == False  # active but size(2) < 3
     assert expr.evaluate(variables3) == False  # inactive and size(10) >= 3
 
@@ -277,14 +260,9 @@ def test_jq_expressions():
     variables = {
         "users": [
             {"name": "Alice", "roles": ["admin", "user"]},
-            {"name": "Bob", "roles": ["user"]}
+            {"name": "Bob", "roles": ["user"]},
         ],
-        "settings": {
-            "features": {
-                "advanced": True,
-                "beta": False
-            }
-        }
+        "settings": {"features": {"advanced": True, "beta": False}},
     }
 
     # Test expressions with angle bracket syntax
@@ -292,20 +270,16 @@ def test_jq_expressions():
         # Basic JQ expressions
         ('`.users[0].name` == "Alice"', True),
         ('`.users[1].name` == "Bob"', True),
-
         # Array access
         ('`.users[0].roles[0]` == "admin"', True),
-
         # Nested property access
-        ('`.settings.features.advanced`', True),
-        ('`.settings.features.beta`', False),
-
+        ("`.settings.features.advanced`", True),
+        ("`.settings.features.beta`", False),
         # JQ expressions in complex conditions
         ('`.users[0].roles` contains "admin" and `.settings.features.advanced`', True),
         ('`.users[1].roles` contains "admin" or `.settings.features.beta`', False),
-
         # Mixed with regular variable paths
-        ('users[0].name == `.users[0].name`', True),
+        ("users[0].name == `.users[0].name`", True),
     ]
 
     for expr, expected in expressions:
@@ -318,13 +292,13 @@ def test_jq_expression_errors():
 
     # Invalid JQ syntax
     with pytest.raises(NameError) as excinfo:
-        evaluate('`invalid[syntax`', variables)
+        evaluate("`invalid[syntax`", variables)
     assert "Failed to evaluate JQ expression" in str(excinfo.value)
 
     # Path that doesn't exist
-    assert evaluate('`.user.age`', variables) is None
+    assert evaluate("`.user.age`", variables) is None
 
     # Empty JQ expression
     with pytest.raises(NameError) as excinfo:
-        evaluate('``', variables)
+        evaluate("``", variables)
     assert "Failed to evaluate JQ expression" in str(excinfo.value)

@@ -8,7 +8,6 @@ from dilemma.lookup import lookup_variable
 import jq
 
 
-
 def test_lang_paren_expression():
     """
     Test parenthesized expressions to exercise the grammar's paren rule.
@@ -17,6 +16,7 @@ def test_lang_paren_expression():
     # Simple arithmetic expression in parentheses
     result = evaluate("(2 + 3) * 4", {})
     assert result == 20
+
 
 def test_lang_nested_arithmetic():
     """
@@ -39,6 +39,7 @@ def test_evaluate_returns_datetime():
     assert isinstance(result, datetime)
     # Compare ISO strings to account for potential microsecond differences.
     assert result.isoformat() == dt.isoformat()
+
 
 def test_lookup_error_nonexistent_path():
     """
@@ -73,7 +74,6 @@ def test_lookup_null_result_for_key():
         evaluate("a.x", context)
 
 
-
 def test_lookup_top_level_variable():
     """
     Test the optimization for top-level variables in lookup_variable.
@@ -88,6 +88,7 @@ def test_lookup_top_level_variable():
     result = evaluate("a", context)
     assert result == 42
 
+
 def test_lookup_top_level_variable_no_dot():
     """
     Test the optimization for top-level variables in lookup_variable.
@@ -101,6 +102,7 @@ def test_lookup_top_level_variable_no_dot():
     # Also test through evaluate()
     result = evaluate("simple_key", context)
     assert result == "simple_value"
+
 
 def test_lookup_null_result():
     """
@@ -152,6 +154,7 @@ def test_evaluate_datetime_from_json_string():
     event_date = evaluate("user.events[1].timestamp", nested_json)
     assert isinstance(event_date, datetime)
     assert event_date.year == 2023 and event_date.month == 6 and event_date.day == 20
+
 
 # Strategy for generating valid variable names (alphanumeric, starting with
 # a letter or underscore)
@@ -321,4 +324,3 @@ def test_lookup_path_starting_with_bracket():
     # This wouldn't hit the branch but confirms the lookup functionality
     result = lookup_variable("items[1].id", nested_context)
     assert result == 2
-

@@ -10,7 +10,7 @@ def test_list_membership():
     variables = {
         "roles": ["admin", "editor", "viewer"],
         "numbers": [1, 2, 3, 4, 5],
-        "empty_list": []
+        "empty_list": [],
     }
 
     # Testing 'in' operator
@@ -38,12 +38,9 @@ def test_dict_membership():
         "user": {
             "name": "John Doe",
             "role": "admin",
-            "settings": {
-                "theme": "dark",
-                "notifications": True
-            }
+            "settings": {"theme": "dark", "notifications": True},
         },
-        "empty_dict": {}
+        "empty_dict": {},
     }
 
     # Testing 'in' operator (key existence)
@@ -66,14 +63,11 @@ def test_mixed_container_types():
     variables = {
         "data": {
             "tags": ["important", "urgent", "review"],
-            "properties": {
-                "color": "red",
-                "priority": "high"
-            }
+            "properties": {"color": "red", "priority": "high"},
         },
         "items": ["apple", "banana", {"type": "fruit"}],
         # Add a direct reference to the dictionary item for testing
-        "fruit_object": {"type": "fruit"}
+        "fruit_object": {"type": "fruit"},
     }
 
     # Test accessing lists inside dicts
@@ -92,7 +86,7 @@ def test_collection_equality():
         "list3": [3, 2, 1],
         "dict1": {"a": 1, "b": 2},
         "dict2": {"b": 2, "a": 1},
-        "dict3": {"a": 1, "c": 3}
+        "dict3": {"a": 1, "c": 3},
     }
 
     # List equality
@@ -112,7 +106,7 @@ def test_container_type_errors():
         "string": "hello",
         "boolean": True,
         "list": [1, 2, 3],
-        "dict": {"a": 1, "b": 2}
+        "dict": {"a": 1, "b": 2},
     }
 
     # These should raise TypeError because the right operand is not a collection
@@ -138,21 +132,13 @@ def test_container_type_errors():
         evaluate("boolean contains 'r'", variables)
 
 
-
 def test_lookup_variable_with_collections():
     """Test lookup_variable function with collections."""
 
-
     # Test with nested dict and list
     context = {
-        "users": [
-            {"id": 1, "name": "Alice"},
-            {"id": 2, "name": "Bob"}
-        ],
-        "settings": {
-            "features": ["search", "export", "import"],
-            "theme": "dark"
-        }
+        "users": [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}],
+        "settings": {"features": ["search", "export", "import"], "theme": "dark"},
     }
 
     # Test lookup on lists with index - using lookup_variable directly, not evaluate
@@ -211,16 +197,15 @@ def test_datetime_in_collections():
 
     variables = {
         "dates": [yesterday, now, tomorrow],
-        "event": {
-            "start": yesterday,
-            "end": tomorrow
-        }
+        "event": {"start": yesterday, "end": tomorrow},
     }
 
     # Test datetime comparisons in lists
     # Need to use a datetime that would serialize/deserialize correctly
     iso_now = now.isoformat()
-    assert evaluate(f"'{iso_now}' in dates", variables) is False  # String comparison won't match
+    assert (
+        evaluate(f"'{iso_now}' in dates", variables) is False
+    )  # String comparison won't match
 
     # Test access to datetime in dict
     assert evaluate("event.start is past", variables) is True
@@ -237,21 +222,19 @@ def test_complex_nested_structures():
                     "name": "Engineering",
                     "teams": [
                         {"name": "Frontend", "members": ["Alice", "Bob"]},
-                        {"name": "Backend", "members": ["Charlie", "Dave"]}
-                    ]
+                        {"name": "Backend", "members": ["Charlie", "Dave"]},
+                    ],
                 },
                 {
                     "name": "Marketing",
-                    "teams": [
-                        {"name": "Digital", "members": ["Eve", "Frank"]}
-                    ]
-                }
-            ]
+                    "teams": [{"name": "Digital", "members": ["Eve", "Frank"]}],
+                },
+            ],
         },
         # Add direct references to the nested objects for testing
         "frontend_team": {"name": "Frontend", "members": ["Alice", "Bob"]},
         "marketing_team": {"name": "Digital", "members": ["Eve", "Frank"]},
-        "marketing_dept": {"name": "Marketing"}
+        "marketing_dept": {"name": "Marketing"},
     }
 
     # Test with directly referenced objects instead of array indexes
@@ -259,7 +242,9 @@ def test_complex_nested_structures():
     assert evaluate("marketing_team.members contains 'Eve'", variables) is True
 
     # Test composite conditions with direct object references
-    complex_expr = "'Marketing' in marketing_dept.name and 'Frank' in marketing_team.members"
+    complex_expr = (
+        "'Marketing' in marketing_dept.name and 'Frank' in marketing_team.members"
+    )
     assert evaluate(complex_expr, variables) is True
 
 

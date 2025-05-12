@@ -49,11 +49,12 @@ doc = [
     "Pygments",
 ]
 dev = [
-    "black",
+    "click",
     "isort",
     "mypy",
     "pre-commit",
     "ruff",
+    "types-PyYAML",
 ]
 all = ["dilemma[test,doc,dev]"]
 

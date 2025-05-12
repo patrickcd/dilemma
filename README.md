@@ -16,7 +16,7 @@ A friendly yet powerful expression evaluation engine  for Python applications.
 {
     bar: {
       closing_time: "23:30",
-      distance: "2 miles"
+      distance: "2"
     },
     bike{
       speed: "10",
@@ -26,8 +26,8 @@ A friendly yet powerful expression evaluation engine  for Python applications.
 
 # dilemma expression:
 
->  bar.closing_time after one hour and bike.speed > 2
-Result: True
+>  bar.closing_time after one hour and (bar.distance / bike.speed) < 1
+Result: True (last orders very possible)
 ```
 
 #### Async Note
