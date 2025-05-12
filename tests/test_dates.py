@@ -8,7 +8,7 @@ from dilemma.dates import DateMethods
 
 
 def test_date_is_comparisons():
-    """Test 'is past/future/today' date comparisons."""
+    """Test 'is $past/future/today' date comparisons."""
     now = datetime.now(timezone.utc)
     yesterday = now - timedelta(days=1)
     tomorrow = now + timedelta(days=1)
@@ -22,18 +22,18 @@ def test_date_is_comparisons():
         "today_date": today_different_time,
     }
 
-    # Test 'is past'
-    assert evaluate("past_date is past", variables) is True
-    assert evaluate("future_date is past", variables) is False
+    # Test 'is $past'
+    assert evaluate("past_date is $past", variables) is True
+    assert evaluate("future_date is $past", variables) is False
 
-    # Test 'is future'
-    assert evaluate("future_date is future", variables) is True
-    assert evaluate("past_date is future", variables) is False
+    # Test 'is $future'
+    assert evaluate("future_date is $future", variables) is True
+    assert evaluate("past_date is $future", variables) is False
 
-    # Test 'is today'
-    assert evaluate("today_date is today", variables) is True
-    assert evaluate("past_date is today", variables) is False
-    assert evaluate("future_date is today", variables) is False
+    # Test 'is $today'
+    assert evaluate("today_date is $today", variables) is True
+    assert evaluate("past_date is $today", variables) is False
+    assert evaluate("future_date is $today", variables) is False
 
 
 def test_date_within_comparisons():
@@ -138,8 +138,8 @@ def test_string_to_date_conversion():
     variables = {"date_string": yesterday, "future_string": tomorrow}
 
     # Test with string dates
-    assert evaluate("date_string is past", variables) is True
-    assert evaluate("future_string is future", variables) is True
+    assert evaluate("date_string is $past", variables) is True
+    assert evaluate("future_string is $future", variables) is True
     assert evaluate("date_string before future_string", variables) is True
 
 
@@ -152,8 +152,8 @@ def test_timestamp_to_date_conversion():
     variables = {"now": now_ts, "yesterday": yesterday_ts, "tomorrow": tomorrow_ts}
 
     # Test with timestamps
-    assert evaluate("yesterday is past", variables) is True
-    assert evaluate("tomorrow is future", variables) is True
+    assert evaluate("yesterday is $past", variables) is True
+    assert evaluate("tomorrow is $future", variables) is True
     assert evaluate("yesterday before tomorrow", variables) is True
     assert evaluate("yesterday older than 12 hours", variables) is True
 
@@ -170,7 +170,7 @@ def test_complex_date_expressions():
     }
 
     # Test combined expressions
-    assert evaluate("start_date is past and end_date is future", variables) is True
+    assert evaluate("start_date is $past and end_date is $future", variables) is True
     assert (
         evaluate("signup_date within 7 days and last_login within 24 hours", variables)
         is True
@@ -194,7 +194,7 @@ def test_date_conversion_edge_cases():
     # Test timestamp conversion
     timestamp = datetime.now(timezone.utc).timestamp()
     variables = {"timestamp": timestamp}
-    assert evaluate("timestamp is past or timestamp is future", variables) is True
+    assert evaluate("timestamp is $past or timestamp is $future", variables) is True
 
     # Test parsing different string formats
     variables = {"iso_date": "2023-05-10T14:30:00Z", "simple_date": "2023-05-10"}
@@ -207,14 +207,14 @@ def test_date_error_handling():
     # Test invalid string format
     variables = {"bad_date": "not-a-date"}
     with pytest.raises(ValueError, match="Could not parse date string"):
-        evaluate("bad_date is past", variables)
+        evaluate("bad_date is $past", variables)
 
     # Test invalid type conversion - update the expected error message
     variables = {"obj": {}}
     with pytest.raises(
         TypeError, match="Cannot convert"
     ):  # Changed from "Unsupported type"
-        evaluate("obj is past", variables)
+        evaluate("obj is $past", variables)
 
     # Test invalid time unit
     with pytest.raises(ValueError, match="Unsupported time unit"):

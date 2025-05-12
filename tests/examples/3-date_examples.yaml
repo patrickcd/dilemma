@@ -4,7 +4,7 @@
 - name: past_date_verification
   category: date_state
   description: "Verify a date in the past"
-  expression: "past_date is past"
+  expression: "past_date is $past"
   expected: true
   context:
     past_date: "__YESTERDAY__"
@@ -12,15 +12,15 @@
 - name: future_date_verification
   category: date_state
   description: "Verify a date in the future"
-  expression: "future_date is future"
+  expression: "future_date is $future"
   expected: true
   context:
     future_date: "__TOMORROW__"
 
 - name: today_date_verification
   category: date_state
-  description: "Verify a date is today"
-  expression: "today_date is today"
+  description: "Verify a date is $today"
+  expression: "today_date is $today"
   expected: true
   context:
     today_date: "__NOW__"
@@ -91,7 +91,7 @@
 - name: project_timeline_active
   category: complex
   description: "Check if project is currently active"
-  expression: "project_start is past and project_end is future"
+  expression: "project_start is $past and project_end is $future"
   expected: true
   context:
     project_start: "__YESTERDAY__"
@@ -117,8 +117,8 @@
 
 - name: literal_date_past
   category: string_dates
-  description: "Check literal date is past"
-  expression: "'2020-01-01' is past"
+  description: "Check literal date is $past"
+  expression: "'2020-01-01' is $past"
   expected: true
 
 - name: literal_date_older_than

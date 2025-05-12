@@ -121,9 +121,12 @@ Behind the scenes, the path lookups are optimized to provide the best performanc
 Dilemma provides convenient date and time comparison operations that make it easy to work with temporal data:
 
 - **State comparisons**:
-  - `date is past` - Checks if a date is in the past
-  - `date is future` - Checks if a date is in the future
-  - `date is today` - Checks if a date falls on the current day
+  - `date is $past` - Checks if a date is in the past
+  - `date is $future` - Checks if a date is in the future
+  - `date is $today` - Checks if a date falls on the current day
+
+- **Time references**:
+  - `$now` - References the current date and time for comparisons (e.g., `date > $now`)
 
 - **Time window comparisons**:
   - `date within N unit` - Checks if a date is within the specified time period from now
@@ -135,26 +138,42 @@ Dilemma provides convenient date and time comparison operations that make it eas
   - `date1 after date2` - Checks if the first date is chronologically after the second
   - `date1 same_day_as date2` - Checks if both dates fall on the same calendar day
 
-- **Format flexibility**:
-  - Works with Python `datetime` objects
-  - Automatically parses ISO 8601 date strings (`"2023-05-10T14:30:00Z"`)
-  - Supports simple date strings (`"2023-05-10"`)
-  - Handles Unix timestamps
-
 Examples:
 
 ```python
 # Check if account has expired
-evaluate("user.subscription.end_date is past", context)
+evaluate("user.subscription.end_date is $past", context)
 
-# Check for recent activity - leading forward slash is optional
+# Check for recent activity
 evaluate("user.last_login within 24 hours", context)
 
 # Check if a date range contains today
-evaluate("start_date before today and end_date after today", context)
+evaluate("start_date before $now and end_date after $now", context)
 
 # Check account age
 evaluate("user.created_at older than 1 year", context)
+
+# Compare with current time
+evaluate("meeting.start_time > $now", context)
+```
+
+### Container Emptiness Checks
+
+Dilemma provides a convenient way to check if containers (lists and dictionaries) are empty:
+
+- `container is $empty` - Returns `True` if the container has no elements
+
+Examples:
+
+```python
+# Check if a user has any roles
+evaluate("user.roles is $empty", context)  # True if roles list is empty
+
+# Check if search results exist
+evaluate("search_results is $empty", context)  # True if no results
+
+# Combine with other conditions
+evaluate("user.is_active and not (user.permissions is $empty)", context)
 ```
 
 ### Optimization Details

@@ -53,7 +53,7 @@
 - name: complex_date_conditions
   category: mixed_date_logic
   description: "Multiple date conditions with nested properties"
-  expression: "(user.last_login within 7 days or user.auto_login) and (user.account.trial_ends is future or user.account.subscription.status == 'active')"
+  expression: "(user.last_login within 7 days or user.auto_login) and (user.account.trial_ends is $future or user.account.subscription.status == 'active')"
   expected: true
   context:
     user:

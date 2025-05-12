@@ -47,6 +47,49 @@ Check if two variables are equal
 
 ---
   
+Check if a filename matches a pattern with wildcard  
+  
+| Expression | Expected Result |  
+|:---:|:---:|  
+| `'document.pdf' like '*.pdf'` | `True` |  
+  
+
+---
+  
+Check if a string matches a pattern with ? (single character wildcard)  
+  
+| Expression | Expected Result |  
+|:---:|:---:|  
+| `'user123' like 'user???'` | `True` |  
+  
+
+---
+  
+Demonstrate case-insensitive matching with the &#x27;like&#x27; operator  
+  
+| Expression | Expected Result |  
+|:---:|:---:|  
+| `'Hello.TXT' like '*.txt'` | `True` |  
+  
+
+---
+  
+Match a variable against a pattern  
+  
+| Expression | Expected Result |  
+|:---:|:---:|  
+| `filename like '*.jpg'` | `True` |  
+  
+  
+#### Context  
+```json
+{
+  "filename": "vacation-photo.JPG"
+}
+```  
+
+---
+  
   
 ### Maths  
 Multiply two integers  
@@ -121,13 +164,13 @@ Verify a date in the past
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| `past_date is past` | `True` |  
+| `past_date is $past` | `True` |  
   
   
 #### Context  
 ```json
 {
-  "past_date": "2025-05-11 00:57:20 UTC"
+  "past_date": "2025-05-11 13:01:53 UTC"
 }
 ```  
 
@@ -137,29 +180,29 @@ Verify a date in the future
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| `future_date is future` | `True` |  
+| `future_date is $future` | `True` |  
   
   
 #### Context  
 ```json
 {
-  "future_date": "2025-05-13 00:57:20 UTC"
+  "future_date": "2025-05-13 13:01:53 UTC"
 }
 ```  
 
 ---
   
-Verify a date is today  
+Verify a date is $today  
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| `today_date is today` | `True` |  
+| `today_date is $today` | `True` |  
   
   
 #### Context  
 ```json
 {
-  "today_date": "2025-05-12 00:57:20 UTC"
+  "today_date": "2025-05-12 13:01:53 UTC"
 }
 ```  
 
@@ -177,7 +220,7 @@ Check event within recent hours
 #### Context  
 ```json
 {
-  "recent_event": "2025-05-11 23:57:20 UTC"
+  "recent_event": "2025-05-12 12:01:53 UTC"
 }
 ```  
 
@@ -193,7 +236,7 @@ Check event older than a week
 #### Context  
 ```json
 {
-  "old_event": "2025-05-05 00:57:20 UTC"
+  "old_event": "2025-05-05 13:01:53 UTC"
 }
 ```  
 
@@ -209,7 +252,7 @@ Check event within minutes (not hours)
 #### Context  
 ```json
 {
-  "very_recent": "2025-05-12 00:57:20 UTC"
+  "very_recent": "2025-05-12 13:01:53 UTC"
 }
 ```  
 
@@ -227,8 +270,8 @@ Compare two dates with before
 #### Context  
 ```json
 {
-  "start_date": "2025-05-11 00:57:20 UTC",
-  "end_date": "2025-05-13 00:57:20 UTC"
+  "start_date": "2025-05-11 13:01:53 UTC",
+  "end_date": "2025-05-13 13:01:53 UTC"
 }
 ```  
 
@@ -244,8 +287,8 @@ Compare two dates with after
 #### Context  
 ```json
 {
-  "start_date": "2025-05-11 00:57:20 UTC",
-  "end_date": "2025-05-13 00:57:20 UTC"
+  "start_date": "2025-05-11 13:01:53 UTC",
+  "end_date": "2025-05-13 13:01:53 UTC"
 }
 ```  
 
@@ -291,14 +334,14 @@ Check if project is currently active
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| `project_start is past and project_end is future` | `True` |  
+| `project_start is $past and project_end is $future` | `True` |  
   
   
 #### Context  
 ```json
 {
-  "project_start": "2025-05-11 00:57:20 UTC",
-  "project_end": "2025-05-13 00:57:20 UTC"
+  "project_start": "2025-05-11 13:01:53 UTC",
+  "project_end": "2025-05-13 13:01:53 UTC"
 }
 ```  
 
@@ -314,8 +357,8 @@ Recent login but account not new
 #### Context  
 ```json
 {
-  "last_login": "2025-05-11 23:57:20 UTC",
-  "signup_date": "2025-05-11 00:57:20 UTC"
+  "last_login": "2025-05-12 12:01:53 UTC",
+  "signup_date": "2025-05-11 13:01:53 UTC"
 }
 ```  
 
@@ -339,11 +382,11 @@ Compare ISO formatted date string
 
 ---
   
-Check literal date is past  
+Check literal date is $past  
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| `'2020-01-01' is past` | `True` |  
+| `'2020-01-01' is $past` | `True` |  
   
 
 ---
@@ -369,7 +412,7 @@ Use hours time unit
 #### Context  
 ```json
 {
-  "hour_ago": "2025-05-11 23:57:20 UTC"
+  "hour_ago": "2025-05-12 12:01:53 UTC"
 }
 ```  
 
@@ -385,7 +428,7 @@ Use minutes time unit
 #### Context  
 ```json
 {
-  "hour_ago": "2025-05-11 23:57:20 UTC"
+  "hour_ago": "2025-05-12 12:01:53 UTC"
 }
 ```  
 
@@ -401,7 +444,7 @@ Use days time unit
 #### Context  
 ```json
 {
-  "week_ago": "2025-05-05 00:57:20 UTC"
+  "week_ago": "2025-05-05 13:01:53 UTC"
 }
 ```  
 
@@ -902,6 +945,35 @@ Complex expression combining array lookups with object properties
 ---
   
   
+### Container Operations  
+Check if containers are empty using &#x27;is $empty&#x27;  
+  
+| Expression | Expected Result |  
+|:---:|:---:|  
+| `ghost_crew is $empty and deserted_mansion is $empty and (treasure_chest is $empty) == false` | `True` |  
+  
+  
+#### Context  
+```json
+{
+  "ghost_crew": [],
+  "treasure_chest": [
+    "ancient coin",
+    "golden chalice",
+    "ruby necklace"
+  ],
+  "deserted_mansion": {},
+  "dragon_hoard": {
+    "golden_crown": 1500,
+    "enchanted_sword": 3000,
+    "crystal_orb": 750
+  }
+}
+```  
+
+---
+  
+  
 ### Nested Objects  
 Check if user is eligible for premium features  
   
@@ -917,11 +989,11 @@ Check if user is eligible for premium features
     "account": {
       "is_active": true,
       "credits": 150,
-      "created_at": "2025-05-05 00:57:20 UTC"
+      "created_at": "2025-05-05 13:01:53 UTC"
     },
     "subscription": {
       "level": "basic",
-      "renewal_date": "2025-06-11 00:57:20 UTC"
+      "renewal_date": "2025-06-11 13:01:53 UTC"
     }
   }
 }
@@ -941,8 +1013,8 @@ Evaluate complex project status conditions
 {
   "project": {
     "status": "in_progress",
-    "start_date": "2025-05-05 00:57:20 UTC",
-    "deadline": "2025-06-11 00:57:20 UTC",
+    "start_date": "2025-05-05 13:01:53 UTC",
+    "deadline": "2025-06-11 13:01:53 UTC",
     "metrics": {
       "completion": 45,
       "quality": 98
@@ -972,7 +1044,7 @@ Check if order is eligible for express shipping
 {
   "order": {
     "status": "confirmed",
-    "created_at": "2025-05-11 23:57:20 UTC",
+    "created_at": "2025-05-12 12:01:53 UTC",
     "items": {
       "count": 7,
       "categories": [
@@ -982,7 +1054,7 @@ Check if order is eligible for express shipping
     },
     "customer": {
       "tier": "gold",
-      "since": "2025-05-05 00:57:20 UTC"
+      "since": "2025-05-05 13:01:53 UTC"
     },
     "total_value": 250
   }
@@ -995,22 +1067,22 @@ Multiple date conditions with nested properties
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| `(user.last_login within 7 days or user.auto_login) and (user.account.trial_ends is future or user.account.subscription.status == 'active')` | `True` |  
+| `(user.last_login within 7 days or user.auto_login) and (user.account.trial_ends is $future or user.account.subscription.status == 'active')` | `True` |  
   
   
 #### Context  
 ```json
 {
   "user": {
-    "last_login": "2025-05-05 00:57:20 UTC",
+    "last_login": "2025-05-05 13:01:53 UTC",
     "auto_login": true,
     "registration_date": "2023-01-15",
     "account": {
-      "trial_ends": "2025-05-11 00:57:20 UTC",
+      "trial_ends": "2025-05-11 13:01:53 UTC",
       "subscription": {
         "status": "active",
         "plan": "premium",
-        "next_payment": "2025-06-11 00:57:20 UTC"
+        "next_payment": "2025-06-11 13:01:53 UTC"
       }
     }
   }
@@ -1042,7 +1114,7 @@ Test operator precedence with mixed conditions
       },
       "theme": "dark"
     },
-    "last_seen": "2025-05-05 00:57:20 UTC",
+    "last_seen": "2025-05-05 13:01:53 UTC",
     "preferences": {
       "urgent_only": false,
       "language": "en"
@@ -1219,7 +1291,7 @@ Combine JQ with regular Dilemma expressions
   "user": {
     "membership": {
       "level": "gold",
-      "since": "2025-05-05 00:57:20 UTC"
+      "since": "2025-05-05 13:01:53 UTC"
     },
     "account": {
       "active": true,
@@ -1409,7 +1481,7 @@ Use JQ to extract a date for comparison
   
 | Expression | Expected Result |  
 |:---:|:---:|  
-| ``.project.milestones[] | select(.name == "beta").date` is past` | `True` |  
+| ``.project.milestones[] | select(.name == "beta").date` is $past` | `True` |  
   
   
 #### Context  
@@ -1420,15 +1492,15 @@ Use JQ to extract a date for comparison
     "milestones": [
       {
         "name": "alpha",
-        "date": "2025-06-11 00:57:20 UTC"
+        "date": "2025-06-11 13:01:53 UTC"
       },
       {
         "name": "beta",
-        "date": "2025-05-11 00:57:20 UTC"
+        "date": "2025-05-11 13:01:53 UTC"
       },
       {
         "name": "release",
-        "date": "2025-05-12 02:57:20 UTC"
+        "date": "2025-05-12 15:01:53 UTC"
       }
     ]
   }

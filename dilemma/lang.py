@@ -40,9 +40,9 @@ grammar = r"""
                | sum "in" sum -> contains
                | sum "contains" sum -> contained_in
                | sum "like" sum -> pattern_match
-               | sum "is" "past" -> date_is_past
-               | sum "is" "future" -> date_is_future
-               | sum "is" "today" -> date_is_today
+               | sum "is" "$past" -> date_is_past
+               | sum "is" "$future" -> date_is_future
+               | sum "is" "$today" -> date_is_today
                | sum "is" "$empty" -> is_empty
                | sum "within" INTEGER time_unit -> date_within
                | sum "older" "than" INTEGER time_unit -> date_older_than
@@ -67,6 +67,7 @@ grammar = r"""
          | "False" -> false_value
          | "true" -> true_value
          | "false" -> false_value
+         | "$now" -> now_value
          | VARIABLE -> variable
          | JQ_EXPR -> jq_expression
          | "(" expr ")" -> paren
@@ -292,6 +293,10 @@ class ExpressionTransformer(Transformer, DateMethods):
             raise TypeError(
                 "'is $empty' can only be used with container types (list, dict)"
             )
+
+    def now_value(self, _) -> datetime:
+        """Return the current datetime for use in comparisons"""
+        return datetime.now()
 
 
 # Thread-local storage for the parser

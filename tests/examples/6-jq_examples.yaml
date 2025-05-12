@@ -108,7 +108,7 @@
 - name: jq_conditional_with_dates
   category: jq_with_dates
   description: "Use JQ to extract a date for comparison"
-  expression: "`.project.milestones[] | select(.name == \"beta\").date` is past"
+  expression: "`.project.milestones[] | select(.name == \"beta\").date` is $past"
   expected: true
   context:
     project:

@@ -208,8 +208,8 @@ def test_datetime_in_collections():
     )  # String comparison won't match
 
     # Test access to datetime in dict
-    assert evaluate("event.start is past", variables) is True
-    assert evaluate("event.end is future", variables) is True
+    assert evaluate("event.start is $past", variables) is True
+    assert evaluate("event.end is $future", variables) is True
 
 
 def test_complex_nested_structures():
