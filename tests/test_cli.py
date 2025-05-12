@@ -257,8 +257,8 @@ def test_generate_markdown_docs(runner, tmp_path):
     assert "# Dilemma Expression Examples" in content
     assert "### Math" in content  # Adjusted to match the actual heading level
     assert "Basic addition" in content
-    assert "`2 + 2`" in content
-    assert "`4`" in content
+    assert "2 + 2" in content
+    assert "4" in content
 
 
 def test_gendocs_error_handling(runner):

@@ -3,86 +3,135 @@ This document contains examples of using the Dilemma expression language.
   
   
 ### String  
+Check if a filename matches a pattern with wildcard  
+  
+```  
+'document.pdf' like '*.pdf'  
+```  
+`Result: True`   
+
+---
+  
 Check if two words are equal  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'hello' == 'hello'` | `True` |  
-  
+```  
+'hello' is 'hello'  
+```  
+`Result: True`   
 
 ---
   
 Check if two words are not equal  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'hello' != 'world'` | `True` |  
+```  
+'hello' is not 'world'  
+```  
+`Result: True`   
+
+---
   
+Check if two words are not equal  
+  
+```  
+ friend.snores is not 'often'  
+```  
+```json
+{
+  "friend": {
+    "name": "Bob",
+    "snores": "often"
+  }
+}
+```  
+`Result: False`   
 
 ---
   
 Check if a phrase contains a word  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'world' in 'hello world'` | `True` |  
-  
+```  
+'world' in 'hello world'  
+```  
+`Result: True`   
 
 ---
   
 Check if two variables are equal  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `var1 == var2` | `True` |  
-  
+```  
+var1 is var2  
+```  
 ```json
 {
   "var1": "hello",
   "var2": "hello"
 }
 ```  
-
----
-  
-Check if a filename matches a pattern with wildcard  
-  
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'document.pdf' like '*.pdf'` | `True` |  
-  
+`Result: True`   
 
 ---
   
 Check if a string matches a pattern with ? (single character wildcard)  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'user123' like 'user???'` | `True` |  
-  
+```  
+'user123' like 'user???'  
+```  
+`Result: True`   
 
 ---
   
 Demonstrate case-insensitive matching with the &#x27;like&#x27; operator  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'Hello.TXT' like '*.txt'` | `True` |  
-  
+```  
+'Hello.TXT' like '*.txt'  
+```  
+`Result: True`   
 
 ---
   
 Match a variable against a pattern  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `filename like '*.jpg'` | `True` |  
-  
+```  
+filename like '*.jpg'  
+```  
 ```json
 {
   "filename": "vacation-photo.JPG"
 }
 ```  
+`Result: True`   
+
+---
+  
+Check a variable doen&#x27;t match  a pattern  
+  
+```  
+filename not like '*.jpg'  
+```  
+```json
+{
+  "filename": "vacation-photo.JPG"
+}
+```  
+`Result: False`   
+
+---
+  
+Check if two words are equal  
+  
+```  
+'hello' == 'hello'  
+```  
+`Result: True`   
+
+---
+  
+Check if two words are not equal  
+  
+```  
+'hello' != 'world'  
+```  
+`Result: True`   
 
 ---
   
@@ -90,55 +139,54 @@ Match a variable against a pattern
 ### Maths  
 Multiply two integers  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `8 * 8` | `64` |  
-  
+```  
+8 * 8  
+```  
+`Result: 64`   
 
 ---
   
 Divide two integers  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `64 / 8` | `8` |  
-  
+```  
+64 / 8  
+```  
+`Result: 8`   
 
 ---
   
 Add two integers  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `8 + 8` | `16` |  
-  
+```  
+8 + 8  
+```  
+`Result: 16`   
 
 ---
   
 Subtract two integers  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `8 - 8` | `0` |  
-  
+```  
+8 - 8  
+```  
+`Result: 0`   
 
 ---
   
 Multiply two floating point numbers  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `0.5 * 8.0` | `4.0` |  
-  
+```  
+0.5 * 8.0  
+```  
+`Result: 4.0`   
 
 ---
   
 Use variables in expressions  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `banana.price * order.quantity` | `16` |  
-  
+```  
+banana.price * order.quantity  
+```  
 ```json
 {
   "banana": {
@@ -149,6 +197,7 @@ Use variables in expressions
   }
 }
 ```  
+`Result: 16`   
 
 ---
   
@@ -156,43 +205,43 @@ Use variables in expressions
 ### Date State  
 Verify a date in the past  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `past_date is $past` | `True` |  
-  
+```  
+past_date is $past  
+```  
 ```json
 {
-  "past_date": "2025-05-11 13:56:39 UTC"
+  "past_date": "2025-05-11 16:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
 Verify a date in the future  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `future_date is $future` | `True` |  
-  
+```  
+future_date is $future  
+```  
 ```json
 {
-  "future_date": "2025-05-13 13:56:39 UTC"
+  "future_date": "2025-05-13 16:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
 Verify a date is $today  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `today_date is $today` | `True` |  
-  
+```  
+today_date is $today  
+```  
 ```json
 {
-  "today_date": "2025-05-12 13:56:39 UTC"
+  "today_date": "2025-05-12 16:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -200,43 +249,43 @@ Verify a date is $today
 ### Time Window  
 Check event within recent hours  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `recent_event within 12 hours` | `True` |  
-  
+```  
+recent_event within 12 hours  
+```  
 ```json
 {
-  "recent_event": "2025-05-12 12:56:39 UTC"
+  "recent_event": "2025-05-12 15:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
 Check event older than a week  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `old_event older than 1 week` | `True` |  
-  
+```  
+old_event older than 1 week  
+```  
 ```json
 {
-  "old_event": "2025-05-05 13:56:39 UTC"
+  "old_event": "2025-05-05 16:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
 Check event within minutes (not hours)  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `very_recent within 30 minutes` | `True` |  
-  
+```  
+very_recent within 30 minutes  
+```  
 ```json
 {
-  "very_recent": "2025-05-12 13:56:39 UTC"
+  "very_recent": "2025-05-12 16:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -244,61 +293,61 @@ Check event within minutes (not hours)
 ### Date Comparison  
 Compare two dates with before  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `start_date before end_date` | `True` |  
-  
+```  
+start_date before end_date  
+```  
 ```json
 {
-  "start_date": "2025-05-11 13:56:39 UTC",
-  "end_date": "2025-05-13 13:56:39 UTC"
+  "start_date": "2025-05-11 16:06:23 UTC",
+  "end_date": "2025-05-13 16:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
 Compare two dates with after  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `end_date after start_date` | `True` |  
-  
+```  
+end_date after start_date  
+```  
 ```json
 {
-  "start_date": "2025-05-11 13:56:39 UTC",
-  "end_date": "2025-05-13 13:56:39 UTC"
+  "start_date": "2025-05-11 16:06:23 UTC",
+  "end_date": "2025-05-13 16:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
 Check same day (should be true)  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `same_day_morning same_day_as same_day_evening` | `True` |  
-  
+```  
+same_day_morning same_day_as same_day_evening  
+```  
 ```json
 {
   "same_day_morning": "2023-05-10T08:00:00Z",
   "same_day_evening": "2023-05-10T20:00:00Z"
 }
 ```  
+`Result: True`   
 
 ---
   
 Check same day (should be false)  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `different_days same_day_as other_day` | `False` |  
-  
+```  
+different_days same_day_as other_day  
+```  
 ```json
 {
   "different_days": "2023-05-10T08:00:00Z",
   "other_day": "2023-05-11T08:00:00Z"
 }
 ```  
+`Result: False`   
 
 ---
   
@@ -306,31 +355,31 @@ Check same day (should be false)
 ### Complex  
 Check if project is currently active  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `project_start is $past and project_end is $future` | `True` |  
-  
+```  
+project_start is $past and project_end is $future  
+```  
 ```json
 {
-  "project_start": "2025-05-11 13:56:39 UTC",
-  "project_end": "2025-05-13 13:56:39 UTC"
+  "project_start": "2025-05-11 16:06:23 UTC",
+  "project_end": "2025-05-13 16:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
 Recent login but account not new  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `last_login within 4 hours and signup_date older than 1 day` | `True` |  
-  
+```  
+last_login within 4 hours and signup_date older than 1 day  
+```  
 ```json
 {
-  "last_login": "2025-05-12 12:56:39 UTC",
-  "signup_date": "2025-05-11 13:56:39 UTC"
+  "last_login": "2025-05-12 15:06:23 UTC",
+  "signup_date": "2025-05-11 16:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -338,33 +387,33 @@ Recent login but account not new
 ### String Dates  
 Compare ISO formatted date string  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `iso_date before '2030-01-01'` | `True` |  
-  
+```  
+iso_date before '2030-01-01'  
+```  
 ```json
 {
   "iso_date": "2023-05-10T00:00:00Z"
 }
 ```  
+`Result: True`   
 
 ---
   
 Check literal date is $past  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'2020-01-01' is $past` | `True` |  
-  
+```  
+'2020-01-01' is $past  
+```  
+`Result: True`   
 
 ---
   
 Check literal date older than period  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'2020-01-01' older than 1 year` | `True` |  
-  
+```  
+'2020-01-01' older than 1 year  
+```  
+`Result: True`   
 
 ---
   
@@ -372,43 +421,43 @@ Check literal date older than period
 ### Time Units  
 Use hours time unit  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `hour_ago within 2 hours` | `True` |  
-  
+```  
+hour_ago within 2 hours  
+```  
 ```json
 {
-  "hour_ago": "2025-05-12 12:56:39 UTC"
+  "hour_ago": "2025-05-12 15:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
 Use minutes time unit  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `hour_ago within 120 minutes` | `True` |  
-  
+```  
+hour_ago within 120 minutes  
+```  
 ```json
 {
-  "hour_ago": "2025-05-12 12:56:39 UTC"
+  "hour_ago": "2025-05-12 15:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
 Use days time unit  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `week_ago older than 6 days` | `True` |  
-  
+```  
+week_ago older than 6 days  
+```  
 ```json
 {
-  "week_ago": "2025-05-05 13:56:39 UTC"
+  "week_ago": "2025-05-05 16:06:23 UTC"
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -416,10 +465,9 @@ Use days time unit
 ### List Operations  
 Check if an element exists in a list using &#x27;in&#x27;  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'admin' in user.roles` | `True` |  
-  
+```  
+'admin' in user.roles  
+```  
 ```json
 {
   "user": {
@@ -432,15 +480,15 @@ Check if an element exists in a list using &#x27;in&#x27;
   }
 }
 ```  
+`Result: True`   
 
 ---
   
 Use a variable as the item to check in a list  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `requested_role in available_roles` | `True` |  
-  
+```  
+requested_role in available_roles  
+```  
 ```json
 {
   "requested_role": "manager",
@@ -452,15 +500,15 @@ Use a variable as the item to check in a list
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
 Alternative contains syntax for list membership  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `permissions contains 'delete'` | `True` |  
-  
+```  
+permissions contains 'delete'  
+```  
 ```json
 {
   "permissions": [
@@ -471,15 +519,15 @@ Alternative contains syntax for list membership
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
 Check behavior when element is not in list  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'superadmin' in user.roles` | `False` |  
-  
+```  
+'superadmin' in user.roles  
+```  
 ```json
 {
   "user": {
@@ -491,6 +539,7 @@ Check behavior when element is not in list
   }
 }
 ```  
+`Result: False`   
 
 ---
   
@@ -498,10 +547,9 @@ Check behavior when element is not in list
 ### Object Operations  
 Check if a key exists in a dictionary  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'address' in user.profile` | `True` |  
-  
+```  
+'address' in user.profile  
+```  
 ```json
 {
   "user": {
@@ -514,15 +562,15 @@ Check if a key exists in a dictionary
   }
 }
 ```  
+`Result: True`   
 
 ---
   
 Use a variable to check dictionary key membership  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `required_field in form_data` | `False` |  
-  
+```  
+required_field in form_data  
+```  
 ```json
 {
   "required_field": "tax_id",
@@ -533,15 +581,15 @@ Use a variable to check dictionary key membership
   }
 }
 ```  
+`Result: False`   
 
 ---
   
 Use contains operator with dictionary  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `config contains 'debug_mode'` | `True` |  
-  
+```  
+config contains 'debug_mode'  
+```  
 ```json
 {
   "config": {
@@ -552,6 +600,7 @@ Use contains operator with dictionary
   }
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -559,10 +608,9 @@ Use contains operator with dictionary
 ### Mixed Collections  
 Check membership in a list nested within a dictionary  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'python' in user.skills.programming` | `True` |  
-  
+```  
+'python' in user.skills.programming  
+```  
 ```json
 {
   "user": {
@@ -581,15 +629,15 @@ Check membership in a list nested within a dictionary
   }
 }
 ```  
+`Result: True`   
 
 ---
   
 Combine collection operators with other logical operators  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'admin' in user.roles and user.settings contains 'notifications' and user.settings.notifications` | `True` |  
-  
+```  
+'admin' in user.roles and user.settings contains 'notifications' and user.settings.notifications  
+```  
 ```json
 {
   "user": {
@@ -605,6 +653,7 @@ Combine collection operators with other logical operators
   }
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -612,10 +661,9 @@ Combine collection operators with other logical operators
 ### Collection Equality  
 Compare two lists for equality  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `user.permissions == required_permissions` | `True` |  
-  
+```  
+user.permissions == required_permissions  
+```  
 ```json
 {
   "user": {
@@ -632,15 +680,15 @@ Compare two lists for equality
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
 Compare two dictionaries for equality  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `user.preferences == default_preferences` | `False` |  
-  
+```  
+user.preferences == default_preferences  
+```  
 ```json
 {
   "user": {
@@ -655,6 +703,7 @@ Compare two dictionaries for equality
   }
 }
 ```  
+`Result: False`   
 
 ---
   
@@ -662,10 +711,9 @@ Compare two dictionaries for equality
 ### Complex Scenarios  
 Use membership test with a composite condition  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `(user.role in admin_roles) or (user.domain in approved_domains and user.verified)` | `True` |  
-  
+```  
+(user.role in admin_roles) or (user.domain in approved_domains and user.verified)  
+```  
 ```json
 {
   "user": {
@@ -684,6 +732,7 @@ Use membership test with a composite condition
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -691,10 +740,9 @@ Use membership test with a composite condition
 ### Path Syntax  
 Look up elements in arrays using indexing  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `teams[0].name == 'Frontend'` | `True` |  
-  
+```  
+teams[0].name == 'Frontend'  
+```  
 ```json
 {
   "teams": [
@@ -715,15 +763,15 @@ Look up elements in arrays using indexing
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
 Use nested array indexing in paths  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `departments[0].teams[1].name == 'Backend'` | `True` |  
-  
+```  
+departments[0].teams[1].name == 'Backend'  
+```  
 ```json
 {
   "departments": [
@@ -761,15 +809,15 @@ Use nested array indexing in paths
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
 Test property of an element accessed through indexing  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `users[1].role == 'admin' and users[1].verified` | `True` |  
-  
+```  
+users[1].role == 'admin' and users[1].verified  
+```  
 ```json
 {
   "users": [
@@ -786,15 +834,15 @@ Test property of an element accessed through indexing
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
 Combine array indexing with membership test  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `'testing' in projects[0].tags and projects[1].status == 'completed'` | `True` |  
-  
+```  
+'testing' in projects[0].tags and projects[1].status == 'completed'  
+```  
 ```json
 {
   "projects": [
@@ -818,6 +866,7 @@ Combine array indexing with membership test
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -825,10 +874,9 @@ Combine array indexing with membership test
 ### Complex Path Operations  
 Complex expression combining array lookups with object properties  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `organization.departments[0].teams[0].members[1] == 'Bob' and organization.departments[1].teams[0].members[0] == 'Eve'` | `True` |  
-  
+```  
+organization.departments[0].teams[0].members[1] == 'Bob' and organization.departments[1].teams[0].members[0] == 'Eve'  
+```  
 ```json
 {
   "organization": {
@@ -869,6 +917,7 @@ Complex expression combining array lookups with object properties
   }
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -876,10 +925,9 @@ Complex expression combining array lookups with object properties
 ### Container Operations  
 Check if containers are empty using &#x27;is $empty&#x27;  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `ghost_crew is $empty and deserted_mansion is $empty and (treasure_chest is $empty) == false` | `True` |  
-  
+```  
+ghost_crew is $empty and deserted_mansion is $empty and (treasure_chest is $empty) == false  
+```  
 ```json
 {
   "ghost_crew": [],
@@ -896,6 +944,7 @@ Check if containers are empty using &#x27;is $empty&#x27;
   }
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -903,40 +952,44 @@ Check if containers are empty using &#x27;is $empty&#x27;
 ### Nested Objects  
 Check if user is eligible for premium features  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `user.account.is_active and (user.subscription.level == 'premium' or user.account.credits > 100)` | `True` |  
-  
+```  
+user.account.is_active and (user.subscription.level == 'premium' or user.account.credits > 100)  
+```  
 ```json
 {
   "user": {
     "account": {
       "is_active": true,
       "credits": 150,
-      "created_at": "2025-05-05 13:56:39 UTC"
+      "created_at": "2025-05-05 16:06:23 UTC"
     },
     "subscription": {
       "level": "basic",
-      "renewal_date": "2025-06-11 13:56:39 UTC"
+      "renewal_date": "2025-06-11 16:06:23 UTC"
     }
   }
 }
 ```  
+`Result: True`   
 
 ---
   
 Evaluate complex project status conditions  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `project.status == 'in_progress' and (project.metrics.completion > 50 or (project.team.size >= 3 and project.priority == 'high'))` | `True` |  
+```  
+project.status == 'in_progress'
+and (
+  project.metrics.completion > 50
+  or (project.team.size >= 3 and project.priority == 'high')
+)
   
+```  
 ```json
 {
   "project": {
     "status": "in_progress",
-    "start_date": "2025-05-05 13:56:39 UTC",
-    "deadline": "2025-06-11 13:56:39 UTC",
+    "start_date": "2025-05-05 16:06:23 UTC",
+    "deadline": "2025-06-11 16:06:23 UTC",
     "metrics": {
       "completion": 45,
       "quality": 98
@@ -949,6 +1002,7 @@ Evaluate complex project status conditions
   }
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -956,15 +1010,20 @@ Evaluate complex project status conditions
 ### Mixed Date Logic  
 Check if order is eligible for express shipping  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `order.status == 'confirmed' and order.created_at within 24 hours and (order.items.count < 5 or (order.customer.tier == 'gold' and order.total_value > 100))` | `True` |  
+```  
+order.status == 'confirmed'
+and order.created_at within 24 hours
+and (
+  order.items.count < 5
+  or (order.customer.tier == 'gold' and order.total_value > 100)
+)
   
+```  
 ```json
 {
   "order": {
     "status": "confirmed",
-    "created_at": "2025-05-12 12:56:39 UTC",
+    "created_at": "2025-05-12 15:06:23 UTC",
     "items": {
       "count": 7,
       "categories": [
@@ -974,38 +1033,45 @@ Check if order is eligible for express shipping
     },
     "customer": {
       "tier": "gold",
-      "since": "2025-05-05 13:56:39 UTC"
+      "since": "2025-05-05 16:06:23 UTC"
     },
     "total_value": 250
   }
 }
 ```  
+`Result: True`   
 
 ---
   
 Multiple date conditions with nested properties  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `(user.last_login within 7 days or user.auto_login) and (user.account.trial_ends is $future or user.account.subscription.status == 'active')` | `True` |  
+```  
+(user.last_login within 7 days or user.auto_login)
+and (
+  user.account.trial_ends is $future
+  or
+  user.account.subscription.status == 'active'
+)
   
+```  
 ```json
 {
   "user": {
-    "last_login": "2025-05-05 13:56:39 UTC",
+    "last_login": "2025-05-05 16:06:23 UTC",
     "auto_login": true,
     "registration_date": "2023-01-15",
     "account": {
-      "trial_ends": "2025-05-11 13:56:39 UTC",
+      "trial_ends": "2025-05-11 16:06:23 UTC",
       "subscription": {
         "status": "active",
         "plan": "premium",
-        "next_payment": "2025-06-11 13:56:39 UTC"
+        "next_payment": "2025-06-11 16:06:23 UTC"
       }
     }
   }
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -1013,10 +1079,12 @@ Multiple date conditions with nested properties
 ### Complex Precedence  
 Test operator precedence with mixed conditions  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `user.settings.notifications.enabled and (user.last_seen older than 1 day or user.preferences.urgent_only) and ('admin' in user.roles or user.tasks.pending > 0)` | `True` |  
+```  
+user.settings.notifications.enabled
+and (user.last_seen older than 1 day or user.preferences.urgent_only)
+and ('admin' in user.roles or user.tasks.pending > 0)
   
+```  
 ```json
 {
   "user": {
@@ -1030,7 +1098,7 @@ Test operator precedence with mixed conditions
       },
       "theme": "dark"
     },
-    "last_seen": "2025-05-05 13:56:39 UTC",
+    "last_seen": "2025-05-05 16:06:23 UTC",
     "preferences": {
       "urgent_only": false,
       "language": "en"
@@ -1043,6 +1111,30 @@ Test operator precedence with mixed conditions
   }
 }
 ```  
+`Result: True`   
+
+---
+  
+  
+### Critical Path  
+Can I get to the bar before last orders?  
+  
+```  
+bar.closing_time within (bike.speed/bar.distance) hours  
+```  
+```json
+{
+  "bar": {
+    "closing_time": "__HOUR_FROM_NOW__",
+    "distance": 10
+  },
+  "bike": {
+    "speed": 12,
+    "units": "mph"
+  }
+}
+```  
+`Result: True`   
 
 ---
   
@@ -1050,10 +1142,9 @@ Test operator precedence with mixed conditions
 ### Jq Basics  
 Basic JQ expression to access a nested property  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| ``.user.profile.name` == 'Alice'` | `True` |  
-  
+```  
+`.user.profile.name` == 'Alice'  
+```  
 ```json
 {
   "user": {
@@ -1067,6 +1158,7 @@ Basic JQ expression to access a nested property
   }
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -1074,10 +1166,9 @@ Basic JQ expression to access a nested property
 ### Jq Arrays  
 Access elements in an array using JQ indexing  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| ``.team[1].role` == 'developer'` | `True` |  
-  
+```  
+`.team[1].role` == 'developer'  
+```  
 ```json
 {
   "team": [
@@ -1096,15 +1187,15 @@ Access elements in an array using JQ indexing
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
 Check array length using JQ pipe function  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| ``.products | length` > 2` | `True` |  
-  
+```  
+`.products | length` > 2  
+```  
 ```json
 {
   "products": [
@@ -1123,15 +1214,15 @@ Check array length using JQ pipe function
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
 Check if any array element matches a condition  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| ``.users[] | select(.role == "admin") | .name` == 'Eva'` | `True` |  
-  
+```  
+`.users[] | select(.role == "admin") | .name` == 'Eva'  
+```  
 ```json
 {
   "users": [
@@ -1150,6 +1241,7 @@ Check if any array element matches a condition
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -1157,10 +1249,9 @@ Check if any array element matches a condition
 ### Jq Filtering  
 Filter array elements based on a condition  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| ``.orders[] | select(.status == "completed") | .id` == 1003` | `True` |  
-  
+```  
+`.orders[] | select(.status == "completed") | .id` == 1003  
+```  
 ```json
 {
   "orders": [
@@ -1179,6 +1270,7 @@ Filter array elements based on a condition
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -1186,16 +1278,15 @@ Filter array elements based on a condition
 ### Jq Mixed  
 Combine JQ with regular Dilemma expressions  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| ``.user.membership.level` == 'gold' and user.account.active == true` | `True` |  
-  
+```  
+`.user.membership.level` == 'gold' and user.account.active == true  
+```  
 ```json
 {
   "user": {
     "membership": {
       "level": "gold",
-      "since": "2025-05-05 13:56:39 UTC"
+      "since": "2025-05-05 16:06:23 UTC"
     },
     "account": {
       "active": true,
@@ -1204,6 +1295,7 @@ Combine JQ with regular Dilemma expressions
   }
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -1211,10 +1303,9 @@ Combine JQ with regular Dilemma expressions
 ### Jq Advanced  
 Complex data transformation with JQ  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| ``.departments[] | select(.name == "Engineering").employees | map(.salary) | add / length` > 75000` | `True` |  
-  
+```  
+`.departments[] | select(.name == "Engineering").employees | map(.salary) | add / length` > 75000  
+```  
 ```json
 {
   "departments": [
@@ -1251,15 +1342,15 @@ Complex data transformation with JQ
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
 Check if an array contains a specific value  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| ``.user.permissions | contains(["edit"])`` | `True` |  
-  
+```  
+`.user.permissions | contains(["edit"])`  
+```  
 ```json
 {
   "user": {
@@ -1273,15 +1364,15 @@ Check if an array contains a specific value
   }
 }
 ```  
+`Result: True`   
 
 ---
   
 Use JQ to conditionally create and check an object  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| ``if .user.premium then {access: "full"} else {access: "limited"} end | .access` == 'full'` | `True` |  
-  
+```  
+`if .user.premium then {access: "full"} else {access: "limited"} end | .access` == 'full'  
+```  
 ```json
 {
   "user": {
@@ -1290,15 +1381,15 @@ Use JQ to conditionally create and check an object
   }
 }
 ```  
+`Result: True`   
 
 ---
   
 Complex JQ expression with deeply nested parentheses and operations  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| ``.employees | map( ((.performance.rating * 0.5) + ((.projects | map(select(.status == "completed") | .difficulty) | add // 0) * 0.3) + (if (.years_experience > 5) then ((.leadership_score // 0) * 0.2) else ((.learning_speed // 0) * 0.2) end) ) * (if .department == "Engineering" then 1.1 else 1 end) ) | add / length` > 75` | `True` |  
-  
+```  
+`.employees | map( ((.performance.rating * 0.5) + ((.projects | map(select(.status == "completed") | .difficulty) | add // 0) * 0.3) + (if (.years_experience > 5) then ((.leadership_score // 0) * 0.2) else ((.learning_speed // 0) * 0.2) end) ) * (if .department == "Engineering" then 1.1 else 1 end) ) | add / length` > 75  
+```  
 ```json
 {
   "employees": [
@@ -1368,6 +1459,7 @@ Complex JQ expression with deeply nested parentheses and operations
   ]
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -1375,10 +1467,9 @@ Complex JQ expression with deeply nested parentheses and operations
 ### Jq With Dates  
 Use JQ to extract a date for comparison  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| ``.project.milestones[] | select(.name == "beta").date` is $past` | `True` |  
-  
+```  
+`.project.milestones[] | select(.name == "beta").date` is $past  
+```  
 ```json
 {
   "project": {
@@ -1386,20 +1477,21 @@ Use JQ to extract a date for comparison
     "milestones": [
       {
         "name": "alpha",
-        "date": "2025-06-11 13:56:39 UTC"
+        "date": "2025-06-11 16:06:23 UTC"
       },
       {
         "name": "beta",
-        "date": "2025-05-11 13:56:39 UTC"
+        "date": "2025-05-11 16:06:23 UTC"
       },
       {
         "name": "release",
-        "date": "2025-05-12 15:56:39 UTC"
+        "date": "2025-05-12 18:06:23 UTC"
       }
     ]
   }
 }
 ```  
+`Result: True`   
 
 ---
   
@@ -1407,10 +1499,9 @@ Use JQ to extract a date for comparison
 ### Jq Parsing  
 Simple JQ expression nested inside multiple levels of Dilemma parentheses  
   
-| Expression | Expected Result |  
-|:---:|:---:|  
-| `(5 + ((`.users | length` * 2) - 1)) > 5` | `True` |  
-  
+```  
+(5 + ((`.users | length` * 2) - 1)) > 5  
+```  
 ```json
 {
   "users": [
@@ -1429,6 +1520,7 @@ Simple JQ expression nested inside multiple levels of Dilemma parentheses
   ]
 }
 ```  
+`Result: True`   
 
 ---
   

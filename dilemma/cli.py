@@ -21,6 +21,7 @@ def evaluate_expression(expression: str, verbose: bool) -> None:
     EXPRESSION: The expression to evaluate, e.g. "2 + 3 * 4" or "5 > 3 and 2 < 4"
     """
     from dilemma.lang import evaluate
+
     try:
         result = evaluate(expression)
         if verbose:
@@ -136,20 +137,13 @@ def generate_markdown_docs(examples_by_category, time_values, output_path):
                     doc.writeTextLine(ft)
                 doc.writeTextLine("")  # Empty line instead of writeNewLine
 
-                # Create a table with expression and expected result
-                # We need to create the table manually to avoid HTML escaping of quotes
-                doc.writeTextLine("| Expression | Expected Result |")
-                doc.writeTextLine("|:---:|:---:|")
+                expression = example['expression']
+                doc.writeTextLine("```")
+                doc.writeTextLine(expression, html_escape=False)
+                doc.writeTextLine("```")
 
-                expression = example["expression"]
-
-                doc.writeTextLine(
-                    f"| `{expression}` | `{example['expected']}` |", html_escape=False
-                )
-                doc.writeTextLine("")
 
                 if example.get("context"):
-
                     # Process context to replace time placeholders with real dates
                     context = process_time_values_for_docs(
                         example["context"], time_values
@@ -158,6 +152,8 @@ def generate_markdown_docs(examples_by_category, time_values, output_path):
                     # Format context as JSON
                     context_json = json.dumps(context, indent=2, default=str)
                     doc.addCodeBlock(context_json, "json")
+
+                doc.writeTextLine( f"`Result: {example['expected']}` " )
 
                 doc.addHorizontalRule()
 

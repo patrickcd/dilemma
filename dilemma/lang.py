@@ -6,7 +6,7 @@ import json
 import threading
 import logging
 import fnmatch
-from datetime import datetime
+from datetime import datetime, timezone
 
 from lark import Token
 from lark import Lark, Transformer, exceptions as lark_exceptions
@@ -33,6 +33,8 @@ grammar = r"""
     ?comparison: sum
                | sum "==" sum -> eq
                | sum "!=" sum -> ne
+               | sum "is" sum -> eq
+               | sum "is" "not" sum -> ne
                | sum "<" sum -> lt
                | sum ">" sum -> gt
                | sum "<=" sum -> le
@@ -40,12 +42,13 @@ grammar = r"""
                | sum "in" sum -> contains
                | sum "contains" sum -> contained_in
                | sum "like" sum -> pattern_match
+               | sum "not" "like" sum -> pattern_not_match
                | sum "is" "$past" -> date_is_past
                | sum "is" "$future" -> date_is_future
                | sum "is" "$today" -> date_is_today
                | sum "is" "$empty" -> is_empty
-               | sum "within" INTEGER time_unit -> date_within
-               | sum "older" "than" INTEGER time_unit -> date_older_than
+               | sum "within" sum time_unit -> date_within
+               | sum "older" "than" sum time_unit -> date_older_than
                | sum "before" sum -> date_before
                | sum "after" sum -> date_after
                | sum "same_day_as" sum -> date_same_day
@@ -282,6 +285,21 @@ class ExpressionTransformer(Transformer, DateMethods):
 
         return fnmatch.fnmatch(string, pattern)
 
+    def pattern_not_match(self, items: list) -> bool:
+        """
+        Implements negated case-insensitive wildcard pattern matching.
+        Returns true when the string does NOT match the pattern.
+
+        Example: 'document.doc' does not match '*.txt'
+        """
+        if not isinstance(items[0], str) or not isinstance(items[1], str):
+            raise TypeError("Pattern matching requires string operands")
+
+        string = items[0].lower()
+        pattern = items[1].lower()
+
+        return not fnmatch.fnmatch(string, pattern)
+
     def is_empty(self, items: list) -> bool:
         """Check if a container (list or dict) is empty."""
         value = items[0]
@@ -294,7 +312,19 @@ class ExpressionTransformer(Transformer, DateMethods):
 
     def now_value(self, _) -> datetime:
         """Return the current datetime for use in comparisons"""
-        return datetime.now()
+        return datetime.now(tz=timezone.utc)
+
+    def date_within(self, items: list) -> bool:
+        """Check if date is within a specified time period from now"""
+        date_obj = self._ensure_datetime(items[0])
+        # Handle potentially float value from expressions
+        quantity = float(items[1]) if hasattr(items[1], "value") else items[1]
+        unit = items[2].value if hasattr(items[2], "value") else items[2]
+
+        now = datetime.now(date_obj.tzinfo if date_obj.tzinfo else timezone.utc)
+        delta = self._create_timedelta(quantity, unit)
+
+        return abs(date_obj - now) <= delta
 
 
 # Thread-local storage for the parser

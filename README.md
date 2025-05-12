@@ -11,26 +11,27 @@ A friendly yet powerful expression evaluation engine  for Python applications.
 - Friendly date comparisons
 - Wildcard text matching
 - Performance optimization strategies for repeated evaluations
+ - **Is it too late reach the bar before last orders?**
 
 ```javascript
 # It's 22:15
-
 {
     bar: {
       closing_time: "23:30",
-      distance: "2"
+      distance: 10
     },
     bike{
-      speed: "10",
+      speed: 20,
       units: "mph"
     }
 }
 
 # dilemma expression:
 
->  bar.closing_time after one hour and (bar.distance / bike.speed) < 1
-Result: true (last orders very possible)
-```
+>  bar.closing_time within (bar.distance/bike.speed) hours
+
+Result: false (last orders very possible)
+````
 
 #### Async Note
 

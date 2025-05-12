@@ -1,14 +1,30 @@
+- name: string_pattern_matching_basic
+  category: string
+  description: "Check if a filename matches a pattern with wildcard"
+  expression: "'document.pdf' like '*.pdf'"
+  expected: true
+
 - name: string_equality
   category: string
   description: "Check if two words are equal"
-  expression: "'hello' == 'hello'"
+  expression: "'hello' is 'hello'"
   expected: true
 
 - name: string_inequality
   category: string
   description: "Check if two words are not equal"
-  expression: "'hello' != 'world'"
+  expression: "'hello' is not 'world'"
   expected: true
+
+- name: string_inequality_variable
+  category: string
+  description: "Check if two words are not equal"
+  expression: " friend.snores is not 'often'"
+  expected: false
+  context:
+    friend:
+      name: Bob
+      snores: often
 
 - name: string_contains
   category: string
@@ -19,17 +35,11 @@
 - name: string_variable_equality
   category: string
   description: "Check if two variables are equal"
-  expression: "var1 == var2"
+  expression: "var1 is var2"
   expected: true
   context:
     var1: "hello"
     var2: "hello"
-
-- name: string_pattern_matching_basic
-  category: string
-  description: "Check if a filename matches a pattern with wildcard"
-  expression: "'document.pdf' like '*.pdf'"
-  expected: true
 
 - name: string_pattern_matching_question_mark
   category: string
@@ -50,3 +60,23 @@
   expected: true
   context:
     filename: "vacation-photo.JPG"
+
+- name: string_pattern_matching_negated
+  category: string
+  description: "Check a variable doen't match  a pattern"
+  expression: "filename not like '*.jpg'"
+  expected: false
+  context:
+    filename: "vacation-photo.JPG"
+
+- name: string_equality_operator
+  category: string
+  description: "Check if two words are equal"
+  expression: "'hello' == 'hello'"
+  expected: true
+
+- name: string_inequality_operator
+  category: string
+  description: "Check if two words are not equal"
+  expression: "'hello' != 'world'"
+  expected: true
