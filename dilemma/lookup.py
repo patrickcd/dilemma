@@ -9,6 +9,8 @@ import json
 import re
 from datetime import datetime
 
+from .exc import VariableError
+
 # These types are acceptable as variable values
 # Updated to include dict and list, which are valid JSON types.
 SUPPORTED_TYPES = (int, float, bool, str, datetime, dict, list)
@@ -36,12 +38,20 @@ def lookup_variable(
     Returns:
         Value at the specified path
     """
+    original_path = path
+    if "'s" in path:
+        # Transform possessive path to dotted path with regex to handle any whitespace
+        path = re.sub(r"'s\s+", ".", path)
+
     # Handle top-level variables directly for optimization
     if "." not in path and "[" not in path:
         if isinstance(json_obj, dict) and path in json_obj:
             return json_obj[path]
 
-        raise NameError(f"Variable '{path}' is not defined")
+        raise VariableError(
+            template_key="undefined_variable",
+            name=path
+        )
 
     # Convert expression path to jq path
     if path.startswith("["):
@@ -55,13 +65,19 @@ def lookup_variable(
 
         # Handle missing or null results
         if not results or results[0] is None:
-            raise NameError(
-                f"Variable '{path}' is not defined or path cannot be resolved."
+            raise VariableError(
+                template_key="unresolved_path",
+                path=original_path,
+                details="Path exists but resolves to null or is missing"
             )
 
         return results[0]
     except Exception as e:
-        raise NameError(f"Variable '{path}' cannot be resolved: {str(e)}")
+        raise VariableError(
+            template_key="unresolved_path",
+            path=original_path,
+            details=str(e)
+        )
 
 
 def evaluate_jq_expression(
@@ -83,7 +99,11 @@ def evaluate_jq_expression(
     try:
         # Validate the jq syntax before compiling
         if not jq_expr.strip():
-            raise NameError("Empty JQ expression")
+            raise VariableError(
+                template_key="invalid_jq",
+                expr=jq_expr,
+                details="Empty JQ expression"
+            )
 
         # Compile and execute the JQ expression
         compiled_jq = jq.compile(jq_expr)
@@ -91,12 +111,20 @@ def evaluate_jq_expression(
 
         # jq always returns a list of results
         if not results:
-            raise NameError(f"JQ expression '{jq_expr}' returned no results")
+            raise VariableError(
+                template_key="invalid_jq",
+                expr=jq_expr,
+                details="JQ expression returned no results"
+            )
 
         # For consistency with lookup_variable, just return the first result
         return results[0]
     except Exception as e:
         # Instead of trying to catch specific jq exceptions, catch all exceptions
-        # and convert them to NameError with a descriptive message
+        # and convert them to VariableError with a descriptive message
         error_msg = str(e)
-        raise NameError(f"Failed to evaluate JQ expression '{jq_expr}': {error_msg}")
+        raise VariableError(
+            template_key="invalid_jq",
+            expr=jq_expr,
+            details=error_msg
+        )

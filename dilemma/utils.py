@@ -6,6 +6,9 @@ from datetime import datetime, timedelta, timezone
 
 log = logging.getLogger(__name__)
 
+log.setLevel(logging.DEBUG)
+log.addHandler(logging.StreamHandler())
+
 
 def binary_op(func):
     """
@@ -45,8 +48,13 @@ def either_string(left, right):
 
 def reject_strings(left, right, op_symbol: str):
     """Raise TypeError if either operand is a string type"""
+    from .exc import TypeMismatchError
+
     if either_string(left, right):
-        raise TypeError(f"'{op_symbol}' operator not supported with string operands")
+        raise TypeMismatchError(
+            template_key="string_operation",
+            operation=op_symbol
+        )
 
 
 @contextmanager
@@ -56,33 +64,62 @@ def error_handling(expression: str):
     with consistent error reporting.
 
     Args:
-        e: The caught VisitError exception
+        expression: The expression being evaluated
 
     Raises:
-        ZeroDivisionError, NameError, TypeError: Re-raised with clean messages
-        ValueError: For all other evaluation errors
+        DilemmaError subclasses with templated error messages
     """
+    from lark.exceptions import VisitError
+    from .exc import DilemmaError, EvaluationError
 
     try:
         yield
-    except Exception as e:
-        # Re-raise common errors with clean messages
+    except DilemmaError:
+        log.info("Caught early DilemmaError: %s", e)
+        # If it's already a DilemmaError, just let it propagate
+        raise
+    except VisitError as e:
+        log.info("Caught VisitError %s", e)
+        # Extract the original error from VisitError if possible
+        if isinstance(e.orig_exc, DilemmaError):
+            log.info("Original Error was DilemmaError, re-raising. msg: %s", e)
+            raise e.orig_exc
 
-        if isinstance(e.__context__, ZeroDivisionError):
-            raise ZeroDivisionError("Division by zero") from e
-        if isinstance(e.__context__, NameError):
-            raise NameError(str(e.__context__)) from e
-        if isinstance(e.__context__, TypeError):
-            raise TypeError(str(e.__context__)) from e
+        log.info("Wrapping VisitError in EvaluationError. msg: %s", e)
+        # Otherwise wrap it in EvaluationError
+        raise EvaluationError(
+            template_key="evaluation_error",
+            expression=expression,
+            error_type="VisitError",
+            details=str(e)
+        ) from e
+    except Exception as e:
+        log.info("Caught Not VisitError: %s", e)
+        # Re-raise common errors with clean messages
+        if (isinstance(e, ZeroDivisionError) or
+            isinstance(e.__context__, ZeroDivisionError)):
+            raise DilemmaError(template_key="zero_division") from e
+
+        if isinstance(e, NameError) or isinstance(e.__context__, NameError):
+            # Pass through the original message which should have the variable name
+            raise DilemmaError(str(e)) from e
+
+        if (isinstance(e, TypeError) or
+            isinstance(e.__context__, TypeError)):
+            # Pass through the original message which should have type information
+            raise DilemmaError(str(e)) from e
 
         # Log the original error for debugging
-        log.error(f"Evaluation error: {type(e.__context__).__name__}: {e.__context__}")
+        log.error(f"Evaluation error: {type(e).__name__}: {e}")
 
-        # Raise a ValueError with details about what went wrong
-        err_name = type(e.__context__).__name__
-        err = e.__context__
-        raise ValueError(
-            f"Error evaluating expression: {expression} - Caused by: {err_name}: {err}"
+        # Raise an EvaluationError with details about what went wrong
+        err_name = type(e).__name__
+        err = e
+        raise EvaluationError(
+            template_key="evaluation_error",
+            expression=expression,
+            error_type=err_name,
+            details=str(err)
         ) from e
 
 
@@ -109,9 +146,10 @@ def check_containment(container, item, container_position: str) -> bool:
         case str() if isinstance(item, str):
             return item in container  # String contains string
         case _:
-            raise TypeError(
-                f"'{container_position}' operand must be a collection "
-                "(string, list, dict)"
+            from .exc import ContainerError
+            raise ContainerError(
+                template_key="invalid_container",
+                position=container_position
             )
 
 
@@ -127,10 +165,11 @@ def temporal_unit_comparison(func):
 
     @functools.wraps(func)
     def wrapper(self, items: list):  # 'self' will be an instance of DateMethods
+        from .exc import DateTimeError
+
         if len(items) != 3:
-            raise ValueError(
-                "Temporal comparison operation expects 3 items: "
-                "a date-like value, a quantity, and a unit string."
+            raise DateTimeError(
+                template_key="temporal_args"
             )
 
         date_val = ensure_datetime(items[0])
@@ -165,12 +204,20 @@ def ensure_datetime(value) -> datetime:
                 return dt
             except ValueError:
                 continue
-        raise ValueError(f"Could not parse date string: {value}")
+        from .exc import DateTimeError
+        raise DateTimeError(
+            template_key="date_parsing",
+            value=value
+        )
     elif isinstance(value, (int, float)):
         # Assume Unix timestamp
         return datetime.fromtimestamp(value, timezone.utc)
     else:
-        raise TypeError(f"Cannot convert {type(value)} to datetime")
+        from .exc import DateTimeError
+        raise DateTimeError(
+            template_key="date_conversion",
+            type=type(value).__name__
+        )
 
 
 def create_timedelta(quantity, unit) -> timedelta:
@@ -193,7 +240,11 @@ def create_timedelta(quantity, unit) -> timedelta:
         # Approximate year as 365 days
         return timedelta(days=365 * quantity)
     else:
-        raise ValueError(f"Unsupported time unit: {unit}")
+        from .exc import DateTimeError
+        raise DateTimeError(
+            template_key="unsupported_unit",
+            unit=unit
+        )
 
 
 def unpack_datetimes(items: list) -> tuple[datetime, datetime]:

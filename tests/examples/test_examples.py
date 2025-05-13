@@ -56,6 +56,7 @@ def load_examples():
                     name,
                     example.get("expression"),
                     example.get("expected"),
+                    example.get("error_message"),
                     example.get("context", {}),
                     time_values,
                 )
@@ -90,32 +91,57 @@ class TestExamples:
     examples, example_ids = load_examples()
 
     @pytest.mark.parametrize(
-        "yaml_file,name,expression,expected,yaml_context,time_values",
+        "yaml_file,name,expression,expected,error_message,yaml_context,time_values",
         examples,
         ids=example_ids,
     )
     def test_example(
-        self, yaml_file, name, expression, expected, yaml_context, time_values
+        self, yaml_file, name, expression, expected, error_message, yaml_context, time_values
     ):
         """Test individual examples from YAML files."""
         assert expression is not None, (
             f"Missing 'expression' in example '{name}' of {yaml_file}"
         )
-        assert expected is not None, (
-            f"Missing 'expected' in example '{name}' of {yaml_file}"
+        assert expected is not None or error_message is not None, (
+            f"Missing 'expected' or 'error_message' in example '{name}' of {yaml_file}"
         )
 
         # Process the context to replace special time values
         context = process_time_values(yaml_context, time_values)
 
-        # Evaluate the expression
-        result = evaluate(expression, context)
+        # Test for expected error message if one is defined
+        if error_message is not None:
+            with pytest.raises(Exception) as excinfo:
+                evaluate(expression, context)
 
-        # Check if result matches expected
-        assert result == expected, (
-            f"Example '{name}' in {yaml_file} failed:\n"
-            f"Expression: {expression}\n"
-            f"Context: {context}\n"
-            f"Expected: {expected} ({type(expected)})\n"
-            f"Got: {result} ({type(result)})"
-        )
+            # Get the string representation of the exception
+            actual_error = str(excinfo.value)
+
+            # Split both messages by lines and trim each line to avoid whitespace issues
+            expected_lines = [line.strip() for line in error_message.strip().split('\n')]
+            actual_lines = [line.strip() for line in actual_error.strip().split('\n')]
+
+            # Compare line by line
+            assert len(expected_lines) == len(actual_lines), (
+                f"Error message line count mismatch in example '{name}' of {yaml_file}:\n"
+                f"Expected {len(expected_lines)} lines, got {len(actual_lines)}"
+            )
+
+            for i, (expected_line, actual_line) in enumerate(zip(expected_lines, actual_lines)):
+                assert expected_line == actual_line, (
+                    f"Error message mismatch at line {i+1} in example '{name}' of {yaml_file}:\n"
+                    f"Expected: '{expected_line}'\n"
+                    f"Got: '{actual_line}'"
+                )
+        else:
+            # Evaluate the expression and check result
+            result = evaluate(expression, context)
+
+            # Check if result matches expected
+            assert result == expected, (
+                f"Example '{name}' in {yaml_file} failed:\n"
+                f"Expression: {expression}\n"
+                f"Context: {context}\n"
+                f"Expected: {expected} ({type(expected)})\n"
+                f"Got: {result} ({type(result)})"
+            )

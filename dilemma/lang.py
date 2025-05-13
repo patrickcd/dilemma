@@ -14,6 +14,7 @@ from lark import Lark, Transformer, exceptions as lark_exceptions
 
 from .lookup import lookup_variable, DateTimeEncoder, evaluate_jq_expression
 from .dates import DateMethods
+from .exc import SyntaxError, ContainerError, TypeMismatchError, DilemmaError
 
 from .utils import (
     binary_op,
@@ -149,10 +150,6 @@ class ExpressionTransformer(Transformer, DateMethods):
     ) -> int | float | bool | str | list | dict | datetime:
         var_path = items[0].value
 
-        # Transform possessive path to dotted path with regex to handle any whitespace
-        if "'s" in var_path:
-            var_path = re.sub(r"'s\s+", ".", var_path)
-
         value = lookup_variable(var_path, self.processed_json)
 
         # Handle datetime reconstruction
@@ -168,14 +165,18 @@ class ExpressionTransformer(Transformer, DateMethods):
         if both_strings(left, right):
             result = left + right
             if len(result) > MAX_STRING_LENGTH:
-                raise ValueError(
-                    f"String result exceeds maximum allowed length ({MAX_STRING_LENGTH})"
+                raise TypeMismatchError(
+                    template_key="string_length",
+                    max_length=MAX_STRING_LENGTH
                 )
             return result
 
         # Prevent mixing strings with other types
         if isinstance(left, str) or isinstance(right, str):
-            raise TypeError("'+' operator cannot mix string and non-string types")
+            raise TypeMismatchError(
+                template_key="string_mix",
+                operation="+"
+            )
 
         # Regular addition for non-string types
         return left + right
@@ -197,7 +198,7 @@ class ExpressionTransformer(Transformer, DateMethods):
         """Division operator (/) - deny for strings"""
         reject_strings(left, right, "/")
         if right == 0:
-            raise ZeroDivisionError("Division by zero")
+            raise DilemmaError(template_key="zero_division", left=left, right=right)
         return left / right  # Now using true division
 
     def paren(self, items: list) -> float:
@@ -309,8 +310,9 @@ class ExpressionTransformer(Transformer, DateMethods):
         if isinstance(value, (list, tuple, dict)):
             return len(value) == 0
         else:
-            raise TypeError(
-                "'is $empty' can only be used with container types (list, tuple, dict)"
+            raise ContainerError(
+                template_key="wrong_container",
+                operation="is $empty"
             )
 
 
@@ -379,7 +381,10 @@ def _process_variables(variables: dict | str | None = None) -> dict:
                 # Convert dictionary to JSON-compatible structure
                 processed_json = json.loads(json.dumps(variables, cls=DateTimeEncoder))
         except (TypeError, json.JSONDecodeError) as e:
-            raise ValueError(f"Failed to process variables: {e}")
+            raise DilemmaError(
+                template_key="variables_processing",
+                details=str(e)
+            )
     return processed_json
 
 
@@ -401,11 +406,14 @@ def compile_expression(expression: str) -> CompiledExpression:
     try:
         tree = parser.parse(expression)
         return CompiledExpression(expression, tree)
-    except lark_exceptions.UnexpectedToken as e:
-        raise ValueError(f"Invalid expression syntax: {e}")
-    except lark_exceptions.UnexpectedCharacters as e:
-        raise ValueError(f"Invalid expression syntax: {e}")
-
+    except (
+        lark_exceptions.UnexpectedToken,
+        lark_exceptions.UnexpectedCharacters
+    ) as e:
+        raise SyntaxError(
+            template_key="syntax_error",
+            details=str(e)
+        )
 
 # Function to evaluate expressions
 def evaluate(
@@ -425,7 +433,10 @@ def evaluate(
         parser = build_parser()
         tree = parser.parse(expression)
     except Exception as e:
-        raise ValueError(f"Invalid expression syntax: {expression}") from e
+        raise SyntaxError(
+            template_key="syntax_error",
+            details=f"Error parsing '{expression}': {str(e)}"
+        ) from e
 
     with error_handling(expression):
         transformer = ExpressionTransformer(processed_json=processed_json)
