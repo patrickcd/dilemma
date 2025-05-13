@@ -340,3 +340,13 @@ def test_string_math_restrictions(expr, error_type, error_msg):
     with pytest.raises(error_type) as excinfo:
         evaluate(expr)
     assert error_msg in str(excinfo.value)
+
+
+def test_possesive_lookup():
+    expr = "user's name =='bob'"
+    context = {
+        'user': {
+            'name': 'bob'
+        }
+    }
+    assert evaluate(expr, context) is True

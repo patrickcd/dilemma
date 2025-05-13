@@ -227,3 +227,21 @@
       golden_crown: 1500
       enchanted_sword: 3000
       crystal_orb: 750
+
+- name: possesive_lookup_in
+  category: critical_path
+  description: "Test lookup of nested attributes by possesive English syntax"
+  expression: "'admin' in user's roles "
+  expected: true
+  context:
+    user:
+      roles: [ "reader", "writer", "admin" ]
+
+- name: possesive_lookup_contains
+  category: critical_path
+  description: "Test lookup of nested attributes by possesive English syntax"
+  expression: " user's roles contains 'reader' "
+  expected: true
+  context:
+    user:
+      roles: [ "reader", "writer", "admin" ]

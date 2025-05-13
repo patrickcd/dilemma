@@ -80,3 +80,12 @@
   description: "Check if two words are not equal"
   expression: "'hello' != 'world'"
   expected: true
+
+- name: possesive_lookup
+  category: critical_path
+  description: "Test lookup of nested attributes by possesive English syntax"
+  expression: "user's name == 'bob'"
+  expected: true
+  context:
+    user:
+      name: bob

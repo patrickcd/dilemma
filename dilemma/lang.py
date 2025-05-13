@@ -6,6 +6,7 @@ import json
 import threading
 import logging
 import fnmatch
+import re
 from datetime import datetime
 
 from lark import Token
@@ -85,7 +86,7 @@ grammar = r"""
     // But use string literals in rules above for "or", "and", "True", "False"
     // Use a negative lookahead in VARIABLE to exclude these as variable names
 
-    VARIABLE: /(?!or\b|and\b|true\b|false\b|is\b|contains\b|like\b|in\b)[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
+    VARIABLE: /(?!or\b|and\b|true\b|false\b|is\b|contains\b|like\b|in\b)[a-zA-Z_][a-zA-Z0-9_]*(?:'s\s+[a-zA-Z_][a-zA-Z0-9_]*|\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
 
     // JQ expression syntax: `expression` - must be matched as a single token
     // Define this before the STRING token to give it higher precedence
@@ -147,6 +148,11 @@ class ExpressionTransformer(Transformer, DateMethods):
         self, items: list[Token]
     ) -> int | float | bool | str | list | dict | datetime:
         var_path = items[0].value
+
+        # Transform possessive path to dotted path with regex to handle any whitespace
+        if "'s" in var_path:
+            var_path = re.sub(r"'s\s+", ".", var_path)
+
         value = lookup_variable(var_path, self.processed_json)
 
         # Handle datetime reconstruction

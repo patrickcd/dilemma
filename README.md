@@ -8,7 +8,8 @@ A friendly yet powerful expression evaluation engine  for Python applications.
 - Support for variables with nested structure (e.g., `user.profile.settings.enabled`)
 - Rich comparison operations with proper handling of floating-point values
 - Logical operations (`and`, `or`) for boolean expressions
-- Friendly date comparisons
+- Natural language attribute lookups - " user's name is 'bob' "
+- Friendly date comparisons - "user's expiry is after $today"
 - Wildcard text matching
 - Performance optimization strategies for repeated evaluations
  - **Is it too late reach the bar before last orders?**
@@ -28,7 +29,7 @@ A friendly yet powerful expression evaluation engine  for Python applications.
 
 # dilemma expression:
 
->  bar.closing_time within (bar.distance/bike.speed) hours
+>  bar's closing_time within (bar.distance/bike.speed) hours
 
 Result: false (last orders very possible)
 ````

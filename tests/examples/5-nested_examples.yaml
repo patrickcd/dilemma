@@ -111,7 +111,7 @@
 - name: rushing_for_last_orders
   category: critical_path
   description: "Is it too late to reach the bar before last orders?"
-  expression: bar.closing_time within (bar.distance / bike.speed)  hours
+  expression: bar's closing_time within (bar.distance / bike.speed)  hours
   expected: false
   context:
     bar:
