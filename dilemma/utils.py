@@ -1,6 +1,7 @@
 import functools
 import logging
 from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
 
 
 log = logging.getLogger(__name__)
@@ -109,3 +110,91 @@ def check_containment(container, item, container_position: str) -> bool:
                 f"'{container_position}' operand must be a collection "
                 "(string, list, dict)"
             )
+
+
+def temporal_unit_comparison(func):
+    """
+    Decorator for DateMethods' methods that expect a date-like value,
+    a numeric quantity, and a string unit from Lark's 'items' list.
+
+    It unpacks 'items', calls self._ensure_datetime() on the first element,
+    casts the second to float, and passes them along with the third (unit)
+    to the decorated function.
+    """
+    @functools.wraps(func)
+    def wrapper(self, items: list):  # 'self' will be an instance of DateMethods
+        if len(items) != 3:
+            raise ValueError(
+                "Temporal comparison operation expects 3 items: "
+                "a date-like value, a quantity, and a unit string."
+            )
+
+        date_val = ensure_datetime(items[0])
+        quantity_val = float(items[1])  # Assumes items[1] is a number or string convertible to float
+        unit_val = items[2]          # Assumes items[2] is already a string (e.g., "minute")
+
+        return func(self, date_val, quantity_val, unit_val)
+    return wrapper
+
+
+
+# Helper methods
+def ensure_datetime(value) -> datetime:
+    """Convert value to datetime if it's not already"""
+    if isinstance(value, datetime):
+        return value
+    elif isinstance(value, str):
+        # Try different formats
+        for fmt in [
+            "%Y-%m-%d",
+            "%Y-%m-%d %H:%M:%S",
+            "%Y-%m-%dT%H:%M:%S",
+            "%Y-%m-%dT%H:%M:%S%z",
+        ]:
+            try:
+                dt = datetime.strptime(value, fmt)
+                # Make naive datetimes timezone-aware with UTC
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                return dt
+            except ValueError:
+                continue
+        raise ValueError(f"Could not parse date string: {value}")
+    elif isinstance(value, (int, float)):
+        # Assume Unix timestamp
+        return datetime.fromtimestamp(value, timezone.utc)
+    else:
+        raise TypeError(f"Cannot convert {type(value)} to datetime")
+
+
+def create_timedelta(quantity, unit) -> timedelta:
+    """Create a timedelta object based on quantity and unit"""
+    # Now unit should be a simple string from one of our unit methods
+    log.debug(f"Unit received: {unit} (type: {type(unit)})")
+
+    if unit == "minute":
+        return timedelta(minutes=quantity)
+    elif unit == "hour":
+        return timedelta(hours=quantity)
+    elif unit == "day":
+        return timedelta(days=quantity)
+    elif unit == "week":
+        return timedelta(weeks=quantity)
+    elif unit == "month":
+        # Approximate month as 30 days
+        return timedelta(days=30 * quantity)
+    elif unit == "year":
+        # Approximate year as 365 days
+        return timedelta(days=365 * quantity)
+    else:
+        raise ValueError(f"Unsupported time unit: {unit}")
+
+
+def unpack_datetimes(items: list) -> tuple[datetime, datetime]:
+        """
+        Extracts items 0 and 1 from the list and passes the values through
+        ensure_datetime
+        """
+        date1 = ensure_datetime(items[0])
+        date2 = ensure_datetime(items[1])
+        return date1, date2

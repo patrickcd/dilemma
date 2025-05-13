@@ -14,3 +14,11 @@
 21:  Add async support as an alternative to the current thread-local implementation
 22:  Build documentation site with comprehensive examples and patterns
 23:  Consider JSON Schema integration for type validation
+
+
+Date improvements
+
+1. "between X and Y" operation
+2. Date arithmetic. Add/substract periods from dates
+3. Relate references - "yesterday", "tomorrow", "last week".
+4. Component extraction - "year of {date_ref} is 2024"

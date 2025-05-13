@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from hypothesis import given, strategies as st, settings
 from dilemma.lang import evaluate
 from dilemma.dates import DateMethods
+from dilemma.utils import ensure_datetime, create_timedelta
 
 
 def test_date_is_comparisons():
@@ -225,7 +226,7 @@ def test_date_error_handling():
 
         # Directly test the method to cover line 126
         date_methods = DateMethods()
-        date_methods._create_timedelta(1, FakeUnit())
+        create_timedelta(1, FakeUnit())
 
 
 def test_ensure_datetime_type_error():
@@ -237,7 +238,7 @@ def test_ensure_datetime_type_error():
 
     # Test with an object that's not a datetime, string, int, or float
     with pytest.raises(TypeError, match="Cannot convert"):
-        date_methods._ensure_datetime({})  # Using a dict should trigger the error
+        ensure_datetime({})  # Using a dict should trigger the error
 
 
 @settings(max_examples=10)

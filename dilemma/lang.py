@@ -297,22 +297,6 @@ class ExpressionTransformer(Transformer, DateMethods):
                 "'is $empty' can only be used with container types (list, tuple, dict)"
             )
 
-    def now_value(self, _) -> datetime:
-        """Return the current datetime for use in comparisons"""
-        return datetime.now(tz=timezone.utc)
-
-    def date_within(self, items: list) -> bool:
-        """Check if date is within a specified time period from now"""
-        date_obj = self._ensure_datetime(items[0])
-        # Handle potentially float value from expressions
-        quantity = float(items[1]) if hasattr(items[1], "value") else items[1]
-        unit = items[2].value if hasattr(items[2], "value") else items[2]
-
-        now = datetime.now(date_obj.tzinfo if date_obj.tzinfo else timezone.utc)
-        delta = self._create_timedelta(quantity, unit)
-
-        return abs(date_obj - now) <= delta
-
 
 # Thread-local storage for the parser
 _thread_local = threading.local()
