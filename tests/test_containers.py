@@ -110,25 +110,25 @@ def test_container_type_errors():
     }
 
     # These should raise TypeError because the right operand is not a collection
-    with pytest.raises(TypeError, match="requires a collection"):
+    with pytest.raises(TypeError, match="must be a collection"):
         evaluate("'test' in number", variables)
 
     # This should work (string contains)
     assert evaluate("'e' in string", variables) is True
 
     # This should fail (boolean is not a collection)
-    with pytest.raises(TypeError, match="requires a collection"):
+    with pytest.raises(TypeError, match="must be a collection"):
         evaluate("'true' in boolean", variables)
 
     # These should raise TypeError because the left operand is not a collection
-    with pytest.raises(TypeError, match="requires a collection"):
+    with pytest.raises(TypeError, match="must be a collection"):
         evaluate("number contains 1", variables)
 
     # This should work (string contains)
     assert evaluate("string contains 'll'", variables) is True
 
     # This should fail
-    with pytest.raises(TypeError, match="requires a collection"):
+    with pytest.raises(TypeError, match="must be a collection"):
         evaluate("boolean contains 'r'", variables)
 
 

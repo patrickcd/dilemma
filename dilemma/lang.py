@@ -11,8 +11,10 @@ from datetime import datetime, timezone
 from lark import Token
 from lark import Lark, Transformer, exceptions as lark_exceptions
 
-from dilemma.lookup import lookup_variable, DateTimeEncoder, evaluate_jq_expression
-from dilemma.dates import DateMethods
+from .lookup import lookup_variable, DateTimeEncoder, evaluate_jq_expression
+from .dates import DateMethods
+
+from .utils import binary_op, both_strings, reject_strings, error_handling, check_containment
 
 
 log = logging.getLogger(__name__)
@@ -104,18 +106,6 @@ grammar = r"""
     %ignore WS
 """
 
-def both_strings(items: list):
-    return isinstance(items[0], str) and isinstance(items[1], str)
-
-
-def either_string(items: list):
-    return isinstance(items[0], str) or isinstance(items[1], str)
-
-
-def reject_strings(items: list, op_symbol: str):
-    """Raise TypeError if either of the first two items are string type"""
-    if either_string(items):
-        raise TypeError(f"'{op_symbol}' operator not supported with string operands")
 
 
 MAX_STRING_LENGTH = 10000  # Define a reasonable maximum length
@@ -159,38 +149,42 @@ class ExpressionTransformer(Transformer, DateMethods):
 
         return value
 
-    def add(self, items: list):
+    @binary_op
+    def add(self, left, right):
         """Addition operator (+) - allows string concatenation with limits"""
         # Allow string concatenation only when both operands are strings
-        if both_strings(items) :
-            result = items[0] + items[1]
+        if both_strings(left, right):
+            result = left + right
             if len(result) > MAX_STRING_LENGTH:
                 raise ValueError(f"String result exceeds maximum allowed length ({MAX_STRING_LENGTH})")
             return result
 
         # Prevent mixing strings with other types
-        if isinstance(items[0], str) or isinstance(items[1], str):
+        if isinstance(left, str) or isinstance(right, str):
             raise TypeError("'+' operator cannot mix string and non-string types")
 
         # Regular addition for non-string types
-        return items[0] + items[1]
+        return left + right
 
-    def sub(self, items: list):
+    @binary_op
+    def sub(self, left, right):
         """Subtraction operator (-) - deny for strings"""
-        reject_strings(items, "-")
-        return items[0] - items[1]
+        reject_strings(left, right, "-")
+        return left - right
 
-    def mul(self, items: list):
+    @binary_op
+    def mul(self, left, right):
         """Multiplication operator (*) - deny for strings"""
-        reject_strings(items, "*")
-        return items[0] * items[1]
+        reject_strings(left, right, "*")
+        return left * right
 
-    def div(self, items: list):
+    @binary_op
+    def div(self, left, right):
         """Division operator (/) - deny for strings"""
-        reject_strings(items, "/")
-        if items[1] == 0:
+        reject_strings(left, right, "/")
+        if right == 0:
             raise ZeroDivisionError("Division by zero")
-        return items[0] / items[1]  # Now using true division
+        return left / right  # Now using true division
 
     def paren(self, items: list) -> float:
         """Handle parenthesized expressions by returning the inner value"""
@@ -201,70 +195,55 @@ class ExpressionTransformer(Transformer, DateMethods):
         return items[0][1:-1].encode("utf-8").decode("unicode_escape")
 
     # Comparison operations
-    def eq(self, items: list) -> bool:
+    @binary_op
+    def eq(self, left, right) -> bool:
         """Check if two items are equal, with special handling for different types"""
 
-        left = items[0]
-        right = items[1]
-
-        # float is  special case
+        # float is special case
         if isinstance(left, float) or isinstance(right, float):
             return abs(left - right) < self.EPSILON
 
         return left == right
 
-    def ne(self, items: list) -> bool:
+    @binary_op
+    def ne(self, left, right) -> bool:
         """Check if two items are not equal, with special handling for float comparison"""
-        return not self.eq(items)
+        return not self.eq(left, right)
 
-    def lt(self, items: list) -> bool:
-        return items[0] < items[1]
+    @binary_op
+    def lt(self, left, right) -> bool:
+        return left < right
 
-    def gt(self, items: list) -> bool:
-        return items[0] > items[1]
+    @binary_op
+    def gt(self, left, right) -> bool:
+        return left > right
 
-    def le(self, items: list[int | float]) -> bool:
-        return items[0] <= items[1]
+    @binary_op
+    def le(self, left, right) -> bool:
+        return left <= right
 
-    def ge(self, items: list) -> bool:
-        return items[0] >= items[1]
+    @binary_op
+    def ge(self, left, right) -> bool:
+        return left >= right
 
     # Logical operations
-    def and_op(self, items: list) -> bool:
-        return bool(items[0]) and bool(items[1])
+    @binary_op
+    def and_op(self, left, right) -> bool:
+        return bool(left) and bool(right)
 
-    def or_op(self, items: list) -> bool:
-        return bool(items[0]) or bool(items[1])
+    @binary_op
+    def or_op(self, left, right) -> bool:
+        return bool(left) or bool(right)
 
-    def contains(self, items: list) -> bool:
+    @binary_op
+    def contains(self, left, right) -> bool:
         """Check if the left operand is contained in the right operand (container)"""
+        return check_containment(container=right, item=left, container_position="in")
 
-        match items[1]:
-            case list() | tuple():
-                return items[0] in items[1]
-            case dict():
-                return items[0] in items[1]  # Check if key exists in dict
-            case str() if isinstance(items[0], str):
-                return items[0] in items[1]  # String in string
-            case _:
-                raise TypeError(
-                    "'in' operator requires a collection (string, list, dict) as the right operand"
-                )
-
-    def contained_in(self, items: list) -> bool:
+    @binary_op
+    def contained_in(self, left, right) -> bool:
         """Check if the right operand is contained in the left operand (container)"""
-
-        match items[0]:
-            case list() | tuple():
-                return items[1] in items[0]
-            case dict():
-                return items[1] in items[0]  # Check if key exists in dict
-            case str() if isinstance(items[1], str):
-                return items[1] in items[0]  # String contains string
-            case _:
-                raise TypeError(
-                    "'contains' operator requires a collection (string, list, dict) as the left operand"
-                )
+        return check_containment(container=left, item=right, container_position="contains")
 
     def jq_expression(
         self, items: list[Token]
@@ -282,21 +261,23 @@ class ExpressionTransformer(Transformer, DateMethods):
 
         return value
 
-    def pattern_match(self, items: list) -> bool:
+    @binary_op
+    def pattern_match(self, left, right) -> bool:
         """
         Implements case-insensitive wildcard pattern matching using fnmatch.
 
         Example: 'filename.txt' matches '*.txt'
         """
-        if not both_strings(items):
+        if not both_strings(left, right):
             raise TypeError("Pattern matching requires string operands")
 
-        string = items[0].lower()
-        pattern = items[1].lower()
+        string = left.lower()
+        pattern = right.lower()
 
         return fnmatch.fnmatch(string, pattern)
 
-    def pattern_not_match(self, items: list) -> bool:
+    @binary_op
+    def pattern_not_match(self, left, right) -> bool:
         """
         Implements negated case-insensitive wildcard pattern matching.
         Returns true when the string does NOT match the pattern.
@@ -304,7 +285,7 @@ class ExpressionTransformer(Transformer, DateMethods):
         Example: 'document.doc' does not match '*.txt'
         """
 
-        return not self.pattern_match(items)
+        return not self.pattern_match(left, right)
 
     def is_empty(self, items: list) -> bool:
         """Check if a container (list or dict) is empty."""
@@ -313,7 +294,7 @@ class ExpressionTransformer(Transformer, DateMethods):
             return len(value) == 0
         else:
             raise TypeError(
-                "'is $empty' can only be used with container types (list, dict)"
+                "'is $empty' can only be used with container types (list, tuple, dict)"
             )
 
     def now_value(self, _) -> datetime:
@@ -369,11 +350,10 @@ class CompiledExpression:
         """
         processed_json = _process_variables(variables)
 
-        try:
+
+        with error_handling(self.expression):
             transformer = ExpressionTransformer(processed_json=processed_json)
             return transformer.transform(self.parse_tree)
-        except lark_exceptions.VisitError as e:
-           return _handle_evaluation_error(e, self.expression)
 
 
 # Helper function to process variables
@@ -448,39 +428,7 @@ def evaluate(
     except Exception as e:
         raise ValueError(f"Invalid expression syntax: {expression}") from e
 
-    try:
+    with error_handling(expression):
         transformer = ExpressionTransformer(processed_json=processed_json)
         return transformer.transform(tree)
-    except lark_exceptions.VisitError as e:
-        return _handle_evaluation_error(e, expression)
 
-
-def _handle_evaluation_error(e: lark_exceptions.VisitError, expression: str) -> None:
-    """
-    Handle common expression evaluation errors with consistent error reporting.
-
-    Args:
-        e: The caught VisitError exception
-        expression: The expression being evaluated
-
-    Raises:
-        ZeroDivisionError, NameError, TypeError: Re-raised with clean messages
-        ValueError: For all other evaluation errors
-    """
-    # Re-raise common errors with clean messages
-    if isinstance(e.__context__, ZeroDivisionError):
-        raise ZeroDivisionError("Division by zero") from e
-    if isinstance(e.__context__, NameError):
-        raise NameError(str(e.__context__)) from e
-    if isinstance(e.__context__, TypeError):
-        raise TypeError(str(e.__context__)) from e
-
-    # Log the original error for debugging
-    log.error(
-        f"Evaluation error: {type(e.__context__).__name__}: {e.__context__}"
-    )
-
-    # Raise a ValueError with details about what went wrong
-    raise ValueError(
-        f"Error evaluating expression: {expression} - Caused by: {type(e.__context__).__name__}: {e.__context__}"
-    ) from e
