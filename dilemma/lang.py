@@ -6,7 +6,7 @@ import json
 import threading
 import logging
 import fnmatch
-from datetime import datetime, timezone
+from datetime import datetime
 
 from lark import Token
 from lark import Lark, Transformer, exceptions as lark_exceptions
@@ -14,7 +14,13 @@ from lark import Lark, Transformer, exceptions as lark_exceptions
 from .lookup import lookup_variable, DateTimeEncoder, evaluate_jq_expression
 from .dates import DateMethods
 
-from .utils import binary_op, both_strings, reject_strings, error_handling, check_containment
+from .utils import (
+    binary_op,
+    both_strings,
+    reject_strings,
+    error_handling,
+    check_containment,
+)
 
 
 log = logging.getLogger(__name__)
@@ -107,8 +113,8 @@ grammar = r"""
 """
 
 
-
 MAX_STRING_LENGTH = 10000  # Define a reasonable maximum length
+
 
 # Transformer to evaluate expressions
 class ExpressionTransformer(Transformer, DateMethods):
@@ -156,7 +162,9 @@ class ExpressionTransformer(Transformer, DateMethods):
         if both_strings(left, right):
             result = left + right
             if len(result) > MAX_STRING_LENGTH:
-                raise ValueError(f"String result exceeds maximum allowed length ({MAX_STRING_LENGTH})")
+                raise ValueError(
+                    f"String result exceeds maximum allowed length ({MAX_STRING_LENGTH})"
+                )
             return result
 
         # Prevent mixing strings with other types
@@ -243,7 +251,9 @@ class ExpressionTransformer(Transformer, DateMethods):
     @binary_op
     def contained_in(self, left, right) -> bool:
         """Check if the right operand is contained in the left operand (container)"""
-        return check_containment(container=left, item=right, container_position="contains")
+        return check_containment(
+            container=left, item=right, container_position="contains"
+        )
 
     def jq_expression(
         self, items: list[Token]
@@ -334,7 +344,6 @@ class CompiledExpression:
         """
         processed_json = _process_variables(variables)
 
-
         with error_handling(self.expression):
             transformer = ExpressionTransformer(processed_json=processed_json)
             return transformer.transform(self.parse_tree)
@@ -415,4 +424,3 @@ def evaluate(
     with error_handling(expression):
         transformer = ExpressionTransformer(processed_json=processed_json)
         return transformer.transform(tree)
-

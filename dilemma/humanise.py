@@ -1,6 +1,7 @@
 from lark import Transformer
 from dilemma.lang import build_parser
 
+
 class IndentedHumanReadableTransformer(Transformer):
     """
     Walks the parse tree of an expression and generates a human-readable description
@@ -103,6 +104,7 @@ class IndentedHumanReadableTransformer(Transformer):
 
     def date_same_day(self, items):
         return self._indent(f"{items[0]} is on the same day as {items[1]}")
+
 
 def to_indented_human_readable(expression: str) -> str:
     """

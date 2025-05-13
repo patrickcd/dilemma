@@ -10,6 +10,7 @@ from datetime import datetime
 # Type definitions
 TypeInfo = Union[str, List[str]]  # e.g., "number", ["number", "string"], "datetime"
 
+
 class TypeValidator(Transformer):
     """
     Walks expression trees to validate type compatibility using JSON Schema.
@@ -28,7 +29,7 @@ class TypeValidator(Transformer):
             "array": list,
             "object": dict,
             # Custom type for dates
-            "datetime": datetime
+            "datetime": datetime,
         }
 
     def get_variable_type(self, path: str) -> TypeInfo:
@@ -76,7 +77,9 @@ class TypeValidator(Transformer):
 
         return type_info
 
-    def is_compatible(self, left_type: TypeInfo, right_type: TypeInfo, operation: str) -> bool:
+    def is_compatible(
+        self, left_type: TypeInfo, right_type: TypeInfo, operation: str
+    ) -> bool:
         """Check if types are compatible for the given operation."""
         # Handle union types (lists of possible types)
         if isinstance(left_type, list):
@@ -86,7 +89,10 @@ class TypeValidator(Transformer):
 
         # Basic arithmetic operations
         if operation in ("+", "-", "*", "/"):
-            return left_type in ("number", "integer") and right_type in ("number", "integer")
+            return left_type in ("number", "integer") and right_type in (
+                "number",
+                "integer",
+            )
 
         # Equality operations
         if operation in ("==", "!="):
@@ -266,6 +272,7 @@ class TypeValidator(Transformer):
         We'll allow them but warn about potential type issues.
         """
         import warnings
+
         warnings.warn(f"Type validation for JQ expression '{items[0].value}' skipped")
         return ["string", "number", "boolean", "array", "object"]  # Could be any type
 
@@ -304,23 +311,31 @@ class TypeValidator(Transformer):
     def date_before(self, items: List[TypeInfo]) -> TypeInfo:
         """Date before - both operands must be dates."""
         if not (items[0] == "datetime" and items[1] == "datetime"):
-            raise TypeError(f"'before' requires datetime operands, got {items[0]} and {items[1]}")
+            raise TypeError(
+                f"'before' requires datetime operands, got {items[0]} and {items[1]}"
+            )
         return "boolean"
 
     def date_after(self, items: List[TypeInfo]) -> TypeInfo:
         """Date after - both operands must be dates."""
         if not (items[0] == "datetime" and items[1] == "datetime"):
-            raise TypeError(f"'after' requires datetime operands, got {items[0]} and {items[1]}")
+            raise TypeError(
+                f"'after' requires datetime operands, got {items[0]} and {items[1]}"
+            )
         return "boolean"
 
     def date_same_day(self, items: List[TypeInfo]) -> TypeInfo:
         """Date same day - both operands must be dates."""
         if not (items[0] == "datetime" and items[1] == "datetime"):
-            raise TypeError(f"'same_day_as' requires datetime operands, got {items[0]} and {items[1]}")
+            raise TypeError(
+                f"'same_day_as' requires datetime operands, got {items[0]} and {items[1]}"
+            )
         return "boolean"
 
 
-def validate_expression_types(expression: str, schema: Dict[str, Any], parser: Lark) -> Tuple[bool, Optional[str]]:
+def validate_expression_types(
+    expression: str, schema: Dict[str, Any], parser: Lark
+) -> Tuple[bool, Optional[str]]:
     """
     Validate expression types against a JSON schema.
 

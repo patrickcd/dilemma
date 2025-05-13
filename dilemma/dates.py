@@ -15,6 +15,7 @@ class DateMethods:
     """
     Mixin class for add datetime handling methods to ExpressionTransformer
     """
+
     def date_is_past(self, items: list) -> bool:
         """Handle 'is past' date comparison"""
         date_obj = ensure_datetime(items[0])

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 log = logging.getLogger(__name__)
 
+
 def binary_op(func):
     """
     Decorator that extracts items[0] and items[1] into left and right variables
@@ -16,6 +17,7 @@ def binary_op(func):
     case. Decoratored methods can be called with either a single list argument (as
     occurs when called by Lark) or with two left and right arguments.
     """
+
     @functools.wraps(func)
     def wrapper(self, *args):
         arg_length = len(args)
@@ -29,7 +31,9 @@ def binary_op(func):
                 " 'items', or two arguments, 'left' + 'right'"
             )
         return func(self, left, right)
+
     return wrapper
+
 
 def both_strings(left, right):
     return isinstance(left, str) and isinstance(right, str)
@@ -71,9 +75,7 @@ def error_handling(expression: str):
             raise TypeError(str(e.__context__)) from e
 
         # Log the original error for debugging
-        log.error(
-            f"Evaluation error: {type(e.__context__).__name__}: {e.__context__}"
-        )
+        log.error(f"Evaluation error: {type(e.__context__).__name__}: {e.__context__}")
 
         # Raise a ValueError with details about what went wrong
         err_name = type(e.__context__).__name__
@@ -121,6 +123,7 @@ def temporal_unit_comparison(func):
     casts the second to float, and passes them along with the third (unit)
     to the decorated function.
     """
+
     @functools.wraps(func)
     def wrapper(self, items: list):  # 'self' will be an instance of DateMethods
         if len(items) != 3:
@@ -130,12 +133,14 @@ def temporal_unit_comparison(func):
             )
 
         date_val = ensure_datetime(items[0])
-        quantity_val = float(items[1])  # Assumes items[1] is a number or string convertible to float
-        unit_val = items[2]          # Assumes items[2] is already a string (e.g., "minute")
+        quantity_val = float(
+            items[1]
+        )  # Assumes items[1] is a number or string convertible to float
+        unit_val = items[2]  # Assumes items[2] is already a string (e.g., "minute")
 
         return func(self, date_val, quantity_val, unit_val)
-    return wrapper
 
+    return wrapper
 
 
 # Helper methods
@@ -191,10 +196,10 @@ def create_timedelta(quantity, unit) -> timedelta:
 
 
 def unpack_datetimes(items: list) -> tuple[datetime, datetime]:
-        """
-        Extracts items 0 and 1 from the list and passes the values through
-        ensure_datetime
-        """
-        date1 = ensure_datetime(items[0])
-        date2 = ensure_datetime(items[1])
-        return date1, date2
+    """
+    Extracts items 0 and 1 from the list and passes the values through
+    ensure_datetime
+    """
+    date1 = ensure_datetime(items[0])
+    date2 = ensure_datetime(items[1])
+    return date1, date2

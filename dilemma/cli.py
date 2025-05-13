@@ -137,11 +137,10 @@ def generate_markdown_docs(examples_by_category, time_values, output_path):
                     doc.writeTextLine(ft)
                 doc.writeTextLine("")  # Empty line instead of writeNewLine
 
-                expression = example['expression']
+                expression = example["expression"]
                 doc.writeTextLine("```")
                 doc.writeTextLine(expression, html_escape=False)
                 doc.writeTextLine("```")
-
 
                 if example.get("context"):
                     # Process context to replace time placeholders with real dates
@@ -153,7 +152,7 @@ def generate_markdown_docs(examples_by_category, time_values, output_path):
                     context_json = json.dumps(context, indent=2, default=str)
                     doc.addCodeBlock(context_json, "json")
 
-                doc.writeTextLine( f"`Result: {example['expected']}` " )
+                doc.writeTextLine(f"`Result: {example['expected']}` ")
 
                 doc.addHorizontalRule()
 
