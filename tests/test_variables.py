@@ -160,7 +160,7 @@ def test_evaluate_datetime_from_json_string():
 # a letter or underscore)
 # Exclude "or" and "and" as they are now reserved keywords.
 variable_names_st = st.from_regex(r"[a-zA-Z_][a-zA-Z0-9_]*", fullmatch=True).filter(
-    lambda x: x not in ["or", "and"]
+    lambda x: x not in ["or", "and", "is", "in"]
 )
 
 # Strategy for generating simple values (integers, floats, booleans)

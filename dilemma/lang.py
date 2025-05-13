@@ -104,6 +104,20 @@ grammar = r"""
     %ignore WS
 """
 
+def both_strings(items: list):
+    return isinstance(items[0], str) and isinstance(items[1], str)
+
+
+def either_string(items: list):
+    return isinstance(items[0], str) or isinstance(items[1], str)
+
+
+def reject_strings(items: list, op_symbol: str):
+    """Raise TypeError if either of the first two items are string type"""
+    if either_string(items):
+        raise TypeError(f"'{op_symbol}' operator not supported with string operands")
+
+
 MAX_STRING_LENGTH = 10000  # Define a reasonable maximum length
 
 # Transformer to evaluate expressions
@@ -148,7 +162,7 @@ class ExpressionTransformer(Transformer, DateMethods):
     def add(self, items: list):
         """Addition operator (+) - allows string concatenation with limits"""
         # Allow string concatenation only when both operands are strings
-        if isinstance(items[0], str) and isinstance(items[1], str):
+        if both_strings(items) :
             result = items[0] + items[1]
             if len(result) > MAX_STRING_LENGTH:
                 raise ValueError(f"String result exceeds maximum allowed length ({MAX_STRING_LENGTH})")
@@ -163,21 +177,17 @@ class ExpressionTransformer(Transformer, DateMethods):
 
     def sub(self, items: list):
         """Subtraction operator (-) - deny for strings"""
-        if isinstance(items[0], str) or isinstance(items[1], str):
-            raise TypeError("'-' operator not supported with string operands")
+        reject_strings(items, "-")
         return items[0] - items[1]
 
     def mul(self, items: list):
         """Multiplication operator (*) - deny for strings"""
-        if isinstance(items[0], str) or isinstance(items[1], str):
-            raise TypeError("'*' operator not supported with string operands")
+        reject_strings(items, "*")
         return items[0] * items[1]
 
     def div(self, items: list):
         """Division operator (/) - deny for strings"""
-        if isinstance(items[0], str) or isinstance(items[1], str):
-            raise TypeError("'/' operator not supported with string operands")
-        # Handle division by zero
+        reject_strings(items, "/")
         if items[1] == 0:
             raise ZeroDivisionError("Division by zero")
         return items[0] / items[1]  # Now using true division
@@ -192,23 +202,20 @@ class ExpressionTransformer(Transformer, DateMethods):
 
     # Comparison operations
     def eq(self, items: list) -> bool:
-        if isinstance(items[0], str) or isinstance(items[1], str):
-            return items[0] == items[1]
-        # Handle floating point comparisons with a small epsilon
-        if isinstance(items[0], float) or isinstance(items[1], float):
-            return abs(items[0] - items[1]) < self.EPSILON
-        # Handle collections (lists, dicts)
-        if isinstance(items[0], (list, dict)) or isinstance(items[1], (list, dict)):
-            return items[0] == items[1]
-        return items[0] == items[1]
+        """Check if two items are equal, with special handling for different types"""
+
+        left = items[0]
+        right = items[1]
+
+        # float is  special case
+        if isinstance(left, float) or isinstance(right, float):
+            return abs(left - right) < self.EPSILON
+
+        return left == right
 
     def ne(self, items: list) -> bool:
-        if isinstance(items[0], str) or isinstance(items[1], str):
-            return items[0] != items[1]
-        # Handle floating point comparisons with a small epsilon
-        if isinstance(items[0], float) or isinstance(items[1], float):
-            return abs(items[0] - items[1]) >= self.EPSILON
-        return items[0] != items[1]
+        """Check if two items are not equal, with special handling for float comparison"""
+        return not self.eq(items)
 
     def lt(self, items: list) -> bool:
         return items[0] < items[1]
@@ -230,30 +237,34 @@ class ExpressionTransformer(Transformer, DateMethods):
         return bool(items[0]) or bool(items[1])
 
     def contains(self, items: list) -> bool:
-        # Check if second operand (container) is a collection or string
-        if isinstance(items[1], (list, tuple)):
-            return items[0] in items[1]
-        elif isinstance(items[1], dict):
-            return items[0] in items[1]  # Check if key exists in dict
-        elif isinstance(items[0], str) and isinstance(items[1], str):
-            return items[0] in items[1]  # String in string
-        else:
-            raise TypeError(
-                "'in' operator requires a collection (string, list, dict) as the right operand"
-            )
+        """Check if the left operand is contained in the right operand (container)"""
+
+        match items[1]:
+            case list() | tuple():
+                return items[0] in items[1]
+            case dict():
+                return items[0] in items[1]  # Check if key exists in dict
+            case str() if isinstance(items[0], str):
+                return items[0] in items[1]  # String in string
+            case _:
+                raise TypeError(
+                    "'in' operator requires a collection (string, list, dict) as the right operand"
+                )
 
     def contained_in(self, items: list) -> bool:
-        # Check if first operand (container) is a collection or string
-        if isinstance(items[0], (list, tuple)):
-            return items[1] in items[0]
-        elif isinstance(items[0], dict):
-            return items[1] in items[0]  # Check if key exists in dict
-        elif isinstance(items[0], str) and isinstance(items[1], str):
-            return items[1] in items[0]  # String contains string
-        else:
-            raise TypeError(
-                "'contains' operator requires a collection (string, list, dict) as the left operand"
-            )
+        """Check if the right operand is contained in the left operand (container)"""
+
+        match items[0]:
+            case list() | tuple():
+                return items[1] in items[0]
+            case dict():
+                return items[1] in items[0]  # Check if key exists in dict
+            case str() if isinstance(items[1], str):
+                return items[1] in items[0]  # String contains string
+            case _:
+                raise TypeError(
+                    "'contains' operator requires a collection (string, list, dict) as the left operand"
+                )
 
     def jq_expression(
         self, items: list[Token]
@@ -277,7 +288,7 @@ class ExpressionTransformer(Transformer, DateMethods):
 
         Example: 'filename.txt' matches '*.txt'
         """
-        if not isinstance(items[0], str) or not isinstance(items[1], str):
+        if not both_strings(items):
             raise TypeError("Pattern matching requires string operands")
 
         string = items[0].lower()
@@ -292,13 +303,8 @@ class ExpressionTransformer(Transformer, DateMethods):
 
         Example: 'document.doc' does not match '*.txt'
         """
-        if not isinstance(items[0], str) or not isinstance(items[1], str):
-            raise TypeError("Pattern matching requires string operands")
 
-        string = items[0].lower()
-        pattern = items[1].lower()
-
-        return not fnmatch.fnmatch(string, pattern)
+        return not self.pattern_match(items)
 
     def is_empty(self, items: list) -> bool:
         """Check if a container (list or dict) is empty."""
@@ -365,24 +371,9 @@ class CompiledExpression:
 
         try:
             transformer = ExpressionTransformer(processed_json=processed_json)
-            result = transformer.transform(self.parse_tree)
-            return result
+            return transformer.transform(self.parse_tree)
         except lark_exceptions.VisitError as e:
-            if isinstance(e.__context__, ZeroDivisionError):
-                raise ZeroDivisionError("Division by zero") from e
-            if isinstance(e.__context__, NameError):
-                raise NameError(str(e.__context__)) from e
-            if isinstance(e.__context__, TypeError):
-                raise TypeError(str(e.__context__)) from e
-
-            # Show the actual error rather than a generic message
-            print(
-                f"DEBUG - Original error: {type(e.__context__).__name__}: {e.__context__}"
-            )
-
-            raise ValueError(
-                f"Error evaluating expression: {self.expression} - Caused by: {type(e.__context__).__name__}: {e.__context__}"
-            ) from e
+           return _handle_evaluation_error(e, self.expression)
 
 
 # Helper function to process variables
@@ -459,21 +450,37 @@ def evaluate(
 
     try:
         transformer = ExpressionTransformer(processed_json=processed_json)
-        result = transformer.transform(tree)
-        return result
+        return transformer.transform(tree)
     except lark_exceptions.VisitError as e:
-        # Error handling logic remains unchanged
-        if isinstance(e.__context__, ZeroDivisionError):
-            raise ZeroDivisionError("Division by zero") from e
-        if isinstance(e.__context__, NameError):
-            raise NameError(str(e.__context__)) from e
-        if isinstance(e.__context__, TypeError):
-            raise TypeError(str(e.__context__)) from e
+        return _handle_evaluation_error(e, expression)
 
-        log.error(
-            f"DEBUG - Original error: {type(e.__context__).__name__}: {e.__context__}"
-        )
 
-        raise ValueError(
-            f"Error evaluating expression: {expression} - Caused by: {type(e.__context__).__name__}: {e.__context__}"
-        ) from e
+def _handle_evaluation_error(e: lark_exceptions.VisitError, expression: str) -> None:
+    """
+    Handle common expression evaluation errors with consistent error reporting.
+
+    Args:
+        e: The caught VisitError exception
+        expression: The expression being evaluated
+
+    Raises:
+        ZeroDivisionError, NameError, TypeError: Re-raised with clean messages
+        ValueError: For all other evaluation errors
+    """
+    # Re-raise common errors with clean messages
+    if isinstance(e.__context__, ZeroDivisionError):
+        raise ZeroDivisionError("Division by zero") from e
+    if isinstance(e.__context__, NameError):
+        raise NameError(str(e.__context__)) from e
+    if isinstance(e.__context__, TypeError):
+        raise TypeError(str(e.__context__)) from e
+
+    # Log the original error for debugging
+    log.error(
+        f"Evaluation error: {type(e.__context__).__name__}: {e.__context__}"
+    )
+
+    # Raise a ValueError with details about what went wrong
+    raise ValueError(
+        f"Error evaluating expression: {expression} - Caused by: {type(e.__context__).__name__}: {e.__context__}"
+    ) from e
