@@ -4,43 +4,116 @@ from datetime import datetime, timedelta, timezone
 
 import yaml
 import click
+import cmd
 
 
 @click.group()
-def cmd():
+def cli():
     """Dilemma Expression Engine CLI."""
     pass
 
 
-@cmd.command(name="x")
-@click.argument("expression")
+class DilemmaREPL(cmd.Cmd):
+    intro = (
+        "Entering REPL mode. Type 'help' or '?' for a list of commands."
+        " Type 'exit' or 'quit' to leave."
+    )
+    prompt = ">>> "
+
+    def __init__(self, context, verbose):
+        super().__init__()
+        self.context = context
+        self.verbose = verbose
+        from dilemma.lang import evaluate
+
+        self.evaluate = evaluate
+
+    def do_exit(self, arg):
+        """Exit the REPL."""
+        return True
+
+    def do_quit(self, arg):
+        """Exit the REPL."""
+        return True
+
+    def do_constants(self, arg):
+        """List available constants."""
+        print("Available constants:")
+        print("  $now - Current datetime in UTC")
+        print("  $past - Check if a date is in the past")
+        print("  $future - Check if a date is in the future")
+        print("  $today - Check if a date is today")
+        print("  $empty - Check if a container is empty")
+
+    def default(self, line):
+        """Evaluate an expression."""
+        try:
+            result = self.evaluate(line, self.context)
+            if self.verbose:
+                print(f"Expression: {line}")
+                print(f"Result: {result}")
+                print(f"Type: {type(result).__name__}")
+            else:
+                print(result)
+        except ZeroDivisionError:
+            print("Error evaluating expression: Division by zero")
+        except Exception as e:
+            print(f"Error evaluating expression: {e}")
+
+
+@cli.command(name="x")
+@click.argument("expression", required=False)
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed output")
-def evaluate_expression(expression: str, verbose: bool) -> None:
+@click.option(
+    "--context-file",
+    "-c",
+    type=click.Path(exists=True, dir_okay=False),
+    help="Path to a YAML or JSON file to load as context for evaluation",
+)
+def evaluate_expression(expression: str, verbose: bool, context_file: str) -> None:
     """Evaluate a mathematical or logical expression.
 
-    EXPRESSION: The expression to evaluate, e.g. "2 + 3 * 4" or "5 > 3 and 2 < 4"
+    EXPRESSION: The expression to evaluate, e.g. "2 + 3 * 4" or "5 > 3 and 2 < 4".
+    If omitted, a REPL loop will be started.
     """
     from dilemma.lang import evaluate
 
-    try:
-        result = evaluate(expression)
-        if verbose:
-            click.echo(f"Expression: {expression}")
-            click.echo(f"Result: {result}")
-            click.echo(f"Type: {type(result).__name__}")
-        else:
-            click.echo(result)
-    except ZeroDivisionError as zde:
-        click.echo("Error evaluating expression: Division by zero", err=True)
-        # Use Click's built-in error handling
-        raise click.Abort from zde
-    except Exception as e:
-        click.echo(f"Error evaluating expression: {e}", err=True)
-        # Use Click's built-in error handling
-        raise click.Abort from e
+    # Load context from the provided file
+    context = {}
+    if context_file:
+        try:
+            with open(context_file, "r") as f:
+                if context_file.endswith(".yaml") or context_file.endswith(".yml"):
+                    context = yaml.safe_load(f)
+                elif context_file.endswith(".json"):
+                    context = json.load(f)
+                else:
+                    click.echo("Unsupported file format. Use YAML or JSON.", err=True)
+                    raise click.Abort()
+        except Exception as e:
+            click.echo(f"Error loading context file: {e}", err=True)
+            raise click.Abort()
+
+    if expression:
+        # Evaluate a single expression
+        try:
+            result = evaluate(expression, context)
+            if verbose:
+                click.echo(f"Expression: {expression}")
+                click.echo(f"Result: {result}")
+                click.echo(f"Type: {type(result).__name__}")
+            else:
+                click.echo(result)
+        except ZeroDivisionError:
+            click.echo("Error evaluating expression: Division by zero", err=True)
+        except Exception as e:
+            click.echo(f"Error evaluating expression: {e}", err=True)
+    else:
+        # Start the REPL
+        DilemmaREPL(context, verbose).cmdloop()
 
 
-@cmd.command()
+@cli.command()
 @click.option(
     "--output",
     "-o",
@@ -175,4 +248,4 @@ def process_time_values_for_docs(data, time_values):
 
 
 if __name__ == "__main__":
-    cmd()
+    cli()
