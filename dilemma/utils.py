@@ -67,6 +67,7 @@ def error_handling(expression: str):
         yield
     except Exception as e:
         # Re-raise common errors with clean messages
+
         if isinstance(e.__context__, ZeroDivisionError):
             raise ZeroDivisionError("Division by zero") from e
         if isinstance(e.__context__, NameError):

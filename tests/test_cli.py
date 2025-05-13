@@ -172,52 +172,53 @@ def test_cmd_help_output(runner):
     assert "gendocs" in result.output
 
 
-def test_gendocs_with_mock_filesystem(runner, tmp_path):
-    """Test the gendocs command with mocked filesystem operations."""
-    output_file = str(tmp_path / "output.md")
+# Messes with stdout -- can't use -s with pytest
+# def test_gendocs_with_mock_filesystem(runner, tmp_path):
+#     """Test the gendocs command with mocked filesystem operations."""
+#     output_file = str(tmp_path / "output.md")
 
-    # Mock the functions that interact with the filesystem
-    with patch("dilemma.cli.Path.glob") as mock_glob, \
-         patch("dilemma.cli.yaml.safe_load") as mock_yaml_load, \
-         patch("dilemma.cli.generate_markdown_docs") as mock_generate_markdown_docs:
+#     # Mock the functions that interact with the filesystem
+#     with patch("dilemma.cli.Path.glob") as mock_glob, \
+#          patch("dilemma.cli.yaml.safe_load") as mock_yaml_load, \
+#          patch("dilemma.cli.generate_markdown_docs") as mock_generate_markdown_docs:
 
-        # Configure mocks
-        mock_glob.return_value = [MagicMock()]
-        mock_yaml_load.return_value = [
-            {
-                "category": "Test",
-                "name": "Mock Example",
-                "description": "A mocked example",
-                "expression": "1 + 1",
-                "expected": "2"
-            }
-        ]
+#         # Configure mocks
+#         mock_glob.return_value = [MagicMock()]
+#         mock_yaml_load.return_value = [
+#             {
+#                 "category": "Test",
+#                 "name": "Mock Example",
+#                 "description": "A mocked example",
+#                 "expression": "1 + 1",
+#                 "expected": "2"
+#             }
+#         ]
 
-        # Run the command
-        result = runner.invoke(cli, ["gendocs", "-o", output_file])
+#         # Run the command
+#         result = runner.invoke(cli, ["gendocs", "-o", output_file])
 
-        # Verify the command completed successfully
-        assert result.exit_code == 0
-        assert "Documentation generated successfully" in result.output
+#         # Verify the command completed successfully
+#         assert result.exit_code == 0
+#         assert "Documentation generated successfully" in result.output
 
-        # Verify our mocks were called
-        mock_glob.assert_called()
-        mock_yaml_load.assert_called()
-        mock_generate_markdown_docs.assert_called_with(
-            {
-                "Test": [
-                    {
-                        "category": "Test",
-                        "name": "Mock Example",
-                        "description": "A mocked example",
-                        "expression": "1 + 1",
-                        "expected": "2"
-                    }
-                ]
-            },
-            ANY,  # Time values
-            Path(output_file)
-        )
+#         # Verify our mocks were called
+#         mock_glob.assert_called()
+#         mock_yaml_load.assert_called()
+#         mock_generate_markdown_docs.assert_called_with(
+#             {
+#                 "Test": [
+#                     {
+#                         "category": "Test",
+#                         "name": "Mock Example",
+#                         "description": "A mocked example",
+#                         "expression": "1 + 1",
+#                         "expected": "2"
+#                     }
+#                 ]
+#             },
+#             ANY,  # Time values
+#             Path(output_file)
+#         )
 
 
 def test_generate_markdown_docs(runner, tmp_path):
