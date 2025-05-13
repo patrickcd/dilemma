@@ -59,7 +59,7 @@ dev = [
 all = ["dilemma[test,doc,dev]"]
 
 [project.scripts]
-dilemma = "dilemma.cli:cli"
+dilemma = "dilemma.cli:cmd"
 
 [tool.setuptools]
 platforms = ["unix", "linux", "osx", "cygwin", "win32"]

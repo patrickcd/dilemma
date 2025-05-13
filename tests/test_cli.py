@@ -6,7 +6,7 @@ import pytest
 import yaml
 from click.testing import CliRunner
 
-from dilemma.cli import evaluate_expression, cmd
+from dilemma.cli import evaluate_expression, cli
 
 
 @pytest.fixture
@@ -86,7 +86,7 @@ def test_division_by_zero(runner):
 
 def test_evaluate_expression_command(runner):
     """Test that the evaluate_expression can be called via the command group."""
-    result = runner.invoke(cmd, ["x", "2 + 2"])
+    result = runner.invoke(cli, ["x", "2 + 2"])
     assert result.exit_code == 0
     assert result.output.strip() == "4"
 
@@ -165,7 +165,7 @@ def test_variable_expression_with_debug(runner):
 
 def test_cmd_help_output(runner):
     """Test that the main command group shows help text."""
-    result = runner.invoke(cmd, ["--help"])
+    result = runner.invoke(cli, ["--help"])
     assert result.exit_code == 0
     assert "Commands:" in result.output
     assert "x" in result.output
@@ -194,7 +194,7 @@ def test_gendocs_with_mock_filesystem(runner, tmp_path):
         ]
 
         # Run the command
-        result = runner.invoke(cmd, ["gendocs", "-o", output_file])
+        result = runner.invoke(cli, ["gendocs", "-o", output_file])
 
         # Verify the command completed successfully
         assert result.exit_code == 0
@@ -265,7 +265,7 @@ def test_gendocs_error_handling(runner):
     """Test error handling in the gendocs command."""
     # Create mock that causes an exception
     with patch("dilemma.cli.Path.glob", side_effect=Exception("Test error")):
-        result = runner.invoke(cmd, ["gendocs"])
+        result = runner.invoke(cli, ["gendocs"])
 
         # Verify error is handled
         assert result.exit_code != 0

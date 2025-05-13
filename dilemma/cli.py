@@ -1,4 +1,5 @@
 import json
+import sys
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
@@ -106,8 +107,10 @@ def evaluate_expression(expression: str, verbose: bool, context_file: str) -> No
                 click.echo(result)
         except ZeroDivisionError:
             click.echo("Error evaluating expression: Division by zero", err=True)
+            sys.exit(1)
         except Exception as e:
             click.echo(f"Error evaluating expression: {e}", err=True)
+            sys.exit(1)
     else:
         # Start the REPL
         DilemmaREPL(context, verbose).cmdloop()
