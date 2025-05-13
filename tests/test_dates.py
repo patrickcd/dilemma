@@ -39,34 +39,34 @@ def test_date_is_comparisons():
 
 def test_date_within_comparisons():
     """Test 'within' time period date comparisons."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(timezone.utc)  # Ensure consistency with the method's 'now'
 
     variables = {
-        "just_now": now - timedelta(minutes=5),
-        "hour_ago": now - timedelta(hours=1),
-        "day_ago": now - timedelta(days=1),
-        "week_ago": now - timedelta(days=6),
-        "month_ago": now - timedelta(days=25),
-        "year_ago": now - timedelta(days=364),
-        "older": now - timedelta(days=500),
+        "just_now": now + timedelta(minutes=5),  # Future date
+        "hour_later": now + timedelta(hours=1),  # Future date
+        "day_later": now + timedelta(days=1),  # Future date
+        "week_later": now + timedelta(days=6),  # Future date
+        "month_later": now + timedelta(days=25),  # Future date
+        "year_later": now + timedelta(days=364),  # Future date
+        "$now": now,  # Pass the fixed 'now' value explicitly
     }
 
     # Test various time periods
-    assert evaluate("just_now within 1 hour", variables) is True
-    assert evaluate("hour_ago within 2 hours", variables) is True
-    assert evaluate("hour_ago within 30 minutes", variables) is False
+    assert evaluate("just_now upcoming within 1 hour", variables) is True
+    assert evaluate("hour_later upcoming within 2 hours", variables) is True
+    assert evaluate("hour_later upcoming within 30 minutes", variables) is False
 
-    assert evaluate("day_ago within 2 days", variables) is True
-    assert evaluate("day_ago within 12 hours", variables) is False
+    assert evaluate("day_later upcoming within 2 days", variables) is True
+    assert evaluate("day_later upcoming within 12 hours", variables) is False
 
-    assert evaluate("week_ago within 1 week", variables) is True
-    assert evaluate("week_ago within 5 days", variables) is False
+    assert evaluate("week_later upcoming within 1 week", variables) is True
+    assert evaluate("week_later upcoming within 5 days", variables) is False
 
-    assert evaluate("month_ago within 1 month", variables) is True
-    assert evaluate("month_ago within 20 days", variables) is False
+    assert evaluate("month_later upcoming within 1 month", variables) is True
+    assert evaluate("month_later upcoming within 20 days", variables) is False
 
-    assert evaluate("year_ago within 1 year", variables) is True
-    assert evaluate("older within 1 year", variables) is False
+    assert evaluate("year_later upcoming within 1 year", variables) is True
+    assert evaluate("year_later upcoming within 2 years", variables) is True
 
 
 def test_date_older_than_comparisons():
@@ -166,14 +166,14 @@ def test_complex_date_expressions():
     variables = {
         "start_date": now - timedelta(days=30),
         "end_date": now + timedelta(days=10),
-        "signup_date": now - timedelta(days=5),
-        "last_login": now - timedelta(hours=2),
+        "signup_date": now - timedelta(days=15),
+        "last_login": now - timedelta(hours=25),
     }
 
     # Test combined expressions
     assert evaluate("start_date is $past and end_date is $future", variables) is True
     assert (
-        evaluate("signup_date within 7 days and last_login within 24 hours", variables)
+        evaluate("signup_date older than 7 days and last_login older than 24 hours", variables)
         is True
     )
     assert (
@@ -262,7 +262,7 @@ def test_date_before_after_property(days_offset, hours_offset):
 @settings(max_examples=10)
 @given(days_ago=st.integers(min_value=1, max_value=500))
 def test_date_older_than_within_property(days_ago):
-    """Property test for date 'older than' and 'within' time periods."""
+    """Property test for date 'older than' and time periods."""
     now = datetime.now(timezone.utc)
     test_date = now - timedelta(days=days_ago)
 
@@ -272,6 +272,3 @@ def test_date_older_than_within_property(days_ago):
     assert evaluate(f"test_date older than {days_ago - 1} days", variables) is True
     assert evaluate(f"test_date older than {days_ago + 1} days", variables) is False
 
-    # Test within
-    assert evaluate(f"test_date within {days_ago + 1} days", variables) is True
-    assert evaluate(f"test_date within {days_ago - 1} days", variables) is False

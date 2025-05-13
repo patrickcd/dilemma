@@ -136,6 +136,86 @@ Check if two words are not equal
 ---
   
   
+### Critical Path  
+Test lookup of nested attributes by possesive English syntax  
+  
+```  
+user's name == 'bob'  
+```  
+```json
+{
+  "user": {
+    "name": "bob"
+  }
+}
+```  
+`Result: True`   
+
+---
+  
+Test lookup of nested attributes by possesive English syntax  
+  
+```  
+'admin' in user's roles   
+```  
+```json
+{
+  "user": {
+    "roles": [
+      "reader",
+      "writer",
+      "admin"
+    ]
+  }
+}
+```  
+`Result: True`   
+
+---
+  
+Test lookup of nested attributes by possesive English syntax  
+  
+```  
+ user's roles contains 'reader'   
+```  
+```json
+{
+  "user": {
+    "roles": [
+      "reader",
+      "writer",
+      "admin"
+    ]
+  }
+}
+```  
+`Result: True`   
+
+---
+  
+Is it too late to reach the bar before last orders?  
+  
+```  
+bar's closing_time upcoming within (bar.distance / bike.speed)  hours  
+```  
+```json
+{
+  "bar": {
+    "closing_time": "__HOUR_FROM_NOW__",
+    "distance": 10,
+    "units": "miles"
+  },
+  "bike": {
+    "speed": 20,
+    "units": "mph"
+  }
+}
+```  
+`Result: False`   
+
+---
+  
+  
 ### Maths  
 Multiply two integers  
   
@@ -210,7 +290,7 @@ past_date is $past
 ```  
 ```json
 {
-  "past_date": "2025-05-11 16:06:23 UTC"
+  "past_date": "2025-05-12 14:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -224,7 +304,7 @@ future_date is $future
 ```  
 ```json
 {
-  "future_date": "2025-05-13 16:06:23 UTC"
+  "future_date": "2025-05-14 14:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -238,7 +318,7 @@ today_date is $today
 ```  
 ```json
 {
-  "today_date": "2025-05-12 16:06:23 UTC"
+  "today_date": "2025-05-13 14:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -247,14 +327,14 @@ today_date is $today
   
   
 ### Time Window  
-Check event within recent hours  
+Check event upcoming within recent hours  
   
 ```  
-recent_event within 12 hours  
+recent_event upcoming within 12 hours  
 ```  
 ```json
 {
-  "recent_event": "2025-05-12 15:06:23 UTC"
+  "recent_event": "2025-05-13 13:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -268,21 +348,7 @@ old_event older than 1 week
 ```  
 ```json
 {
-  "old_event": "2025-05-05 16:06:23 UTC"
-}
-```  
-`Result: True`   
-
----
-  
-Check event within minutes (not hours)  
-  
-```  
-very_recent within 30 minutes  
-```  
-```json
-{
-  "very_recent": "2025-05-12 16:06:23 UTC"
+  "old_event": "2025-05-06 14:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -298,8 +364,8 @@ start_date before end_date
 ```  
 ```json
 {
-  "start_date": "2025-05-11 16:06:23 UTC",
-  "end_date": "2025-05-13 16:06:23 UTC"
+  "start_date": "2025-05-12 14:51:37 UTC",
+  "end_date": "2025-05-14 14:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -313,8 +379,8 @@ end_date after start_date
 ```  
 ```json
 {
-  "start_date": "2025-05-11 16:06:23 UTC",
-  "end_date": "2025-05-13 16:06:23 UTC"
+  "start_date": "2025-05-12 14:51:37 UTC",
+  "end_date": "2025-05-14 14:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -360,8 +426,8 @@ project_start is $past and project_end is $future
 ```  
 ```json
 {
-  "project_start": "2025-05-11 16:06:23 UTC",
-  "project_end": "2025-05-13 16:06:23 UTC"
+  "project_start": "2025-05-12 14:51:37 UTC",
+  "project_end": "2025-05-14 14:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -371,12 +437,12 @@ project_start is $past and project_end is $future
 Recent login but account not new  
   
 ```  
-last_login within 4 hours and signup_date older than 1 day  
+last_login upcoming within 4 hours and signup_date older than 1 day  
 ```  
 ```json
 {
-  "last_login": "2025-05-12 15:06:23 UTC",
-  "signup_date": "2025-05-11 16:06:23 UTC"
+  "last_login": "2025-05-13 13:51:37 UTC",
+  "signup_date": "2025-05-12 14:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -422,11 +488,11 @@ Check literal date older than period
 Use hours time unit  
   
 ```  
-hour_ago within 2 hours  
+hour_ago upcoming within 2 hours  
 ```  
 ```json
 {
-  "hour_ago": "2025-05-12 15:06:23 UTC"
+  "hour_ago": "2025-05-13 13:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -436,11 +502,11 @@ hour_ago within 2 hours
 Use minutes time unit  
   
 ```  
-hour_ago within 120 minutes  
+hour_ago upcoming within 120 minutes  
 ```  
 ```json
 {
-  "hour_ago": "2025-05-12 15:06:23 UTC"
+  "hour_ago": "2025-05-13 13:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -454,7 +520,7 @@ week_ago older than 6 days
 ```  
 ```json
 {
-  "week_ago": "2025-05-05 16:06:23 UTC"
+  "week_ago": "2025-05-06 14:51:37 UTC"
 }
 ```  
 `Result: True`   
@@ -606,7 +672,7 @@ config contains 'debug_mode'
   
   
 ### Mixed Collections  
-Check membership in a list nested within a dictionary  
+Check membership in a list nested upcoming within a dictionary  
   
 ```  
 'python' in user.skills.programming  
@@ -961,11 +1027,11 @@ user.account.is_active and (user.subscription.level == 'premium' or user.account
     "account": {
       "is_active": true,
       "credits": 150,
-      "created_at": "2025-05-05 16:06:23 UTC"
+      "created_at": "2025-05-06 14:51:37 UTC"
     },
     "subscription": {
       "level": "basic",
-      "renewal_date": "2025-06-11 16:06:23 UTC"
+      "renewal_date": "2025-06-12 14:51:37 UTC"
     }
   }
 }
@@ -988,8 +1054,8 @@ and (
 {
   "project": {
     "status": "in_progress",
-    "start_date": "2025-05-05 16:06:23 UTC",
-    "deadline": "2025-06-11 16:06:23 UTC",
+    "start_date": "2025-05-06 14:51:37 UTC",
+    "deadline": "2025-06-12 14:51:37 UTC",
     "metrics": {
       "completion": 45,
       "quality": 98
@@ -1012,7 +1078,7 @@ Check if order is eligible for express shipping
   
 ```  
 order.status == 'confirmed'
-and order.created_at within 24 hours
+and order.created_at upcoming within 24 hours
 and (
   order.items.count < 5
   or (order.customer.tier == 'gold' and order.total_value > 100)
@@ -1023,7 +1089,7 @@ and (
 {
   "order": {
     "status": "confirmed",
-    "created_at": "2025-05-12 15:06:23 UTC",
+    "created_at": "2025-05-13 13:51:37 UTC",
     "items": {
       "count": 7,
       "categories": [
@@ -1033,7 +1099,7 @@ and (
     },
     "customer": {
       "tier": "gold",
-      "since": "2025-05-05 16:06:23 UTC"
+      "since": "2025-05-06 14:51:37 UTC"
     },
     "total_value": 250
   }
@@ -1046,7 +1112,7 @@ and (
 Multiple date conditions with nested properties  
   
 ```  
-(user.last_login within 7 days or user.auto_login)
+(user.last_login upcoming within 7 days or user.auto_login)
 and (
   user.account.trial_ends is $future
   or
@@ -1057,15 +1123,15 @@ and (
 ```json
 {
   "user": {
-    "last_login": "2025-05-05 16:06:23 UTC",
+    "last_login": "2025-05-06 14:51:37 UTC",
     "auto_login": true,
     "registration_date": "2023-01-15",
     "account": {
-      "trial_ends": "2025-05-11 16:06:23 UTC",
+      "trial_ends": "2025-05-12 14:51:37 UTC",
       "subscription": {
         "status": "active",
         "plan": "premium",
-        "next_payment": "2025-06-11 16:06:23 UTC"
+        "next_payment": "2025-06-12 14:51:37 UTC"
       }
     }
   }
@@ -1098,7 +1164,7 @@ and ('admin' in user.roles or user.tasks.pending > 0)
       },
       "theme": "dark"
     },
-    "last_seen": "2025-05-05 16:06:23 UTC",
+    "last_seen": "2025-05-06 14:51:37 UTC",
     "preferences": {
       "urgent_only": false,
       "language": "en"
@@ -1108,29 +1174,6 @@ and ('admin' in user.roles or user.tasks.pending > 0)
       "pending": 3,
       "completed": 27
     }
-  }
-}
-```  
-`Result: True`   
-
----
-  
-  
-### Critical Path  
-Can I get to the bar before last orders?  
-  
-```  
-bar.closing_time within (bike.speed/bar.distance) hours  
-```  
-```json
-{
-  "bar": {
-    "closing_time": "__HOUR_FROM_NOW__",
-    "distance": 10
-  },
-  "bike": {
-    "speed": 12,
-    "units": "mph"
   }
 }
 ```  
@@ -1286,7 +1329,7 @@ Combine JQ with regular Dilemma expressions
   "user": {
     "membership": {
       "level": "gold",
-      "since": "2025-05-05 16:06:23 UTC"
+      "since": "2025-05-06 14:51:37 UTC"
     },
     "account": {
       "active": true,
@@ -1477,15 +1520,15 @@ Use JQ to extract a date for comparison
     "milestones": [
       {
         "name": "alpha",
-        "date": "2025-06-11 16:06:23 UTC"
+        "date": "2025-06-12 14:51:37 UTC"
       },
       {
         "name": "beta",
-        "date": "2025-05-11 16:06:23 UTC"
+        "date": "2025-05-12 14:51:37 UTC"
       },
       {
         "name": "release",
-        "date": "2025-05-12 18:06:23 UTC"
+        "date": "2025-05-13 16:51:37 UTC"
       }
     ]
   }

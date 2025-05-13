@@ -75,7 +75,7 @@
 
 - name: nested_list_in_dict
   category: mixed_collections
-  description: "Check membership in a list nested within a dictionary"
+  description: "Check membership in a list nested upcoming within a dictionary"
   expression: "'python' in user.skills.programming"
   expected: true
   context:

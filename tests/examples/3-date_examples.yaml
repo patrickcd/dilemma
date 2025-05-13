@@ -26,10 +26,10 @@
     today_date: "__NOW__"
 
 # Time window comparisons
-- name: within_hours_window
+- name: upcoming within_hours_window
   category: time_window
-  description: "Check event within recent hours"
-  expression: "recent_event within 12 hours"
+  description: "Check event upcoming within recent hours"
+  expression: "recent_event upcoming within 12 hours"
   expected: true
   context:
     recent_event: "__HOUR_AGO__"
@@ -41,14 +41,6 @@
   expected: true
   context:
     old_event: "__LAST_WEEK__"
-
-- name: within_minutes_precision
-  category: time_window
-  description: "Check event within minutes (not hours)"
-  expression: "very_recent within 30 minutes"
-  expected: true
-  context:
-    very_recent: "__NOW__"
 
 # Date comparison operations
 - name: date_before_comparison
@@ -100,7 +92,7 @@
 - name: recent_user_with_history
   category: complex
   description: "Recent login but account not new"
-  expression: "last_login within 4 hours and signup_date older than 1 day"
+  expression: "last_login upcoming within 4 hours and signup_date older than 1 day"
   expected: true
   context:
     last_login: "__HOUR_AGO__"
@@ -128,18 +120,18 @@
   expected: true
 
 # Different time units
-- name: within_hours_unit
+- name: upcoming within_hours_unit
   category: time_units
   description: "Use hours time unit"
-  expression: "hour_ago within 2 hours"
+  expression: "hour_ago upcoming within 2 hours"
   expected: true
   context:
     hour_ago: "__HOUR_AGO__"
 
-- name: within_minutes_unit
+- name: upcoming within_minutes_unit
   category: time_units
   description: "Use minutes time unit"
-  expression: "hour_ago within 120 minutes"
+  expression: "hour_ago upcoming within 120 minutes"
   expected: true
   context:
     hour_ago: "__HOUR_AGO__"

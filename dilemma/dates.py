@@ -39,16 +39,6 @@ class DateMethods:
         return datetime.now(tz=timezone.utc)
 
     @temporal_unit_comparison
-    def date_within(self, date_obj: datetime, quantity: float, unit: str) -> bool:
-        """
-        Check if date is within a specified time period from now.
-        """
-        now = datetime.now(date_obj.tzinfo if date_obj.tzinfo else timezone.utc)
-        delta = create_timedelta(quantity, unit)
-
-        return abs(date_obj - now) <= delta
-
-    @temporal_unit_comparison
     def date_older_than(self, date_obj: datetime, quantity: float, unit: str) -> bool:
         """
         Check if date is older than a specified time period from now.
@@ -57,6 +47,18 @@ class DateMethods:
         delta = create_timedelta(quantity, unit)
 
         return (now - date_obj) > delta
+
+    @temporal_unit_comparison
+    def date_upcoming_within(
+        self, date_obj: datetime, quantity: float, unit: str
+    ) -> bool:
+        """
+        Check if a date is within a specified time period in the future from now.
+        """
+        now = datetime.now(date_obj.tzinfo if date_obj.tzinfo else timezone.utc)
+        delta = create_timedelta(quantity, unit)
+
+        return now <= date_obj <= (now + delta)
 
     def date_before(self, items: list) -> bool:
         """Check if one date is before another"""

@@ -56,7 +56,7 @@ grammar = r"""
                | sum "is" "$future" -> date_is_future
                | sum "is" "$today" -> date_is_today
                | sum "is" "$empty" -> is_empty
-               | sum "within" sum time_unit -> date_within
+               | sum "upcoming" "within" sum time_unit -> date_upcoming_within
                | sum "older" "than" sum time_unit -> date_older_than
                | sum "before" sum -> date_before
                | sum "after" sum -> date_after
