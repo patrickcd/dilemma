@@ -44,31 +44,13 @@ def execution_error_handling(expression: str):
             details=str(e),
         ) from e
 
-    except Exception as e:
-        log.info("Caught Not VisitError: %s", e)
-        # Re-raise common errors with clean messages
-        if isinstance(e, ZeroDivisionError) or isinstance(
-            e.__context__, ZeroDivisionError
-        ):
-            raise DilemmaError(template_key="zero_division") from e
+    except Exception as err:
+        log.warning("Caught Not VisitError: %s", err)
 
-        if isinstance(e, NameError) or isinstance(e.__context__, NameError):
-            # Pass through the original message which should have the variable name
-            raise DilemmaError(str(e)) from e
-
-        if isinstance(e, TypeError) or isinstance(e.__context__, TypeError):
-            # Pass through the original message which should have type information
-            raise DilemmaError(str(e)) from e
-
-        # Log the original error for debugging
-        log.error(f"Evaluation error: {type(e).__name__}: {e}")
-
-        # Raise an EvaluationError with details about what went wrong
-        err_name = type(e).__name__
-        err = e
+        errtype = str(type(err))
         raise EvaluationError(
             template_key="evaluation_error",
             expression=expression,
-            error_type=err_name,
+            error_type=errtype,
             details=str(err),
-        ) from e
+        ) from err
