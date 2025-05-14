@@ -4,7 +4,6 @@ Expression language implementation using Lark
 
 import json
 import threading
-import logging
 import fnmatch
 from datetime import datetime
 
@@ -21,7 +20,7 @@ from .errors import (
 
 from .lookup import lookup_variable, DateTimeEncoder, evaluate_jq_expression
 from .dates import DateMethods
-
+from .logconf import get_logger
 from .utils import (
     binary_op,
     both_strings,
@@ -30,7 +29,8 @@ from .utils import (
 )
 
 
-log = logging.getLogger(__name__)
+
+log = get_logger(__name__)
 
 # ruff: noqa: E501
 grammar = r"""

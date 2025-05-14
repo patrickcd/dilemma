@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime, timezone
 
 from .utils import (
@@ -7,8 +6,9 @@ from .utils import (
     create_timedelta,
     unpack_datetimes,
 )
+from .logconf import get_logger
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class DateMethods:

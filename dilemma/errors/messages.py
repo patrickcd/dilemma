@@ -5,18 +5,13 @@ This module provides a configurable template system for error messages.
 Users can supply their own templates with placeholders for error context.
 """
 
-import logging
-from importlib.resources import files
-import xml.etree.ElementTree as ET
 from typing import Dict
+import xml.etree.ElementTree as ET
+from importlib.resources import files
 
-log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+from ..logconf import get_logger
 
-# Add a console handler for debugging
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-log.addHandler(ch)
+log = get_logger(__name__)
 
 
 # Global templates storage

@@ -1,13 +1,9 @@
 import functools
-import logging
 from datetime import datetime, timedelta, timezone
 
 from .errors import TypeMismatchError
-
-log = logging.getLogger(__name__)
-
-log.setLevel(logging.DEBUG)
-log.addHandler(logging.StreamHandler())
+from .logconf import get_logger
+log = get_logger(__name__)
 
 
 def binary_op(func):
@@ -177,3 +173,4 @@ def unpack_datetimes(items: list) -> tuple[datetime, datetime]:
     date1 = ensure_datetime(items[0])
     date2 = ensure_datetime(items[1])
     return date1, date2
+

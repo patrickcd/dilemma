@@ -1,11 +1,11 @@
 from contextlib import contextmanager
-import logging
 
 from lark.exceptions import VisitError
 
 from .exc import DilemmaError, EvaluationError
+from ..logconf import get_logger
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 @contextmanager
