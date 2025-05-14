@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 
 from .utils import (
@@ -10,6 +11,10 @@ from .logconf import get_logger
 
 log = get_logger(__name__)
 
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        return {"__datetime__": obj.isoformat()}
 
 class DateMethods:
     """

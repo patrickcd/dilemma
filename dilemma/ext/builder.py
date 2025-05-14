@@ -16,7 +16,7 @@ IF
 from lark import Lark
 from dilemma.lang import ExpressionTransformer
 
-# Define the Lark grammar for the human-readable indented format
+# Lark grammar for the human-readable indented format
 human_readable_grammar = r"""
     ?start: expr
 

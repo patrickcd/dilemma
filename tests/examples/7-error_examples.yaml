@@ -12,7 +12,7 @@
   description: Error message for an unknown variable name
   expression: bob
   error_message: |
-    The word, 'bob' is not recognised.
+    The word 'bob' is not recognised.
     Unquoted words should refer names of data items in the context.
     Possibly a spelling mistake?
     If you intended this word to be used for a comparison put it in quotation marks.
