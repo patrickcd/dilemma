@@ -33,9 +33,8 @@ def load_templates_from_xml() -> Dict[str, str]:
     """
     log.debug("Loading error templates from XML file")
     try:
-        # Get the path to errors.xml using importlib.resources.files
-        package_name = __name__.split(".")[0]  # Get the top-level package name
-        xml_path = files(package_name).joinpath(XML_FILENAME)
+        # Use the current module name to find the XML file in the same directory
+        xml_path = files(__name__).joinpath(XML_FILENAME)
 
         # Parse the XML file
         tree = ET.parse(xml_path)

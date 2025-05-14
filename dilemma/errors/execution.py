@@ -9,7 +9,7 @@ log = get_logger(__name__)
 
 
 @contextmanager
-def error_handling(expression: str):
+def execution_error_handling(expression: str):
     """
     Context manager for handling common expression evaluation errors
     with consistent error reporting.

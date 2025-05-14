@@ -5,8 +5,11 @@ from lark.exceptions import UnexpectedCharacters, UnexpectedEOF, UnexpectedToken
 
 
 from .examples import ERROR_EXAMPLES
+from ..logconf import get_logger
 from .exc import UnexpectedCharacterError, UnexpectedEOFError, UnexpectedTokenError
 
+
+log = get_logger(__name__)
 
 def suggest_correction(interactive_parser, token):
     """
@@ -68,37 +71,42 @@ def parsing_error_handling(expression: str, parse_func: Callable):
     """
     try:
         yield
-    except UnexpectedToken as e:
-        error_context = e.get_context(expression)
+    except UnexpectedToken as ute:
+        error_context = ute.get_context(expression)
         error_pattern = None
+        log.debug("Caught lark UnexpectedToken Exception %s", ute)
 
-        if hasattr(e, "state") and e.state is not None:
-            error_pattern = e.match_examples(parse_func, ERROR_EXAMPLES)
+        if hasattr(ute, "state") and ute.state is not None:
+            log.debug("Found state on UnexpectedToken - attempting to match_examples")
+            error_pattern = ute.match_examples(parse_func, ERROR_EXAMPLES)
+        else:
+            log.debug("No state found on UnexpectedToken")
 
         suggestions = (
-            suggest_correction(e.interactive_parser, e.token)
-            if e.interactive_parser
+            suggest_correction(ute.interactive_parser, ute.token)
+            if ute.interactive_parser
             else []
         )
 
         raise UnexpectedTokenError(
             template_key=error_pattern or "unexpected_token",
-            details=str(e),
+            details=str(ute),
             context=error_context,
-            line=e.line,
-            column=e.column,
+            line=ute.line,
+            column=ute.column,
             suggestions=suggestions,
         )
-    except UnexpectedCharacters as e:
-        error_context = e.get_context(expression)
+    except UnexpectedCharacters as uce:
+        log.debug("Caught lark UnexpectedCharacters Exception %s",uce)
+        error_context = uce.get_context(expression)
         raise UnexpectedCharacterError(
             template_key="unexpected_character",
-            details=str(e),
+            details=str(uce),
             context=error_context,
-            line=e.line,
-            column=e.column,
+            line=uce.line,
+            column=uce.column,
         )
-    except UnexpectedEOF as e:
+    except UnexpectedEOF as eof:
         raise UnexpectedEOFError(
-            template_key="unexpected_eof", details=str(e), expected=list(e.expected)
+            template_key="unexpected_eof", details=str(eof), expected=list(eof.expected)
         )
