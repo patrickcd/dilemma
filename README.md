@@ -209,6 +209,88 @@ user2_eligible = eligibility.evaluate(user2_data)
 
 This approach is significantly more efficient than repeatedly calling `evaluate()` with the same expression string, as it eliminates the parsing overhead for each evaluation.
 
+
+## Pluggable Context Resolvers
+
+Dilemma uses a flexible plugin system for resolving variable paths in expressions. This allows you to:
+
+- Use different path resolution strategies
+- Deploy in environments with different capabilities (e.g., browsers via pyodide)
+- Create custom resolvers for specialized data structures
+
+### Built-in Resolvers
+
+Dilemma comes with three built-in resolvers:
+
+1. **JqResolver**: Uses the [jq](https://stedolan.github.io/jq/) library for powerful JSON path resolution
+   - Provides full jq query capabilities including conditionals and transformations
+   - Requires a C extension (not compatible with pyodide/WebAssembly)
+   - Used by default when available
+
+2. **JsonPathResolver**: Uses [jsonpath-ng](https://github.com/h2non/jsonpath-ng) for pure Python path resolution
+   - Works in all Python environments including pyodide
+   - Slightly less powerful than jq but covers most use cases
+   - Used as fallback when jq is unavailable
+
+3. **BasicResolver**: A minimal resolver for simple dictionary lookups
+   - No external dependencies
+   - Only supports top-level dictionary keys
+   - Used as a last resort when other resolvers are unavailable
+
+### Creating a Custom Resolver
+
+You can create your own resolver by extending the `ResolverSpec` class:
+
+```python
+from dilemma.resolvers.interface import ResolverSpec
+
+class MyCustomResolver(ResolverSpec):
+    """A custom resolver implementation."""
+
+    def __init__(self):
+        super().__init__()
+        # Initialize any resources needed
+
+    def _convert_path(self, path):
+        """Convert dilemma path to your resolver's syntax."""
+        # First apply the base class's possessive handling
+        path = super()._convert_path(path)
+
+        # Then apply your custom conversion logic
+        # ...implementation specific to your resolver...
+        return path
+
+    def _execute_query(self, converted_path, context):
+        """Execute the converted path against the context."""
+        # Your resolution logic here
+        # ...implementation specific to your resolver...
+
+        # Return the result or None if not found
+        return result
+
+    def _execute_raw_query(self, raw_expr, context):
+        """Execute a raw expression (from backtick syntax)."""
+        # Handle raw expressions (if supported)
+        # ...implementation specific to your resolver...
+        return result
+```
+
+### Registering and Using Custom Resolvers
+
+To use your custom resolver, register it with Dilemma's resolver system:
+
+```python
+from dilemma.resolvers import register_resolver
+from mypackage.resolvers import MyCustomResolver
+
+# Register your resolver (default=True makes it the preferred resolver)
+register_resolver(MyCustomResolver, default=True)
+
+# Or register with a specific name
+register_resolver(MyCustomResolver, name="mycustom")
+
+```
+
 ## Use Cases
 
 - Form validation rules

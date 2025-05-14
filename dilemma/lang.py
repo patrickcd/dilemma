@@ -11,23 +11,22 @@ from lark import Token
 from lark import Lark, Transformer
 
 from .errors import (
-    error_handling,
+    execution_error_handling,
     parsing_error_handling,
     ContainerError,
     TypeMismatchError,
     DilemmaError,
 )
 
-from .lookup import lookup_variable, DateTimeEncoder, evaluate_jq_expression
-from .dates import DateMethods
+from .dates import DateMethods, DateTimeEncoder
 from .logconf import get_logger
+from .resolvers import resolve_path
 from .utils import (
     binary_op,
     both_strings,
     reject_strings,
     check_containment,
 )
-
 
 
 log = get_logger(__name__)
@@ -85,7 +84,7 @@ grammar = r"""
          | "false" -> false_value
          | "$now" -> now_value
          | VARIABLE -> variable
-         | JQ_EXPR -> jq_expression
+         | RESOLVER_EXPR -> resolver_expression
          | "(" expr ")" -> paren
 
     // Define reserved keywords
@@ -96,7 +95,7 @@ grammar = r"""
 
     // JQ expression syntax: `expression` - must be matched as a single token
     // Define this before the STRING token to give it higher precedence
-    JQ_EXPR: /`[^`]*`/
+    RESOLVER_EXPR: /`[^`]*`/
 
     INTEGER: /[0-9]+/
     FLOAT: /([0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+/i
@@ -155,7 +154,7 @@ class ExpressionTransformer(Transformer, DateMethods):
     ) -> int | float | bool | str | list | dict | datetime:
         var_path = items[0].value
 
-        value = lookup_variable(var_path, self.processed_json)
+        value = resolve_path(var_path, self.processed_json, raw=False)
 
         # Handle datetime reconstruction
         if isinstance(value, dict) and "__datetime__" in value:
@@ -263,22 +262,6 @@ class ExpressionTransformer(Transformer, DateMethods):
             container=left, item=right, container_position="contains"
         )
 
-    def jq_expression(
-        self, items: list[Token]
-    ) -> int | float | bool | str | list | dict | datetime:
-        """Process a raw JQ expression to access data in the variables"""
-        # Extract the JQ expression from the token: `expression` -> expression
-        jq_expr = items[0].value[1:-1]  # Remove ` prefix and ` suffix
-
-        # Evaluate the JQ expression against the processed JSON
-        value = evaluate_jq_expression(jq_expr, self.processed_json)
-
-        # Handle datetime reconstruction
-        if isinstance(value, dict) and "__datetime__" in value:
-            return datetime.fromisoformat(value["__datetime__"])
-
-        return value
-
     @binary_op
     def pattern_match(self, left, right) -> bool:
         """
@@ -313,6 +296,31 @@ class ExpressionTransformer(Transformer, DateMethods):
         else:
             raise ContainerError(template_key="wrong_container", operation="is $empty")
 
+    def transform_backticked_expression(self, items):
+        """Transform a backticked expression into a value by passing it to the resolver."""
+        # Get the raw expression from inside the backticks
+        raw_expr = items[0]
+
+        # Use the resolver system to evaluate it, with raw=True
+        result = resolve_path(raw_expr, self.context, raw=True)
+        return result
+
+    def resolver_expression(
+        self, items: list[Token]
+    ) -> int | float | bool | str | list | dict | datetime:
+        """Process a backticked expression using the configured resolver"""
+        # Extract the expression from the token: `expression` -> expression
+        raw_expr = items[0].value[1:-1]  # Remove ` prefix and ` suffix
+
+        # Use the resolver system to evaluate with raw=True
+        value = resolve_path(raw_expr, self.processed_json, raw=True)
+
+        # Handle datetime reconstruction
+        if isinstance(value, dict) and "__datetime__" in value:
+            return datetime.fromisoformat(value["__datetime__"])
+
+        return value
+
 
 # Thread-local storage for the parser
 _thread_local = threading.local()
@@ -324,6 +332,7 @@ def build_parser() -> Lark:
     Ensures thread safety by creating a separate parser for each thread.
     """
     if not hasattr(_thread_local, "parser"):
+        log.info("Building parser from grammar and assigning to thread local")
         _thread_local.parser = Lark(grammar, start="expr", parser="lalr")
     return _thread_local.parser
 
@@ -350,7 +359,7 @@ class CompiledExpression:
         """
         processed_json = _process_variables(variables)
 
-        with error_handling(self.expression):
+        with execution_error_handling(self.expression):
             transformer = ExpressionTransformer(processed_json=processed_json)
             return transformer.transform(self.parse_tree)
 
@@ -421,6 +430,6 @@ def evaluate(
     with parsing_error_handling(expression, parser.parse):
         tree = parser.parse(expression)
 
-    with error_handling(expression):
+    with execution_error_handling(expression):
         transformer = ExpressionTransformer(processed_json=processed_json)
         return transformer.transform(tree)
