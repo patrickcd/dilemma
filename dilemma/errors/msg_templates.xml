@@ -74,4 +74,8 @@
         Unexpected end of input.
         Expected one of: {expected}
     </error>
+
+    <error key="trailing_operator">
+        There's a problem in your expression - are there two operators (+, -, * or / ) next to each other?
+    </error>
 </errors>

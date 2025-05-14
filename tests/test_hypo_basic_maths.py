@@ -1,6 +1,8 @@
 import pytest
 from hypothesis import given, strategies as st
+
 from dilemma.lang import evaluate
+from dilemma.errors import DilemmaError
 
 # Strategy for generating integers including negative numbers
 integers_st = st.integers(min_value=-100, max_value=1000)
@@ -368,8 +370,9 @@ def test_division_precedence(a, b, c):
 def test_hypothesis_division_by_zero(numerator):
     """Test that division by zero always raises a ZeroDivisionError"""
     expr = f"{numerator} / 0"
-    with pytest.raises(ZeroDivisionError):
+    with pytest.raises(DilemmaError) as exc_info:
         evaluate(expr)
+    assert exc_info.value.template_key == "zero_division"
 
 
 # Test boundary conditions with large integers

@@ -2,7 +2,6 @@
 
 import pytest
 from dilemma.lang import evaluate, ExpressionTransformer
-from dilemma.lookup import lookup_variable
 from dilemma.errors.exc import ContainerError, VariableError
 
 def test_list_membership():
@@ -132,36 +131,6 @@ def test_container_type_errors():
         evaluate("boolean contains 'r'", variables)
 
 
-def test_lookup_variable_with_collections():
-    """Test lookup_variable function with collections."""
-
-    # Test with nested dict and list
-    context = {
-        "users": [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}],
-        "settings": {"features": ["search", "export", "import"], "theme": "dark"},
-    }
-
-    # Test lookup on lists with index - using lookup_variable directly, not evaluate
-    result = lookup_variable("users[0]", context)
-    assert result == {"id": 1, "name": "Alice"}
-
-    # Test lookup on nested properties
-    result = lookup_variable("users[1].name", context)
-    assert result == "Bob"
-
-    # Test lookup on list in dict
-    result = lookup_variable("settings.features[2]", context)
-    assert result == "import"
-
-    # Test with a complex path that doesn't exist
-    with pytest.raises(VariableError):
-        lookup_variable("users[2].name", context)  # Out of bounds
-
-    # Test with direct dict access
-    result = lookup_variable("settings", context)
-    assert "features" in result
-    assert "theme" in result
-
 
 def test_direct_transformer_methods():
     """Test ExpressionTransformer methods directly to ensure coverage."""
@@ -246,23 +215,6 @@ def test_complex_nested_structures():
         "'Marketing' in marketing_dept.name and 'Frank' in marketing_team.members"
     )
     assert evaluate(complex_expr, variables) is True
-
-
-def test_lookup_errors():
-    """Test error handling in lookup_variable function."""
-    from dilemma.lookup import lookup_variable
-
-    # Test with invalid path
-    with pytest.raises(VariableError):
-        lookup_variable("b", {"a": 1})
-
-    # Test with non-existing path in nested structure
-    with pytest.raises(VariableError):
-        lookup_variable("user.age", {"user": {"name": "Alice"}})
-
-    # Test with invalid JQ path
-    with pytest.raises(VariableError):
-        lookup_variable("items[invalid]", {"items": [1, 2, 3]})
 
 
 def test_empty_containers():

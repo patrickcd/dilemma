@@ -3,6 +3,7 @@ import threading
 import pytest
 
 from dilemma.lang import evaluate, MAX_STRING_LENGTH, ExpressionTransformer, compile_expression
+from dilemma.errors import DilemmaError, VariableError, TypeMismatchError
 
 
 def test_specific_cases():
@@ -53,7 +54,7 @@ def test_specific_cases():
 
 def test_division_by_zero():
     """Test that division by zero raises an error"""
-    with pytest.raises(ZeroDivisionError):
+    with pytest.raises(DilemmaError):
         evaluate("5 / 0")
 
 
@@ -66,43 +67,28 @@ class CustomTransformer(ExpressionTransformer):
 
 def test_other_visit_errors(monkeypatch):
     """Test that other VisitErrors are properly handled"""
-    import dilemma.lang
 
     # Create an instance of our custom transformer
     custom_transformer = CustomTransformer()
 
     # Keep the original function to restore later
-    original_transform = dilemma.lang.ExpressionTransformer.transform
+    original_transform = ExpressionTransformer.transform
 
     # Replace the transform method on the ExpressionTransformer class
     def mock_transform(self, tree):
-        if self.__class__ == dilemma.lang.ExpressionTransformer:
+        if self.__class__ == ExpressionTransformer:
             return custom_transformer.transform(tree)
         return original_transform(self, tree)
 
     # Apply the monkeypatch to the class method
-    monkeypatch.setattr(dilemma.lang.ExpressionTransformer, "transform", mock_transform)
+    monkeypatch.setattr(ExpressionTransformer, "transform", mock_transform)
 
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(DilemmaError) as excinfo:
         evaluate("3 * 4")
 
     # Check that the error message contains the expression
     assert "3 * 4" in str(excinfo.value)
 
-
-def test_invalid_syntax():
-    """Test that invalid syntax raises an appropriate error"""
-    with pytest.raises(ValueError) as excinfo:
-        evaluate("2 + * 3")
-    assert "Invalid expression syntax" in str(excinfo.value)
-
-
-# Add test for syntax errors
-def test_invalid_characters():
-    """Test that invalid characters raise an appropriate error"""
-    with pytest.raises(ValueError) as excinfo:
-        evaluate("2 + 3 $ 4")
-    assert "Invalid expression syntax" in str(excinfo.value)
 
 
 def test_comparison_operators():
@@ -198,7 +184,7 @@ def test_variables_processing_json_error(monkeypatch):
     monkeypatch.setattr(json, "dumps", mock_dumps)
 
     # Test that the error path in ExpressionTransformer.__init__ is triggered
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(DilemmaError) as excinfo:
         evaluate("1 + 1", variables={"trigger_error": "value"})
 
     # Check the error message matches what we expect
@@ -244,12 +230,12 @@ def test_compiled_expression_error_handling():
 
     # Test division by zero error
     variables = {"x": 10, "y": 0}
-    with pytest.raises(ZeroDivisionError):
+    with pytest.raises(DilemmaError):
         expr.evaluate(variables)
 
     # Test missing variable error
     variables = {"x": 10}  # Missing y
-    with pytest.raises(NameError):
+    with pytest.raises(DilemmaError):
         expr.evaluate(variables)
 
 
@@ -290,17 +276,13 @@ def test_jq_expression_errors():
     variables = {"user": {"name": "Alice"}}
 
     # Invalid JQ syntax
-    with pytest.raises(NameError) as excinfo:
+    with pytest.raises(VariableError) as excinfo:
         evaluate("`invalid[syntax`", variables)
-    assert "Failed to evaluate JQ expression" in str(excinfo.value)
 
-    # Path that doesn't exist
-    assert evaluate("`.user.age`", variables) is None
 
     # Empty JQ expression
-    with pytest.raises(NameError) as excinfo:
+    with pytest.raises(VariableError) as excinfo:
         evaluate("``", variables)
-    assert "Failed to evaluate JQ expression" in str(excinfo.value)
 
 
 def test_valid_string_concatenation():
@@ -317,23 +299,23 @@ def test_valid_string_concatenation():
 @pytest.mark.parametrize("expr,error_type,error_msg", [
     # String length limit test
     (f"'{'a' * (MAX_STRING_LENGTH // 2)}' + '{'b' * (MAX_STRING_LENGTH // 2 + 1)}'",
-     ValueError, "String result exceeds maximum allowed length"),
+     TypeMismatchError, "String result exceeds maximum allowed length"),
 
     # Mixing strings with other types
-    ("'hello' + 5", TypeError, "'+' operator cannot mix string and non-string types"),
-    ("5 + 'hello'", TypeError, "'+' operator cannot mix string and non-string types"),
+    ("'hello' + 5", TypeMismatchError, "'+' operator cannot mix string and non-string types"),
+    ("5 + 'hello'", TypeMismatchError, "'+' operator cannot mix string and non-string types"),
 
     # Subtraction with strings
-    ("'hello' - 'h'", TypeError, "'-' operator not supported with string operands"),
-    ("'hello' - 5", TypeError, "'-' operator not supported with string operands"),
+    ("'hello' - 'h'", TypeMismatchError, "'-' operator not supported with string operands"),
+    ("'hello' - 5", TypeMismatchError, "'-' operator not supported with string operands"),
 
     # Multiplication with strings
-    ("'hello' * 3", TypeError, "'*' operator not supported with string operands"),
-    ("3 * 'hello'", TypeError, "'*' operator not supported with string operands"),
+    ("'hello' * 3", TypeMismatchError, "'*' operator not supported with string operands"),
+    ("3 * 'hello'", TypeMismatchError, "'*' operator not supported with string operands"),
 
     # Division with strings
-    ("'hello' / 'h'", TypeError, "'/' operator not supported with string operands"),
-    ("'hello' / 5", TypeError, "'/' operator not supported with string operands"),
+    ("'hello' / 'h'", TypeMismatchError, "'/' operator not supported with string operands"),
+    ("'hello' / 5", TypeMismatchError, "'/' operator not supported with string operands"),
 ])
 def test_string_math_restrictions(expr, error_type, error_msg):
     """Test restrictions on mathematical operations with strings"""

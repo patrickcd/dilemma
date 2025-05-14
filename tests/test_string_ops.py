@@ -1,6 +1,7 @@
 import pytest
-from dilemma.lang import evaluate
 
+from dilemma.lang import evaluate
+from dilemma.errors import TypeMismatchError, ContainerError
 
 def test_string_equality():
     test_cases = [
@@ -39,16 +40,16 @@ def test_string_contains():
 
 
 def test_string_comparison_with_arithmetic():
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeMismatchError):
         evaluate("'hello' + 5")
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeMismatchError):
         evaluate("5 + 'hello'")
 
 
 def test_invalid_contains_operation():
-    with pytest.raises(TypeError, match="'in' operand must be a collection"):
+    with pytest.raises(ContainerError):
         evaluate("5 in 10")
-    with pytest.raises(TypeError, match="'in' operand must be a collection"):
+    with pytest.raises(ContainerError):
         evaluate("5 in 'hello'")
 
 

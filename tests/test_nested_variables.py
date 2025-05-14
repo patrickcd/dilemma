@@ -1,7 +1,8 @@
 import pytest
 from hypothesis import given, strategies as st, settings, example
+
+from dilemma.errors import DilemmaError
 from dilemma.lang import evaluate
-from dilemma.lookup import lookup_variable
 
 # Strategy for generating nested variable names with smaller size limits
 nested_variable_names_st = st.lists(
@@ -94,33 +95,5 @@ def test_evaluate_undefined_nested_variable(var_path, context):
         current = current.get(segment, {})
 
     # Try to evaluate the expression, should raise some kind of lookup error
-    with pytest.raises((NameError, AttributeError)):  # Accept either error type
+    with pytest.raises((DilemmaError, AttributeError)):  # Accept either error type
         evaluate(var_path, modified_context)
-
-
-@settings(max_examples=20)
-@given(
-    var_path=nested_variable_names_st,
-    value=st.integers(min_value=-10, max_value=10),
-    context=nested_dicts_st,
-)
-@example(var_path="a.b", value=42, context={})
-def test_nested_lookup_variable(var_path, value, context):
-    """Test resolving nested variable names using lookup_variable."""
-    # Inject the value into the context at the specified path
-    segments = var_path.split(".")
-
-    # Create a new context to avoid modifying the original
-    modified_context = context.copy()
-    current = modified_context
-
-    # Inject value at the path, ensuring all intermediate segments are dictionaries
-    for segment in segments[:-1]:
-        if segment not in current or not isinstance(current[segment], dict):
-            current[segment] = {}
-        current = current[segment]
-    current[segments[-1]] = value
-
-    # Resolve the variable path
-    result = lookup_variable(var_path, modified_context)
-    assert result == value

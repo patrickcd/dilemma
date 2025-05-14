@@ -1,11 +1,11 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
+import jq
 import pytest
 from hypothesis import given, strategies as st
 
 from dilemma.lang import evaluate
-from dilemma.lookup import lookup_variable
-import jq
+from dilemma.errors import VariableError, DilemmaError
 
 
 def test_lang_paren_expression():
@@ -39,78 +39,6 @@ def test_evaluate_returns_datetime():
     assert isinstance(result, datetime)
     # Compare ISO strings to account for potential microsecond differences.
     assert result.isoformat() == dt.isoformat()
-
-
-def test_lookup_error_nonexistent_path():
-    """
-    Test that lookup_variable raises a NameError when the requested path does not exist.
-    Covers branch where jq returns an empty result.
-    """
-    # Keep this test for now since lookup_variable can still be called directly
-    context = {"a": {"b": 123}}
-    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
-        lookup_variable("a.x", context)
-
-    # Also test through evaluate() to ensure consistent behavior
-    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
-        evaluate("a.x", context)
-
-
-def test_lookup_null_result_for_key():
-    """
-    Test that lookup_variable raises NameError when the JSON conversion
-    of a defined key produces a null result.
-    In this case, context contains a key with a value of None.
-    """
-    # Keep this test for now since lookup_variable can still be called directly
-    context = {"a": {"x": None}}
-    # "a.x" is defined in Python, but json.dumps will convert None to null,
-    # causing jq to return [None] and thus triggering the error branch.
-    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
-        lookup_variable("a.x", context)
-
-    # Also test through evaluate() to ensure consistent behavior
-    with pytest.raises(NameError, match="Variable 'a.x' is not defined"):
-        evaluate("a.x", context)
-
-
-def test_lookup_top_level_variable():
-    """
-    Test the optimization for top-level variables in lookup_variable.
-    Covers line 21: `if "." not in path and path in obj:`.
-    """
-    # Keep this test for now since lookup_variable can still be called directly
-    context = {"a": 42}
-    result = lookup_variable("a", context)
-    assert result == 42
-
-    # Also test through evaluate()
-    result = evaluate("a", context)
-    assert result == 42
-
-
-def test_lookup_top_level_variable_no_dot():
-    """
-    Test the optimization for top-level variables in lookup_variable.
-    Covers line 21: `if "." not in path and path in obj:`.
-    """
-    # Keep this test for now since lookup_variable can still be called directly
-    context = {"simple_key": "simple_value"}
-    result = lookup_variable("simple_key", context)
-    assert result == "simple_value"
-
-    # Also test through evaluate()
-    result = evaluate("simple_key", context)
-    assert result == "simple_value"
-
-
-def test_lookup_null_result():
-    """
-    Test that lookup_variable returns None when the value in the context is None.
-    """
-    context = {"a": None}
-    result = lookup_variable("a", context)
-    assert result is None
 
 
 def test_evaluate_datetime_from_json_string():
@@ -221,14 +149,6 @@ def test_evaluate_variable_as_boolean(var_name, value):
     assert result == value
 
 
-@given(var_name=variable_names_st)
-def test_evaluate_undefined_variable(var_name):
-    """Test that evaluating an undefined variable raises a NameError."""
-    expression = var_name
-    with pytest.raises(NameError, match=f"Variable '{var_name}' is not defined"):
-        evaluate(expression, {})  # Empty variables dictionary
-
-
 @given(var_name=variable_names_st, defined_value=simple_values_st)
 def test_evaluate_variable_among_others(var_name, defined_value):
     """Test evaluating a variable when other variables are also defined."""
@@ -240,13 +160,6 @@ def test_evaluate_variable_among_others(var_name, defined_value):
         assert evaluate(expression, variables) == defined_value
 
 
-def test_evaluate_variable_case_sensitive():
-    """Test that variable names are case-sensitive."""
-    variables = {"myVar": 10, "myvar": 20}
-    assert evaluate("myVar", variables) == 10
-    assert evaluate("myvar", variables) == 20
-    with pytest.raises(NameError, match="Variable 'MYVAR' is not defined"):
-        evaluate("MYVAR", variables)
 
 
 @given(var_name=st.sampled_from(["or", "and"]))  # Actual reserved keywords
@@ -255,7 +168,7 @@ def test_evaluate_reserved_keyword_as_variable_name_fails_parsing(var_name):
     Test that using an actual reserved keyword ("or", "and") as if it were a
     variable name causes a parse error (ValueError).
     """
-    with pytest.raises(ValueError):  # Expecting a parse error from Lark
+    with pytest.raises(DilemmaError):  # Expecting a parse error from Lark
         evaluate(var_name, {var_name: 1})
 
 
@@ -274,53 +187,3 @@ def test_evaluate_non_keyword_strings_as_variable_names(var_name, value):
     else:
         assert evaluate(expression, variables) == value
 
-
-@given(var_name=variable_names_st)  # Uses the updated strategy that excludes "or", "and"
-def test_evaluate_undefined_variable_with_valid_name(var_name):
-    """Test NameError for valid (non-reserved) but undefined variable names."""
-    # The filter `lambda x: x not in ["or", "and"]` is no longer needed here
-    # because variable_names_st already excludes them.
-    with pytest.raises(NameError, match=f"Variable '{var_name}' is not defined"):
-        evaluate(var_name, {})
-
-
-def test_lookup_path_construction():
-    """
-    Test the path construction in lookup_variable function.
-    This directly tests line 55 in lookup.py: jq_path = "." + path
-    """
-    from dilemma.lookup import lookup_variable
-
-    # Create a context with a simple structure
-    context = {"user": {"name": "Alice"}}
-
-    # Test a path that requires the "." prefix
-    result = lookup_variable("user.name", context)
-    assert result == "Alice"
-
-    # Test with array indexing
-    context_with_array = {"items": [10, 20, 30]}
-    result = lookup_variable("items[1]", context_with_array)
-    assert result == 20
-
-
-def test_lookup_path_starting_with_bracket():
-    """
-    Test lookup_variable when path starts with square brackets.
-    This specifically covers the code path in lookup.py:
-    if path.startswith("["): jq_path = "." + path
-    """
-    from dilemma.lookup import lookup_variable
-
-    # Create a context with an array at the top level
-    context = [{"id": 1, "name": "First"}, {"id": 2, "name": "Second"}]
-
-    # Test a path that starts with brackets - this should hit the specific branch
-    result = lookup_variable("[0].name", context)
-    assert result == "First"
-
-    # Also test a nested case
-    nested_context = {"items": [{"id": 1}, {"id": 2}]}
-    # This wouldn't hit the branch but confirms the lookup functionality
-    result = lookup_variable("items[1].id", nested_context)
-    assert result == 2

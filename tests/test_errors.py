@@ -1,7 +1,7 @@
 import pytest
 
 from dilemma.errors import exc
-from dilemma.errors.messages import DEFAULT_TEMPLATES
+from dilemma.errors.messages import get_default_templates
 
 def test_exc():
     assert exc.DilemmaError.template_key is None
@@ -12,8 +12,9 @@ def test_exc():
 
 
 def test_excecptions_have_templates():
+    templates = get_default_templates()
     for name in dir(exc):
         candidate_exception = getattr(exc, name)
         if type(candidate_exception) is type and  issubclass(candidate_exception, exc.DilemmaError):
             if candidate_exception is not exc.DilemmaError:
-                assert candidate_exception.template_key in DEFAULT_TEMPLATES
+                assert candidate_exception.template_key in templates

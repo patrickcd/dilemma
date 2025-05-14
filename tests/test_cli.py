@@ -265,7 +265,7 @@ def test_generate_markdown_docs(runner, tmp_path):
 def test_gendocs_error_handling(runner):
     """Test error handling in the gendocs command."""
     # Create mock that causes an exception
-    with patch("dilemma.cli.Path.glob", side_effect=Exception("Test error")):
+    with patch("dilemma.ext.cli.Path.glob", side_effect=Exception("Test error")):
         result = runner.invoke(cli, ["gendocs"])
 
         # Verify error is handled

@@ -216,7 +216,7 @@ def test_date_error_handling():
     # Test invalid type conversion - update the expected error message
     variables = {"obj": {}}
     with pytest.raises(
-        TypeError, match="Cannot convert"
+        DateTimeError, match="Cannot convert"
     ):  # Changed from "Unsupported type"
         evaluate("obj is $past", variables)
 
@@ -240,7 +240,7 @@ def test_ensure_datetime_type_error():
     date_methods = DateMethods()
 
     # Test with an object that's not a datetime, string, int, or float
-    with pytest.raises(TypeError, match="Cannot convert"):
+    with pytest.raises(DateTimeError, match="Cannot convert"):
         ensure_datetime({})  # Using a dict should trigger the error
 
 
