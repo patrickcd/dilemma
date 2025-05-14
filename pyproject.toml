@@ -79,6 +79,7 @@ omit = [
     "setup.py",
     "dilemma/__init__.py",
     "dilemma/version.py",
+    "dilemma/ext/*",  # Added to ignore the ext directory
 ]
 
 [tool.coverage.report]

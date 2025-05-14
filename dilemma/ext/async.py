@@ -10,8 +10,9 @@ from contextvars import ContextVar
 from lark import Lark, Tree
 
 from ..lang import ExpressionTransformer, CompiledExpression, _process_variables, grammar
-from ..errors import parsing_error_handling, execution_error_handling
+from ..errors import parsing_error_handling, execution_error_handling, VariableError
 from ..logconf import get_logger
+from ..resolvers.interface import ResolverSpec
 
 log = get_logger(__name__)
 
@@ -107,3 +108,54 @@ async def compile_expression_async(expression):
     with parsing_error_handling(expression, parser.parse):
         tree = parser.parse(expression)
         return AsyncCompiledExpression(expression, tree)
+
+
+
+
+class AsyncResolverSpec(ResolverSpec):
+    """Base class for asynchronous resolvers."""
+
+    async def resolve_path_async(self, path, context, raw=False):
+        """Asynchronous path resolution with error handling."""
+        original_path = path
+        resolver_type = self.__class__.__name__.lower().replace("resolver", "")
+
+        try:
+            if raw:
+                self.logger.debug(f"Resolving raw expression: {path}")
+                result = await self._execute_raw_query_async(path, context)
+            else:
+                converted_path = self._convert_path(path)
+                self.logger.debug(f"Converted path '{path}' to '{converted_path}'")
+                result = await self._execute_query_async(converted_path, context)
+
+            if result is None:
+                raise VariableError(
+                    template_key="unresolved_path",
+                    path=original_path,
+                    resolver=resolver_type,
+                    details="Path resolves to null or is missing",
+                )
+
+            return result
+
+        except VariableError:
+            raise
+        except Exception as e:
+            self.logger.warning(f"Error resolving '{original_path}': {str(e)}")
+            self.logger.debug(traceback.format_exc())
+
+            raise VariableError(
+                template_key="unresolved_path",
+                path=original_path,
+                resolver=resolver_type,
+                details=str(e),
+            )
+
+    async def _execute_query_async(self, converted_path, context):
+        """Execute the converted path against the context asynchronously."""
+        raise NotImplementedError("Resolver must implement _execute_query_async")
+
+    async def _execute_raw_query_async(self, raw_expr, context):
+        """Execute a raw expression directly asynchronously."""
+        return await self._execute_query_async(raw_expr, context)

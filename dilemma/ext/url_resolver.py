@@ -1,4 +1,4 @@
-from .interface import AsyncResolverSpec
+from ..resolvers.interface import AsyncResolverSpec
 
 
 

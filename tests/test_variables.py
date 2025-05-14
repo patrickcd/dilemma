@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 import jq
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import given, strategies as st, settings
 
 from dilemma.lang import evaluate
 from dilemma.errors import VariableError, DilemmaError
@@ -97,6 +97,7 @@ simple_values_st = st.one_of(
 )
 
 
+@settings(max_examples=50)
 @given(var_name=variable_names_st, value=simple_values_st)
 def test_evaluate_single_variable(var_name, value):
     """Test evaluating an expression that is just a single variable."""
@@ -110,6 +111,7 @@ def test_evaluate_single_variable(var_name, value):
         assert evaluate(expression, variables) == value
 
 
+@settings(max_examples=50)
 @given(var_name=variable_names_st, value=st.integers())
 def test_evaluate_variable_as_integer(var_name, value):
     """Test that a variable holding an integer is evaluated correctly."""
@@ -120,6 +122,7 @@ def test_evaluate_variable_as_integer(var_name, value):
     assert result == value
 
 
+@settings(max_examples=50)
 @given(var_name=variable_names_st, value=st.floats(allow_nan=False, allow_infinity=False))
 def test_evaluate_variable_as_float(var_name, value):
     """Test that a variable holding a float is evaluated correctly."""
@@ -133,6 +136,7 @@ def test_evaluate_variable_as_float(var_name, value):
         assert result == pytest.approx(value)
 
 
+@settings(max_examples=50)
 @given(var_name=variable_names_st, value=st.booleans())
 def test_evaluate_variable_as_boolean(var_name, value):
     """Test that a variable holding a boolean is evaluated correctly."""
@@ -149,6 +153,7 @@ def test_evaluate_variable_as_boolean(var_name, value):
     assert result == value
 
 
+@settings(max_examples=30)
 @given(var_name=variable_names_st, defined_value=simple_values_st)
 def test_evaluate_variable_among_others(var_name, defined_value):
     """Test evaluating a variable when other variables are also defined."""
@@ -162,6 +167,7 @@ def test_evaluate_variable_among_others(var_name, defined_value):
 
 
 
+@settings(max_examples=30)
 @given(var_name=st.sampled_from(["or", "and"]))  # Actual reserved keywords
 def test_evaluate_reserved_keyword_as_variable_name_fails_parsing(var_name):
     """

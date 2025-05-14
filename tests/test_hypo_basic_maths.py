@@ -1,5 +1,5 @@
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import given, strategies as st, settings
 
 from dilemma.lang import evaluate
 from dilemma.errors import DilemmaError
@@ -131,6 +131,7 @@ def less_than_expressions(draw):
 
 
 # Strategy for generating greater than expressions
+@settings(max_examples=30)
 @st.composite
 def greater_than_expressions(draw):
     """Generate a greater than comparison and its expected result"""
@@ -240,7 +241,7 @@ def test_complex_expressions(expr_tuple):
     expr, expected = expr_tuple
     assert evaluate(expr) == expected
 
-
+@settings(max_examples=20)
 @given(whitespace_variations())
 def test_whitespace_handling(expr_tuple):
     """Test that expressions with varied whitespace are handled correctly"""

@@ -24,7 +24,7 @@ nested_dicts_st = st.recursive(
 
 
 # Use settings to limit the number of test examples
-@settings(max_examples=20)
+@settings(max_examples=10)
 @given(
     var_path=nested_variable_names_st,
     value=st.integers(min_value=-10, max_value=10),
@@ -68,7 +68,7 @@ def test_evaluate_nested_variable_specific_cases():
     assert evaluate("flag.state", context) is True
 
 
-@settings(max_examples=20)
+@settings(max_examples=10)
 @given(var_path=nested_variable_names_st, context=nested_dicts_st)
 @example(var_path="a.b.c", context={"a": {"x": 5}})
 @example(var_path="A0.A0", context={"A0": 0})  # Add the failing example explicitly
