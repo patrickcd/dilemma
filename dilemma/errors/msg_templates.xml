@@ -51,4 +51,20 @@
     <error key="evaluation_error">Error evaluating expression: {expression} - Caused by: {error_type}: {details}</error>
 
     <error key="variables_processing">Failed to process variables: {details}</error>
+
+    <error key="unexpected_token">
+        Unexpected token '{token_value}' at line {line}, column {column}.
+        {context}
+        Expected one of: {suggestions}
+    </error>
+
+    <error key="unexpected_character">
+        Unexpected character at line {line}, column {column}.
+        {context}
+    </error>
+
+    <error key="unexpected_eof">
+        Unexpected end of input.
+        Expected one of: {expected}
+    </error>
 </errors>

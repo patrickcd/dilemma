@@ -22,3 +22,14 @@ Date improvements
 2. Date arithmetic. Add/substract periods from dates
 3. Relate references - "yesterday", "tomorrow", "last week".
 4. Component extraction - "year of {date_ref} is 2024"
+
+
+Pluggable Resolver
+
+
+Replace jq with jsonpath for context
+Or context could be anything, like a SQLAlchemy session and the
+resolve is a function that takes a path and fetches something -
+ie an api for fetching data.
+
+

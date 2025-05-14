@@ -1,7 +1,7 @@
 import pytest
 
-from dilemma import exc
-from dilemma.error_messages import DEFAULT_TEMPLATES
+from dilemma.errors import exc
+from dilemma.errors.messages import DEFAULT_TEMPLATES
 
 def test_exc():
     assert exc.DilemmaError.template_key is None

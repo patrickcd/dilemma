@@ -3,7 +3,7 @@
 import pytest
 from dilemma.lang import evaluate, ExpressionTransformer
 from dilemma.lookup import lookup_variable
-
+from dilemma.errors.exc import ContainerError, VariableError
 
 def test_list_membership():
     """Test basic list membership operations."""
@@ -100,7 +100,7 @@ def test_collection_equality():
 
 
 def test_container_type_errors():
-    """Test TypeError handling for container operations."""
+    """Test ContainerError handling for container operations."""
     variables = {
         "number": 42,
         "string": "hello",
@@ -109,26 +109,26 @@ def test_container_type_errors():
         "dict": {"a": 1, "b": 2},
     }
 
-    # These should raise TypeError because the right operand is not a collection
-    with pytest.raises(TypeError, match="must be a collection"):
+    # These should raise ContainerError because the right operand is not a collection
+    with pytest.raises(ContainerError, match="must be a collection"):
         evaluate("'test' in number", variables)
 
     # This should work (string contains)
     assert evaluate("'e' in string", variables) is True
 
     # This should fail (boolean is not a collection)
-    with pytest.raises(TypeError, match="must be a collection"):
+    with pytest.raises(ContainerError, match="must be a collection"):
         evaluate("'true' in boolean", variables)
 
-    # These should raise TypeError because the left operand is not a collection
-    with pytest.raises(TypeError, match="must be a collection"):
+    # These should raise ContainerError because the left operand is not a collection
+    with pytest.raises(ContainerError, match="must be a collection"):
         evaluate("number contains 1", variables)
 
     # This should work (string contains)
     assert evaluate("string contains 'll'", variables) is True
 
     # This should fail
-    with pytest.raises(TypeError, match="must be a collection"):
+    with pytest.raises(ContainerError, match="must be a collection"):
         evaluate("boolean contains 'r'", variables)
 
 
@@ -154,7 +154,7 @@ def test_lookup_variable_with_collections():
     assert result == "import"
 
     # Test with a complex path that doesn't exist
-    with pytest.raises(NameError):
+    with pytest.raises(VariableError):
         lookup_variable("users[2].name", context)  # Out of bounds
 
     # Test with direct dict access
@@ -179,11 +179,11 @@ def test_direct_transformer_methods():
     # Test contained_in with dict
     assert transformer.contained_in([{"key": "value", "other": 123}, "key"]) is True
 
-    # Test with non-collection types (these should raise TypeError)
-    with pytest.raises(TypeError):
+    # Test with non-collection types (these should raise ContainerError)
+    with pytest.raises(ContainerError):
         transformer.contains([42, 100])
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ContainerError):
         transformer.contained_in([42, "test"])
 
 
@@ -253,15 +253,15 @@ def test_lookup_errors():
     from dilemma.lookup import lookup_variable
 
     # Test with invalid path
-    with pytest.raises(NameError):
+    with pytest.raises(VariableError):
         lookup_variable("b", {"a": 1})
 
     # Test with non-existing path in nested structure
-    with pytest.raises(NameError):
+    with pytest.raises(VariableError):
         lookup_variable("user.age", {"user": {"name": "Alice"}})
 
     # Test with invalid JQ path
-    with pytest.raises(NameError):
+    with pytest.raises(VariableError):
         lookup_variable("items[invalid]", {"items": [1, 2, 3]})
 
 
@@ -285,14 +285,14 @@ def test_empty_containers():
     assert evaluate("filled_list is $empty", variables) is False
     assert evaluate("filled_dict is $empty", variables) is False
 
-    # Test with non-container types (should raise TypeError)
-    with pytest.raises(TypeError, match="can only be used with container types"):
+    # Test with non-container types (should raise ContainerError)
+    with pytest.raises(ContainerError, match="can only be used with container types"):
         evaluate("string is $empty", variables)
 
-    with pytest.raises(TypeError, match="can only be used with container types"):
+    with pytest.raises(ContainerError, match="can only be used with container types"):
         evaluate("number is $empty", variables)
 
-    with pytest.raises(TypeError, match="can only be used with container types"):
+    with pytest.raises(ContainerError, match="can only be used with container types"):
         evaluate("boolean is $empty", variables)
 
     # Test with complex expressions - using valid syntax

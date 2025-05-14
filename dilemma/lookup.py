@@ -9,7 +9,7 @@ import json
 import re
 from datetime import datetime
 
-from .exc import VariableError
+from .errors import VariableError
 
 # These types are acceptable as variable values
 # Updated to include dict and list, which are valid JSON types.
@@ -48,10 +48,7 @@ def lookup_variable(
         if isinstance(json_obj, dict) and path in json_obj:
             return json_obj[path]
 
-        raise VariableError(
-            template_key="undefined_variable",
-            name=path
-        )
+        raise VariableError(template_key="undefined_variable", name=path)
 
     # Convert expression path to jq path
     if path.startswith("["):
@@ -68,15 +65,13 @@ def lookup_variable(
             raise VariableError(
                 template_key="unresolved_path",
                 path=original_path,
-                details="Path exists but resolves to null or is missing"
+                details="Path exists but resolves to null or is missing",
             )
 
         return results[0]
     except Exception as e:
         raise VariableError(
-            template_key="unresolved_path",
-            path=original_path,
-            details=str(e)
+            template_key="unresolved_path", path=original_path, details=str(e)
         )
 
 
@@ -100,9 +95,7 @@ def evaluate_jq_expression(
         # Validate the jq syntax before compiling
         if not jq_expr.strip():
             raise VariableError(
-                template_key="invalid_jq",
-                expr=jq_expr,
-                details="Empty JQ expression"
+                template_key="invalid_jq", expr=jq_expr, details="Empty JQ expression"
             )
 
         # Compile and execute the JQ expression
@@ -114,7 +107,7 @@ def evaluate_jq_expression(
             raise VariableError(
                 template_key="invalid_jq",
                 expr=jq_expr,
-                details="JQ expression returned no results"
+                details="JQ expression returned no results",
             )
 
         # For consistency with lookup_variable, just return the first result
@@ -123,8 +116,4 @@ def evaluate_jq_expression(
         # Instead of trying to catch specific jq exceptions, catch all exceptions
         # and convert them to VariableError with a descriptive message
         error_msg = str(e)
-        raise VariableError(
-            template_key="invalid_jq",
-            expr=jq_expr,
-            details=error_msg
-        )
+        raise VariableError(template_key="invalid_jq", expr=jq_expr, details=error_msg)

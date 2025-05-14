@@ -1,8 +1,11 @@
 """Tests for date comparison functionality in the expression language."""
 
-import pytest
 from datetime import datetime, timedelta, timezone
+
 from hypothesis import given, strategies as st, settings
+import pytest
+
+from dilemma.errors.exc import DateTimeError
 from dilemma.lang import evaluate
 from dilemma.dates import DateMethods
 from dilemma.utils import ensure_datetime, create_timedelta
@@ -207,7 +210,7 @@ def test_date_error_handling():
     """Test error handling for invalid date formats."""
     # Test invalid string format
     variables = {"bad_date": "not-a-date"}
-    with pytest.raises(ValueError, match="Could not parse date string"):
+    with pytest.raises(DateTimeError, match="Could not parse date string"):
         evaluate("bad_date is $past", variables)
 
     # Test invalid type conversion - update the expected error message
@@ -218,7 +221,7 @@ def test_date_error_handling():
         evaluate("obj is $past", variables)
 
     # Test invalid time unit
-    with pytest.raises(ValueError, match="Unsupported time unit"):
+    with pytest.raises(DateTimeError, match="Unsupported time unit"):
         # We need to trick the parser to test this branch
         class FakeUnit:
             def __str__(self):

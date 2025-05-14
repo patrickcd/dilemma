@@ -6,21 +6,26 @@ import json
 import threading
 import logging
 import fnmatch
-import re
 from datetime import datetime
 
 from lark import Token
-from lark import Lark, Transformer, exceptions as lark_exceptions
+from lark import Lark, Transformer
+
+from .errors import (
+    error_handling,
+    parsing_error_handling,
+    ContainerError,
+    TypeMismatchError,
+    DilemmaError,
+)
 
 from .lookup import lookup_variable, DateTimeEncoder, evaluate_jq_expression
 from .dates import DateMethods
-from .exc import SyntaxError, ContainerError, TypeMismatchError, DilemmaError
 
 from .utils import (
     binary_op,
     both_strings,
     reject_strings,
-    error_handling,
     check_containment,
 )
 
@@ -166,17 +171,13 @@ class ExpressionTransformer(Transformer, DateMethods):
             result = left + right
             if len(result) > MAX_STRING_LENGTH:
                 raise TypeMismatchError(
-                    template_key="string_length",
-                    max_length=MAX_STRING_LENGTH
+                    template_key="string_length", max_length=MAX_STRING_LENGTH
                 )
             return result
 
         # Prevent mixing strings with other types
         if isinstance(left, str) or isinstance(right, str):
-            raise TypeMismatchError(
-                template_key="string_mix",
-                operation="+"
-            )
+            raise TypeMismatchError(template_key="string_mix", operation="+")
 
         # Regular addition for non-string types
         return left + right
@@ -310,10 +311,7 @@ class ExpressionTransformer(Transformer, DateMethods):
         if isinstance(value, (list, tuple, dict)):
             return len(value) == 0
         else:
-            raise ContainerError(
-                template_key="wrong_container",
-                operation="is $empty"
-            )
+            raise ContainerError(template_key="wrong_container", operation="is $empty")
 
 
 # Thread-local storage for the parser
@@ -381,10 +379,7 @@ def _process_variables(variables: dict | str | None = None) -> dict:
                 # Convert dictionary to JSON-compatible structure
                 processed_json = json.loads(json.dumps(variables, cls=DateTimeEncoder))
         except (TypeError, json.JSONDecodeError) as e:
-            raise DilemmaError(
-                template_key="variables_processing",
-                details=str(e)
-            )
+            raise DilemmaError(template_key="variables_processing", details=str(e))
     return processed_json
 
 
@@ -403,17 +398,10 @@ def compile_expression(expression: str) -> CompiledExpression:
         ValueError: If the expression has invalid syntax
     """
     parser = build_parser()
-    try:
+    with parsing_error_handling(expression, parser.parse):
         tree = parser.parse(expression)
         return CompiledExpression(expression, tree)
-    except (
-        lark_exceptions.UnexpectedToken,
-        lark_exceptions.UnexpectedCharacters
-    ) as e:
-        raise SyntaxError(
-            template_key="syntax_error",
-            details=str(e)
-        )
+
 
 # Function to evaluate expressions
 def evaluate(
@@ -428,15 +416,10 @@ def evaluate(
     """
 
     processed_json = _process_variables(variables)
+    parser = build_parser()
 
-    try:
-        parser = build_parser()
+    with parsing_error_handling(expression, parser.parse):
         tree = parser.parse(expression)
-    except Exception as e:
-        raise SyntaxError(
-            template_key="syntax_error",
-            details=f"Error parsing '{expression}': {str(e)}"
-        ) from e
 
     with error_handling(expression):
         transformer = ExpressionTransformer(processed_json=processed_json)

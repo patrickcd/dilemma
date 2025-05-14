@@ -24,6 +24,9 @@ DEFAULT_TEMPLATES = None
 _custom_templates = None
 
 
+XML_FILENAME = "msg_templates.xml"
+
+
 def load_templates_from_xml() -> Dict[str, str]:
     """
     Load error message templates from the errors.xml file.
@@ -36,8 +39,8 @@ def load_templates_from_xml() -> Dict[str, str]:
     log.debug("Loading error templates from XML file")
     try:
         # Get the path to errors.xml using importlib.resources.files
-        package_name = __name__.split('.')[0]  # Get the top-level package name
-        xml_path = files(package_name).joinpath('errors.xml')
+        package_name = __name__.split(".")[0]  # Get the top-level package name
+        xml_path = files(package_name).joinpath(XML_FILENAME)
 
         # Parse the XML file
         tree = ET.parse(xml_path)
@@ -45,20 +48,21 @@ def load_templates_from_xml() -> Dict[str, str]:
 
         # Extract templates from error elements
         templates = {}
-        for error in root.findall('error'):
-            key = error.get('key')
+        for error in root.findall("error"):
+            key = error.get("key")
             if key:
-                # Get the text content and preserve formatting, but strip leading/trailing whitespace
+                # Get the text content and preserve formatting, but strip leading/trailing
+                # whitespace
                 message = error.text.strip() if error.text else ""
                 templates[key] = message
                 log.debug(f"Loaded template '{key}' from XML")
 
         # Update DEFAULT_TEMPLATES with the loaded templates
         if templates:
-            log.info(f"Loaded {len(templates)} templates from errors.xml")
+            log.info(f"Loaded {len(templates)} templates from {XML_FILENAME}")
             return templates
         else:
-            log.warning("No templates found in errors.xml")
+            log.warning("No templates found in %s", XML_FILENAME)
             return {}
     except Exception as e:
         log.error(f"Failed to load templates from XML: {e}")

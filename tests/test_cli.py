@@ -6,7 +6,7 @@ import pytest
 import yaml
 from click.testing import CliRunner
 
-from dilemma.cli import evaluate_expression, cli
+from dilemma.ext.cli import evaluate_expression, cli
 
 
 @pytest.fixture
@@ -81,7 +81,7 @@ def test_division_by_zero(runner):
     """Test handling of division by zero."""
     result = runner.invoke(evaluate_expression, ["5 / 0"])
     assert result.exit_code == 1
-    assert "Division by zero" in result.output
+    assert "divide by zero" in result.output
 
 
 def test_evaluate_expression_command(runner):
@@ -94,7 +94,7 @@ def test_evaluate_expression_command(runner):
 # Add tests for generate documentation with direct patching
 def test_create_time_values():
     """Test the function to create time values."""
-    from dilemma.cli import create_time_values
+    from dilemma.ext.cli import create_time_values
 
     time_values = create_time_values()
 
@@ -116,7 +116,7 @@ def test_create_time_values():
 # Test process_time_values_for_docs function
 def test_process_time_values():
     """Test processing time values for documentation."""
-    from dilemma.cli import process_time_values_for_docs, create_time_values
+    from dilemma.ext.cli import process_time_values_for_docs, create_time_values
 
     time_values = create_time_values()
 
@@ -223,7 +223,7 @@ def test_cmd_help_output(runner):
 
 def test_generate_markdown_docs(runner, tmp_path):
     """Test the generate_markdown_docs function."""
-    from dilemma.cli import generate_markdown_docs, create_time_values
+    from dilemma.ext.cli import generate_markdown_docs, create_time_values
 
     # Create test data with exact structure expected by the function
     examples_by_category = {
