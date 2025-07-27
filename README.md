@@ -1,7 +1,7 @@
 # Dilemma Expression Language
 
-[![CI](https://github.com/yourusername/dilemma/workflows/CI/badge.svg)](https://github.com/yourusername/dilemma/actions)
-[![codecov](https://codecov.io/gh/yourusername/dilemma/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/dilemma)
+[![CI](https://github.com/patrickcd/dilemma/workflows/CI/badge.svg)](https://github.com/patrickcd/dilemma/actions)
+[![codecov](https://codecov.io/gh/patrickcd/dilemma/branch/main/graph/badge.svg)](https://codecov.io/gh/patrickcd/dilemma)
 [![PyPI version](https://badge.fury.io/py/dilemma.svg)](https://badge.fury.io/py/dilemma)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-312/)
 
