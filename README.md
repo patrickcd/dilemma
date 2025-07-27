@@ -3,7 +3,7 @@
 [![CI](https://github.com/patrickcd/dilemma/workflows/CI/badge.svg)](https://github.com/patrickcd/dilemma/actions)
 [![codecov](https://codecov.io/gh/patrickcd/dilemma/branch/main/graph/badge.svg)](https://codecov.io/gh/patrickcd/dilemma)
 [![PyPI version](https://badge.fury.io/py/dilemma.svg)](https://badge.fury.io/py/dilemma)
-[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-312/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 
 A secure, powerful expression evaluation engine for Python applications that makes complex logical expressions readable and maintainable.
 
@@ -15,16 +15,18 @@ if (user.get('profile', {}).get('age', 0) >= 18 and
     user.get('subscription', {}).get('status') == 'active' and
     datetime.now() - user.get('last_login', datetime.min) < timedelta(days=30)):
     # grant access
+    pass
 ```
 
 Write this:
 ```python
 from dilemma import evaluate
 
-expr = "user.profile.age >= 18 and user.subscription.status == 'active' and user.last_login within 30 days"
+expr = "user.profile.age >= 18 and user.subscription.status == 'active' and user.last_login upcoming within 30 days"
 
 if evaluate(expr, context):
     # grant access
+    pass
 ```
 
 ## Features
@@ -50,12 +52,12 @@ result = evaluate("2 * (3 + 4)")  # Returns 14
 result = evaluate("age >= 18 and status == 'active'", {"age": 25, "status": "active"})
 
 # Date operations
-result = evaluate("user.last_login within 7 days", context)
+result = evaluate("user.last_login upcoming within 7 days", context)
 result = evaluate("subscription.end_date is $future", context)
 
 # Complex data access
 result = evaluate("user.permissions contains 'admin'", context)
-result = evaluate("`users[].roles[] | select(. == 'admin')` | length > 0", context)
+result = evaluate("`[.users[] | select(.active == true) | .name] | length` > 0", context)
 ```
 
 ## Language Features
@@ -81,7 +83,7 @@ result = evaluate("`users[].roles[] | select(. == 'admin')` | length > 0", conte
 
 ```python
 # Relative time checks
-"user.created_at within 30 days"
+"user.created_at upcoming within 30 days"
 "order.shipped_date older than 1 week"
 
 # State comparisons
@@ -99,14 +101,14 @@ result = evaluate("`users[].roles[] | select(. == 'admin')` | length > 0", conte
 For complex data manipulation, use JQ expressions in backticks:
 
 ```python
-# Filter and transform arrays
-evaluate('`users[] | select(.active == true) | .name`')
+# Filter and transform arrays - working with provided context
+evaluate('`[.users[] | select(.active == true) | .name]`', context)
 
-# Mathematical operations on arrays
-evaluate('`sales[].amount | add` > 10000')
+# Mathematical operations on arrays  
+evaluate('`[.sales[].amount] | add` > 10000', context)
 
 # Complex conditionals
-evaluate('`products[] | select(.price > 100 and .category == "electronics") | length` > 5')
+evaluate('`[.products[] | select(.price > 100 and .category == "electronics")] | length` > 1', context)
 ```
 
 ## Performance Optimization
@@ -118,13 +120,14 @@ from dilemma import compile_expression
 
 # Compile once
 eligibility_check = compile_expression(
-    "user.age >= 18 and user.subscription.active and user.last_login within 30 days"
+    "user.age >= 18 and user.subscription.active and user.last_login upcoming within 30 days"
 )
 
 # Evaluate many times with different contexts
 for user_data in users:
     if eligibility_check.evaluate(user_data):
-        send_premium_content(user_data)
+        # send_premium_content(user_data)
+        pass
 ```
 
 ## Error Handling
@@ -134,17 +137,17 @@ Dilemma provides clear, actionable error messages:
 ```python
 try:
     result = evaluate("user.invalidfield == 'test'", context)
-except ExpressionError as e:
+except VariableError as e:
     print(f"Expression error: {e}")
     # Suggests available fields and common fixes
 ```
 
 ## Use Cases
 
-- **Form validation rules** - `"email matches '^[^@]+@[^@]+$' and age >= 13"`
+- **Form validation rules** - `"email like '*@*' and age >= 13"`
 - **Business logic** - `"order.total > 100 and customer.tier == 'premium'"`
 - **Access control** - `"user.roles contains 'admin' or resource.owner == user.id"`
-- **Data filtering** - `"created_at within 24 hours and status == 'pending'"`
+- **Data filtering** - `"created_at upcoming within 24 hours and status == 'pending'"`
 - **Workflow conditions** - `"approval.status == 'approved' and budget.remaining >= cost"`
 
 ## Safety & Security
