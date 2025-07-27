@@ -30,6 +30,7 @@ dependencies = [
     "jq",
     "click",
     "pyyaml",
+    "jsonpath-ng>=1.7.0",
 ]
 dynamic = ["version"]
 
@@ -39,7 +40,8 @@ test = [
     "pytest-cov",
     "codecov",
     "pre-commit",
-    "pyyaml"
+    "pyyaml",
+    "hypothesis>=6.136.4",
 ]
 doc = [
     "mkdocs",
@@ -63,10 +65,14 @@ dilemma = "dilemma.ext.cli:cmd"
 
 [tool.setuptools]
 platforms = ["unix", "linux", "osx", "cygwin", "win32"]
-packages = ["dilemma"]  # optional
+
 
 [tool.setuptools.dynamic]
 version = {attr = "dilemma.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["dilemma*"]
 
 [tool.pytest.ini_options]
 minversion = "7.3"
@@ -77,9 +83,9 @@ branch = true
 parallel = true
 omit = [
     "setup.py",
-    "dilemma/__init__.py",
-    "dilemma/version.py",
-    "dilemma/ext/*",  # Added to ignore the ext directory
+    "src/dilemma/__init__.py",
+    "src/dilemma/version.py",
+    "src/dilemma/ext/*",  # Added to ignore the ext directory
 ]
 
 [tool.coverage.report]
@@ -96,7 +102,7 @@ exclude_lines = [
 
 [tool.coverage.paths]
 source = [
-    "dilemma/*",
+    "src/dilemma/*",
 ]
 
 [tool.coverage.html]
@@ -141,6 +147,14 @@ line-ending = "auto"
 [tool.mypy]
 # Platform configuration
 python_version = "3.12"
+
+[tool.uv.sources]
+python-markdown-generator = { git = "https://github.com/Nicceboy/python-markdown-generator" }
+
+[dependency-groups]
+dev = [
+    "python-markdown-generator",
+]
 #
 
 
