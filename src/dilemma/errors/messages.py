@@ -15,8 +15,8 @@ log = get_logger(__name__)
 
 
 # Global templates storage
-DEFAULT_TEMPLATES = None
-_custom_templates = None
+DEFAULT_TEMPLATES: Dict[str, str] | None = None
+_custom_templates: Dict[str, str] | None = None
 
 
 XML_FILENAME = "msg_templates.xml"
@@ -36,8 +36,9 @@ def load_templates_from_xml() -> Dict[str, str]:
         # Use the current module name to find the XML file in the same directory
         xml_path = files(__name__).joinpath(XML_FILENAME)
 
-        # Parse the XML file
-        tree = ET.parse(xml_path)
+        # Convert Traversable to string path for ElementTree.parse
+        with xml_path.open("rb") as xml_file:
+            tree = ET.parse(xml_file)
         root = tree.getroot()
 
         # Extract templates from error elements
@@ -51,13 +52,14 @@ def load_templates_from_xml() -> Dict[str, str]:
                 templates[key] = message
                 log.debug(f"Loaded template '{key}' from XML")
 
-        # Update DEFAULT_TEMPLATES with the loaded templates
+        # Log results
         if templates:
             log.info(f"Loaded {len(templates)} templates from {XML_FILENAME}")
-            return templates
         else:
             log.warning("No templates found in %s", XML_FILENAME)
-            return {}
+
+        return templates
+
     except Exception as e:
         log.error(f"Failed to load templates from XML: {e}")
         return {}
