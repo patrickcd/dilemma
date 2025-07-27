@@ -1,7 +1,6 @@
 from ..resolvers.interface import AsyncResolverSpec
 
 
-
 # Example implementation
 class UrlResolver(AsyncResolverSpec):
     """Resolver for URL content using aiohttp."""
@@ -14,6 +13,7 @@ class UrlResolver(AsyncResolverSpec):
         """Lazily create aiohttp session."""
         if self._session is None:
             import aiohttp
+
             self._session = aiohttp.ClientSession()
         return self._session
 
@@ -28,8 +28,8 @@ class UrlResolver(AsyncResolverSpec):
         session = await self._ensure_session()
         async with session.get(url) as response:
             if response.status == 200:
-                content_type = response.headers.get('Content-Type', '')
-                if 'application/json' in content_type:
+                content_type = response.headers.get("Content-Type", "")
+                if "application/json" in content_type:
                     return await response.json()
                 else:
                     return await response.text()

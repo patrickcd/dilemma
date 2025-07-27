@@ -11,6 +11,7 @@ from .exc import UnexpectedCharacterError, UnexpectedEOFError, UnexpectedTokenEr
 
 log = get_logger(__name__)
 
+
 def suggest_correction(interactive_parser, token):
     """
     Suggest possible corrections based on expected tokens at the error position.
@@ -97,7 +98,7 @@ def parsing_error_handling(expression: str, parse_func: Callable):
             suggestions=suggestions,
         )
     except UnexpectedCharacters as uce:
-        log.debug("Caught lark UnexpectedCharacters Exception %s",uce)
+        log.debug("Caught lark UnexpectedCharacters Exception %s", uce)
         error_context = uce.get_context(expression)
         raise UnexpectedCharacterError(
             template_key="unexpected_character",

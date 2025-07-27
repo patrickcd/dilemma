@@ -8,6 +8,7 @@ logger = get_logger("resolvers")
 _resolvers = {}
 _default_resolver = None
 
+
 def register_resolver(resolver_class, name=None, default=True):
     """Register a resolver with the system.
 
@@ -21,7 +22,7 @@ def register_resolver(resolver_class, name=None, default=True):
     # Create an instance of the resolver
     resolver = resolver_class()
 
-    resolver_name = name or resolver_class.__name__.lower().replace('resolver', '')
+    resolver_name = name or resolver_class.__name__.lower().replace("resolver", "")
 
     # Store in our resolver dictionary
     _resolvers[resolver_name] = resolver
@@ -32,6 +33,7 @@ def register_resolver(resolver_class, name=None, default=True):
 
     logger.info(f"Registered resolver: {resolver_name}")
     return resolver
+
 
 def resolve_path(path, context, resolver_name=None, raw=False):
     """Resolve a path using the appropriate resolver.
@@ -58,7 +60,7 @@ async def resolve_path_async(path, context, resolver_name=None, raw=False):
     resolver = _resolvers[res_name]
 
     # Check if resolver supports async operations
-    if hasattr(resolver, 'resolve_path_async'):
+    if hasattr(resolver, "resolve_path_async"):
         return await resolver.resolve_path_async(path, context, raw=raw)
     else:
         # Fall back to sync version for backward compatibility
@@ -68,20 +70,23 @@ async def resolve_path_async(path, context, resolver_name=None, raw=False):
 # Try to register available resolvers
 try:
     from .jsonpath_resolver import JsonPathResolver
+
     register_resolver(JsonPathResolver)
 except ImportError:
     logger.info("JsonPath resolver not available")
 
 try:
     from .jq_resolver import JqResolver
+
     register_resolver(JqResolver)
 except ImportError:
     logger.info("JQ resolver not available")
 
 if not _resolvers:
-        from .basic_resolver import BasicResolver
-        register_resolver(BasicResolver)
-        logger.warning("Using BasicResolver as fallback")
+    from .basic_resolver import BasicResolver
+
+    register_resolver(BasicResolver)
+    logger.warning("Using BasicResolver as fallback")
 
 
 __all__ = ["register_resolver", "resolve_path"]

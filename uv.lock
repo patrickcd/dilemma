@@ -200,6 +200,7 @@ dependencies = [
 all = [
     { name = "click" },
     { name = "codecov" },
+    { name = "coverage" },
     { name = "hypothesis" },
     { name = "isort" },
     { name = "mkdocs" },
@@ -230,6 +231,7 @@ doc = [
 ]
 test = [
     { name = "codecov" },
+    { name = "coverage" },
     { name = "hypothesis" },
     { name = "pre-commit" },
     { name = "pytest" },
@@ -247,6 +249,7 @@ requires-dist = [
     { name = "click" },
     { name = "click", marker = "extra == 'dev'" },
     { name = "codecov", marker = "extra == 'test'" },
+    { name = "coverage", extras = ["toml"], marker = "extra == 'test'" },
     { name = "dilemma", extras = ["dev", "doc", "test"], marker = "extra == 'all'" },
     { name = "hypothesis", marker = "extra == 'test'", specifier = ">=6.136.4" },
     { name = "isort", marker = "extra == 'dev'" },

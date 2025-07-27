@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 from .errors import TypeMismatchError
 from .logconf import get_logger
+
 log = get_logger(__name__)
 
 
@@ -173,4 +174,3 @@ def unpack_datetimes(items: list) -> tuple[datetime, datetime]:
     date1 = ensure_datetime(items[0])
     date2 = ensure_datetime(items[1])
     return date1, date2
-

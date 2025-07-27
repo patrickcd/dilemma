@@ -16,6 +16,7 @@ class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         return {"__datetime__": obj.isoformat()}
 
+
 class DateMethods:
     """
     Mixin class for add datetime handling methods to ExpressionTransformer

@@ -6,6 +6,7 @@ expression.
 
 from datetime import datetime
 from contextvars import ContextVar
+import traceback
 
 from lark import Lark, Tree
 
@@ -108,8 +109,6 @@ async def compile_expression_async(expression):
     with parsing_error_handling(expression, parser.parse):
         tree = parser.parse(expression)
         return AsyncCompiledExpression(expression, tree)
-
-
 
 
 class AsyncResolverSpec(ResolverSpec):

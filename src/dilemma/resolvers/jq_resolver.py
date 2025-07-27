@@ -1,4 +1,5 @@
 """JQ-based resolver implementation."""
+
 import re
 
 try:
@@ -14,12 +15,12 @@ from .interface import ResolverSpec
 
 JQ_KEYWORDS = re.compile(r"^\s*(if|map|reduce|foreach|while|until|label|break)\b")
 
+
 class JqResolver(ResolverSpec):
     """A resolver using jq (C extension)."""
 
     def __init__(self):
         super().__init__()
-
 
     def _execute_query(self, path: str, context):
         """Execute a jq expression against the context."""
@@ -31,7 +32,7 @@ class JqResolver(ResolverSpec):
         if path.startswith("."):
             jq_expr = path
         else:
-            jq_expr = "."+path
+            jq_expr = "." + path
         results = jq.compile(jq_expr).input(context).all()
 
         # Return the first result, or None if no results

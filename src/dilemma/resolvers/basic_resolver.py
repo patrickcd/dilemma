@@ -2,6 +2,7 @@
 
 from .interface import ResolverSpec
 
+
 class BasicResolver(ResolverSpec):
     """A minimal resolver that only supports top-level dictionary keys.
 
@@ -40,4 +41,3 @@ class BasicResolver(ResolverSpec):
         For the basic resolver, raw expressions are treated the same as paths.
         """
         return self._execute_query(raw_expr, context)
-

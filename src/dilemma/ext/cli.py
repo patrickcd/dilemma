@@ -253,7 +253,7 @@ def process_time_values_for_docs(data, time_values):
 
 
 @cli.command()
-@click.argument('directory', type=click.Path(exists=True))
+@click.argument("directory", type=click.Path(exists=True))
 def validate_exceptions(directory):
     """
     Validate that all exceptions raised in the codebase provide the required
@@ -263,7 +263,7 @@ def validate_exceptions(directory):
         directory: The root directory of the codebase to analyze.
     """
     # Parse the msg_templates.xml file to extract placeholders for each template_key
-    templates_path = Path(directory) / 'errors' / 'msg_templates.xml'
+    templates_path = Path(directory) / "errors" / "msg_templates.xml"
     if not templates_path.exists():
         click.echo(f"Error: Template file not found at {templates_path}")
         return
@@ -273,8 +273,8 @@ def validate_exceptions(directory):
     try:
         tree = ET.parse(templates_path)
         root = tree.getroot()
-        for error in root.findall('error'):
-            key = error.get('key')
+        for error in root.findall("error"):
+            key = error.get("key")
             if key:
                 placeholders = re.findall(r"\{(\w+)\}", error.text or "")
                 template_placeholders[key] = set(placeholders)
@@ -285,21 +285,21 @@ def validate_exceptions(directory):
     # Traverse the codebase to find exceptions raised
     exceptions_report = []
     for py_file in Path(directory).rglob("*.py"):
-        if 'ext' in py_file.parts:
+        if "ext" in py_file.parts:
             continue  # Skip the 'ext' directory
 
-        with open(py_file, 'r') as f:
+        with open(py_file, "r") as f:
             lines = f.readlines()
 
         for i, line in enumerate(lines):
-            if 'raise ' in line:
+            if "raise " in line:
                 match = re.search(r"raise (\w+)\((.*)\)", line)
                 if match:
                     exception_name = match.group(1)
                     args = match.group(2)
 
                     # Check if the exception is a DilemmaError or subclass
-                    if exception_name.endswith('Error'):
+                    if exception_name.endswith("Error"):
                         # Extract the template_key and context variables
                         template_key_match = re.search(
                             r"template_key=['\"](\w+)['\"]", args
@@ -318,13 +318,15 @@ def validate_exceptions(directory):
                                 template_placeholders[template_key] - context
                             )
                             if missing_placeholders:
-                                exceptions_report.append({
-                                    'file': py_file,
-                                    'line': i + 1,
-                                    'exception': exception_name,
-                                    'template_key': template_key,
-                                    'missing_placeholders': missing_placeholders,
-                                })
+                                exceptions_report.append(
+                                    {
+                                        "file": py_file,
+                                        "line": i + 1,
+                                        "exception": exception_name,
+                                        "template_key": template_key,
+                                        "missing_placeholders": missing_placeholders,
+                                    }
+                                )
 
     # Report the results
     if exceptions_report:
