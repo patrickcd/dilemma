@@ -62,6 +62,10 @@ result = evaluate("`[.users[] | select(.active == true) | .name] | length` > 0",
 
 ## Language Features
 
+All [Language Features](https://github.com/patrickcd/dilemma/blob/main/docs/language.md).
+Extensive [Examples](https://github.com/patrickcd/dilemma/blob/main/docs/examples.md).
+
+
 ### Data Access Patterns
 
 ```python
@@ -95,6 +99,7 @@ result = evaluate("`[.users[] | select(.active == true) | .name] | length` > 0",
 "start_date before end_date"
 "event.date same_day_as $now"
 ```
+
 
 ### Advanced JQ Integration
 
@@ -158,10 +163,7 @@ except VariableError as e:
 - ✅ Input validation and sanitization
 - ✅ Memory and complexity limits
 
-## Contributing
-
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](https://github.com/patrickcd/dilemma/blob/main/LICENSE) file for details.
