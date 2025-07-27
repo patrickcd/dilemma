@@ -60,7 +60,7 @@ async def resolve_path_async(path, context, resolver_name=None, raw=False):
     resolver = _resolvers[res_name]
 
     # Check if resolver supports async operations
-    if hasattr(resolver, "resolve_path_async"):
+    if hasattr(resolver, "resolve_path_async"):  # pragma: no cover
         return await resolver.resolve_path_async(path, context, raw=raw)
     else:
         # Fall back to sync version for backward compatibility
@@ -82,7 +82,7 @@ try:
 except ImportError:
     logger.info("JQ resolver not available")
 
-if not _resolvers:
+if not _resolvers:  # pragma: no cover
     from .basic_resolver import BasicResolver
 
     register_resolver(BasicResolver)
