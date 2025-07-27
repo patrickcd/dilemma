@@ -21,7 +21,9 @@ Write this:
 ```python
 from dilemma import evaluate
 
-if evaluate("user.profile.age >= 18 and user.subscription.status == 'active' and user.last_login within 30 days", context):
+expr = "user.profile.age >= 18 and user.subscription.status == 'active' and user.last_login within 30 days"
+
+if evaluate(expr, context):
     # grant access
 ```
 
