@@ -190,6 +190,7 @@ python-markdown-generator = { git = "https://github.com/Nicceboy/python-markdown
 [dependency-groups]
 dev = [
     "python-markdown-generator",
+    "twine>=6.1.0",
 ]
 
 
