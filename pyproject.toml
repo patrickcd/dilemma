@@ -33,8 +33,15 @@ dependencies = [
     "click",
     "pyyaml",
     "jsonpath-ng>=1.7.0",
+    "validate-pyproject>=0.24.1",
+    "packaging>=25.0",
 ]
 dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/patrickcd/dilemma"
+Repository = "https://github.com/patrickcd/dilemma.git"
+Issues = "https://github.com/patrickcd/dilemma/issues"
 
 [project.optional-dependencies]
 test = [
