@@ -129,7 +129,7 @@ def evaluate_expression(expression: str, verbose: bool, context_file: str) -> No
 def gendocs(output):
     """Generate documentation from test examples."""
     try:
-        tests_dir = Path(__file__).parents[1] / "tests" / "examples"
+        tests_dir = Path(__file__).parents[3] / "tests" / "examples"
         if not tests_dir.exists():
             click.echo(f"Error: Examples directory not found at {tests_dir}", err=True)
             raise click.Abort()
@@ -230,7 +230,14 @@ def generate_markdown_docs(examples_by_category, time_values, output_path):
                     context_json = json.dumps(context, indent=2, default=str)
                     doc.addCodeBlock(context_json, "json")
 
-                doc.writeTextLine(f"`Result: {example['expected']}` ")
+                # Show result or error message
+                if "expected" in example:
+                    doc.writeTextLine(f"`Result: {example['expected']}` ")
+                elif "error_message" in example:
+                    doc.writeTextLine("**Expected Error:**")
+                    doc.writeTextLine("```")
+                    doc.writeTextLine(example["error_message"].strip())
+                    doc.writeTextLine("```")
 
                 doc.addHorizontalRule()
 
