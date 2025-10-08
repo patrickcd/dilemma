@@ -106,21 +106,21 @@ def format_error(template_name: str, **kwargs) -> str:
 
     template = templates[template_name]
     log.debug(f"Found template: '{template}'")
-    
+
     # Process template to preserve line breaks but strip leading whitespace
-    template_lines = template.split('\n')
+    template_lines = template.split("\n")
     processed_lines = []
     for line in template_lines:
         processed_lines.append(line.strip())
     # Join lines back together, removing empty lines at start/end
-    processed_template = '\n' + '\n'.join(processed_lines).strip()
-    
+    processed_template = "\n" + "\n".join(processed_lines).strip()
+
     try:
         # Handle special formatting for lists in suggestions
-        if 'suggestions' in kwargs and isinstance(kwargs['suggestions'], list):
+        if "suggestions" in kwargs and isinstance(kwargs["suggestions"], list):
             # Create a copy of kwargs with formatted suggestions
             formatted_kwargs = kwargs.copy()
-            suggestions = kwargs['suggestions']
+            suggestions = kwargs["suggestions"]
             if suggestions:
                 # Format suggestions with line breaks for better readability
                 formatted_lines = []
@@ -132,29 +132,29 @@ def format_error(template_name: str, **kwargs) -> str:
                         tokens = []
                         current_token = ""
                         paren_count = 0
-                        
+
                         for char in expected_part:
-                            if char == '(':
+                            if char == "(":
                                 paren_count += 1
-                            elif char == ')':
+                            elif char == ")":
                                 paren_count -= 1
-                            elif char == ',' and paren_count == 0:
+                            elif char == "," and paren_count == 0:
                                 tokens.append(current_token.strip())
                                 current_token = ""
                                 continue
                             current_token += char
-                        
+
                         if current_token.strip():
                             tokens.append(current_token.strip())
-                        
+
                         for token in tokens:
                             formatted_lines.append(f"  - {token}")
                     else:
                         # Other suggestions (like keyword warnings) stay as-is
                         formatted_lines.append(f"  - {suggestion}")
-                formatted_kwargs['suggestions'] = "\n" + "\n".join(formatted_lines)
+                formatted_kwargs["suggestions"] = "\n" + "\n".join(formatted_lines)
             else:
-                formatted_kwargs['suggestions'] = "None available"
+                formatted_kwargs["suggestions"] = "None available"
             return processed_template.format(**formatted_kwargs)
         else:
             return processed_template.format(**kwargs)
