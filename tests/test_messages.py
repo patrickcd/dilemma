@@ -195,7 +195,7 @@ def test_format_error_success(test_templates):
     
     result = messages.format_error("test_template", details="Something went wrong")
     
-    assert result == "Error: Something went wrong"
+    assert result == "\nError: Something went wrong"
 
 
 def test_format_error_multiple_placeholders(test_templates):
@@ -204,7 +204,7 @@ def test_format_error_multiple_placeholders(test_templates):
     
     result = messages.format_error("multi_placeholder", type="string", line=42)
     
-    assert result == "Type string at line 42"
+    assert result == "\nType string at line 42"
 
 
 def test_format_error_no_placeholders(test_templates):
@@ -213,7 +213,7 @@ def test_format_error_no_placeholders(test_templates):
     
     result = messages.format_error("no_placeholder")
     
-    assert result == "Simple error message"
+    assert result == "\nSimple error message"
 
 
 def test_format_error_template_not_found(test_templates):
@@ -404,11 +404,11 @@ def test_custom_templates_override_default():
     
     # Test that custom template is used
     result = messages.format_error("syntax_error", details="Bad syntax")
-    assert result == "Custom syntax error: Bad syntax"
+    assert result == "\nCustom syntax error: Bad syntax"
     
     # Test that new custom template works
     result = messages.format_error("new_error", message="Something wrong")
-    assert result == "New error type: Something wrong"
+    assert result == "\nNew error type: Something wrong"
     
     # Test that fallback still works for non-existent templates
     result = messages.format_error("unknown_error", details="Unknown issue")

@@ -60,7 +60,7 @@
 
     <error key="unsupported_unit">Unsupported time unit: {unit}</error>
 
-    <error key="temporal_args">Temporal comparison operation expects 3 items: a date-like value, a quantity, and a unit string</error>
+    <error key="temporal_args">Time comparisons expect 3 items: a date-like value, a quantity, and a unit string</error>
 
     <error key="evaluation_error">Error evaluating expression: {expression} - Caused by: {error_type}: {details}</error>
 
@@ -70,6 +70,13 @@
         Unexpected token '{token_value}' at line {line}, column {column}.
         {context}
         Expected one of: {suggestions}
+    </error>
+
+    <error key="invalid_variable">
+        '{token_value}' is not a valid variable name.
+        Variable names cannot be reserved keywords.
+        If you meant to use this as a string, put it in quotes.
+        Available constants: $now, $past, $future, $today, $empty
     </error>
 
     <error key="unexpected_character">
