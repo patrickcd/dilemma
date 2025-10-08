@@ -47,6 +47,13 @@
 
     <error key="wrong_container">'{operation}' can only be used with container types (list, tuple, dict)</error>
 
+    <error key="unknown_function">Unknown function '{function}'. Available functions: count_of, any_of, all_of, none_of</error>
+
+    <error key="missing_operator">
+        Missing operator between expressions.
+        Did you forget to add an operator like +, -, *, /, ==, !=, and, or?
+    </error>
+
     <error key="date_parsing">Could not parse date string: {value}</error>
 
     <error key="date_conversion">Cannot convert {type} to datetime</error>

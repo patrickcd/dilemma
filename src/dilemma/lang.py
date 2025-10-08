@@ -27,7 +27,7 @@ from .utils import (
     reject_strings,
     check_containment,
 )
-
+from .arraymethods import ArrayMethods
 
 log = get_logger(__name__)
 
@@ -83,6 +83,7 @@ grammar = r"""
          | "true" -> true_value
          | "false" -> false_value
          | "$now" -> now_value
+         | func_call
          | VARIABLE -> variable
          | RESOLVER_EXPR -> resolver_expression
          | "(" expr ")" -> paren
@@ -91,8 +92,12 @@ grammar = r"""
     // But use string literals in rules above for "or", "and", "True", "False"
     // Use a negative lookahead in VARIABLE to exclude these as variable names
 
-    VARIABLE: /(?!or\b|and\b|true\b|false\b|is\b|contains\b|like\b|in\b)[a-zA-Z_][a-zA-Z0-9_]*(?:'s\s+[a-zA-Z_][a-zA-Z0-9_]*|\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
+    FUNC_NAME: /(count_of|any_of|all_of|none_of)/
 
+    VARIABLE: /(?!or\b|and\b|true\b|false\b|is\b|contains\b|like\b|in\b|count_of\b|any_of\b|all_of\b|none_of\b)[a-zA-Z_][a-zA-Z0-9_]*(?:'s\s+[a-zA-Z_][a-zA-Z0-9_]*|\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
+
+    func_call: FUNC_NAME "(" expr ("," RESOLVER_EXPR)? ")"
+    
     // JQ expression syntax: `expression` - must be matched as a single token
     // Define this before the STRING token to give it higher precedence
     RESOLVER_EXPR: /`[^`]*`/
@@ -123,7 +128,7 @@ MAX_STRING_LENGTH = 10000  # Define a reasonable maximum length
 
 
 # Transformer to evaluate expressions
-class ExpressionTransformer(Transformer, DateMethods):
+class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
     # Epsilon value for float comparison
     EPSILON = 1e-10
 

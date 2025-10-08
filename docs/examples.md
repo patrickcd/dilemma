@@ -290,7 +290,7 @@ past_date is $past
 ```  
 ```json
 {
-  "past_date": "2025-05-12 15:20:33 UTC"
+  "past_date": "2025-10-07 20:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -304,7 +304,7 @@ future_date is $future
 ```  
 ```json
 {
-  "future_date": "2025-05-14 15:20:33 UTC"
+  "future_date": "2025-10-09 20:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -318,7 +318,7 @@ today_date is $today
 ```  
 ```json
 {
-  "today_date": "2025-05-13 15:20:33 UTC"
+  "today_date": "2025-10-08 20:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -334,7 +334,7 @@ recent_event upcoming within 12 hours
 ```  
 ```json
 {
-  "recent_event": "2025-05-13 14:20:33 UTC"
+  "recent_event": "2025-10-08 19:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -348,7 +348,7 @@ old_event older than 1 week
 ```  
 ```json
 {
-  "old_event": "2025-05-06 15:20:33 UTC"
+  "old_event": "2025-10-01 20:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -364,8 +364,8 @@ start_date before end_date
 ```  
 ```json
 {
-  "start_date": "2025-05-12 15:20:33 UTC",
-  "end_date": "2025-05-14 15:20:33 UTC"
+  "start_date": "2025-10-07 20:51:29 UTC",
+  "end_date": "2025-10-09 20:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -379,8 +379,8 @@ end_date after start_date
 ```  
 ```json
 {
-  "start_date": "2025-05-12 15:20:33 UTC",
-  "end_date": "2025-05-14 15:20:33 UTC"
+  "start_date": "2025-10-07 20:51:29 UTC",
+  "end_date": "2025-10-09 20:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -426,8 +426,8 @@ project_start is $past and project_end is $future
 ```  
 ```json
 {
-  "project_start": "2025-05-12 15:20:33 UTC",
-  "project_end": "2025-05-14 15:20:33 UTC"
+  "project_start": "2025-10-07 20:51:29 UTC",
+  "project_end": "2025-10-09 20:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -441,8 +441,8 @@ last_login upcoming within 4 hours and signup_date older than 1 day
 ```  
 ```json
 {
-  "last_login": "2025-05-13 14:20:33 UTC",
-  "signup_date": "2025-05-12 15:20:33 UTC"
+  "last_login": "2025-10-08 19:51:29 UTC",
+  "signup_date": "2025-10-07 20:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -492,7 +492,7 @@ hour_ago upcoming within 2 hours
 ```  
 ```json
 {
-  "hour_ago": "2025-05-13 14:20:33 UTC"
+  "hour_ago": "2025-10-08 19:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -506,7 +506,7 @@ hour_ago upcoming within 120 minutes
 ```  
 ```json
 {
-  "hour_ago": "2025-05-13 14:20:33 UTC"
+  "hour_ago": "2025-10-08 19:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -520,7 +520,7 @@ week_ago older than 6 days
 ```  
 ```json
 {
-  "week_ago": "2025-05-06 15:20:33 UTC"
+  "week_ago": "2025-10-01 20:51:29 UTC"
 }
 ```  
 `Result: True`   
@@ -1027,11 +1027,11 @@ user.account.is_active and (user.subscription.level == 'premium' or user.account
     "account": {
       "is_active": true,
       "credits": 150,
-      "created_at": "2025-05-06 15:20:33 UTC"
+      "created_at": "2025-10-01 20:51:29 UTC"
     },
     "subscription": {
       "level": "basic",
-      "renewal_date": "2025-06-12 15:20:33 UTC"
+      "renewal_date": "2025-11-07 20:51:29 UTC"
     }
   }
 }
@@ -1054,8 +1054,8 @@ and (
 {
   "project": {
     "status": "in_progress",
-    "start_date": "2025-05-06 15:20:33 UTC",
-    "deadline": "2025-06-12 15:20:33 UTC",
+    "start_date": "2025-10-01 20:51:29 UTC",
+    "deadline": "2025-11-07 20:51:29 UTC",
     "metrics": {
       "completion": 45,
       "quality": 98
@@ -1089,7 +1089,7 @@ and (
 {
   "order": {
     "status": "confirmed",
-    "created_at": "2025-05-13 14:20:33 UTC",
+    "created_at": "2025-10-08 19:51:29 UTC",
     "items": {
       "count": 7,
       "categories": [
@@ -1099,7 +1099,7 @@ and (
     },
     "customer": {
       "tier": "gold",
-      "since": "2025-05-06 15:20:33 UTC"
+      "since": "2025-10-01 20:51:29 UTC"
     },
     "total_value": 250
   }
@@ -1123,15 +1123,15 @@ and (
 ```json
 {
   "user": {
-    "last_login": "2025-05-06 15:20:33 UTC",
+    "last_login": "2025-10-01 20:51:29 UTC",
     "auto_login": true,
     "registration_date": "2023-01-15",
     "account": {
-      "trial_ends": "2025-05-12 15:20:33 UTC",
+      "trial_ends": "2025-10-07 20:51:29 UTC",
       "subscription": {
         "status": "active",
         "plan": "premium",
-        "next_payment": "2025-06-12 15:20:33 UTC"
+        "next_payment": "2025-11-07 20:51:29 UTC"
       }
     }
   }
@@ -1164,7 +1164,7 @@ and ('admin' in user.roles or user.tasks.pending > 0)
       },
       "theme": "dark"
     },
-    "last_seen": "2025-05-06 15:20:33 UTC",
+    "last_seen": "2025-10-01 20:51:29 UTC",
     "preferences": {
       "urgent_only": false,
       "language": "en"
@@ -1329,7 +1329,7 @@ Combine JQ with regular Dilemma expressions
   "user": {
     "membership": {
       "level": "gold",
-      "since": "2025-05-06 15:20:33 UTC"
+      "since": "2025-10-01 20:51:29 UTC"
     },
     "account": {
       "active": true,
@@ -1520,15 +1520,15 @@ Use JQ to extract a date for comparison
     "milestones": [
       {
         "name": "alpha",
-        "date": "2025-06-12 15:20:33 UTC"
+        "date": "2025-11-07 20:51:29 UTC"
       },
       {
         "name": "beta",
-        "date": "2025-05-12 15:20:33 UTC"
+        "date": "2025-10-07 20:51:29 UTC"
       },
       {
         "name": "release",
-        "date": "2025-05-13 17:20:33 UTC"
+        "date": "2025-10-08 22:51:29 UTC"
       }
     ]
   }
@@ -1561,6 +1561,450 @@ Simple JQ expression nested inside multiple levels of Dilemma parentheses
       "name": "Charlie"
     }
   ]
+}
+```  
+`Result: True`   
+
+---
+  
+  
+### Errors  
+Test division by zero error  
+  
+```  
+12 / 0  
+```  
+**Expected Error:**  
+```  
+It is not possible to divide by zero (12 / 0 ).
+You can guard against this error by checking that
+the value of the right-hand side is not zero.  
+```  
+
+---
+  
+Error message for an unknown variable name  
+  
+```  
+bob  
+```  
+**Expected Error:**  
+```  
+The word &#x27;bob&#x27; is not recognised.
+Unquoted words should refer names of data items in the context.
+Possibly a spelling mistake?
+If you intended this word to be used for a comparison put it in quotation marks.  
+```  
+
+---
+  
+Error message for an unknown variable path  
+  
+```  
+bob's age  
+```  
+**Expected Error:**  
+```  
+Lookup for a value matching &#x27;bob&#x27;s age&#x27; failed.
+The first part of this phrase is expected to be the name of an item in the context,
+subsequent parts are the names of nested items
+Possibly a spelling mistake? Please check the context.
+If you intended this word to be used for a comparison put it in quotation marks.  
+```  
+
+---
+  
+  
+### Function Operations  
+Count members in a list that match a condition  
+  
+```  
+count_of(roles, `'write' in permissions`) == 3  
+```  
+```json
+{
+  "roles": [
+    {
+      "name": "user",
+      "permissions": [
+        "read",
+        "write"
+      ]
+    },
+    {
+      "name": "admin",
+      "permissions": [
+        "read",
+        "write",
+        "delete"
+      ]
+    },
+    {
+      "name": "manager",
+      "permissions": [
+        "read",
+        "write",
+        "approve"
+      ]
+    },
+    {
+      "name": "guest",
+      "permissions": [
+        "read"
+      ]
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Count all members in a list (no condition)  
+  
+```  
+count_of(roles) == 4  
+```  
+```json
+{
+  "roles": [
+    {
+      "name": "user",
+      "permissions": [
+        "read",
+        "write"
+      ]
+    },
+    {
+      "name": "admin",
+      "permissions": [
+        "read",
+        "write",
+        "delete"
+      ]
+    },
+    {
+      "name": "manager",
+      "permissions": [
+        "read",
+        "write",
+        "approve"
+      ]
+    },
+    {
+      "name": "guest",
+      "permissions": [
+        "read"
+      ]
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Count items that match a numeric condition  
+  
+```  
+count_of(scores, `score > 80`) == 2  
+```  
+```json
+{
+  "scores": [
+    {
+      "name": "Alice",
+      "score": 95
+    },
+    {
+      "name": "Bob",
+      "score": 72
+    },
+    {
+      "name": "Charlie",
+      "score": 88
+    },
+    {
+      "name": "David",
+      "score": 65
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Check if any item matches a condition  
+  
+```  
+any_of(users, `age >= 18`)  
+```  
+```json
+{
+  "users": [
+    {
+      "name": "Alice",
+      "age": 25
+    },
+    {
+      "name": "Bob",
+      "age": 16
+    },
+    {
+      "name": "Charlie",
+      "age": 30
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Check if any item is truthy  
+  
+```  
+any_of(flags)  
+```  
+```json
+{
+  "flags": [
+    false,
+    true,
+    false
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Check if any item matches condition (false case)  
+  
+```  
+any_of(users, `age > 100`)  
+```  
+```json
+{
+  "users": [
+    {
+      "name": "Alice",
+      "age": 25
+    },
+    {
+      "name": "Bob",
+      "age": 16
+    }
+  ]
+}
+```  
+`Result: False`   
+
+---
+  
+Check if all items match a condition (true case)  
+  
+```  
+all_of(products, `price > 0`)  
+```  
+```json
+{
+  "products": [
+    {
+      "name": "Widget A",
+      "price": 10.5
+    },
+    {
+      "name": "Widget B",
+      "price": 25.0
+    },
+    {
+      "name": "Widget C",
+      "price": 5.99
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Check if all items match a condition (false case)  
+  
+```  
+all_of(products, `price > 20`)  
+```  
+```json
+{
+  "products": [
+    {
+      "name": "Widget A",
+      "price": 10.5
+    },
+    {
+      "name": "Widget B",
+      "price": 25.0
+    },
+    {
+      "name": "Widget C",
+      "price": 5.99
+    }
+  ]
+}
+```  
+`Result: False`   
+
+---
+  
+Check if all items are truthy  
+  
+```  
+all_of(flags)  
+```  
+```json
+{
+  "flags": [
+    true,
+    false,
+    true
+  ]
+}
+```  
+`Result: False`   
+
+---
+  
+Check if no items match a condition (true case)  
+  
+```  
+none_of(users, `age > 100`)  
+```  
+```json
+{
+  "users": [
+    {
+      "name": "Alice",
+      "age": 25
+    },
+    {
+      "name": "Bob",
+      "age": 16
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Check if no items match a condition (false case)  
+  
+```  
+none_of(users, `age >= 18`)  
+```  
+```json
+{
+  "users": [
+    {
+      "name": "Alice",
+      "age": 25
+    },
+    {
+      "name": "Bob",
+      "age": 16
+    }
+  ]
+}
+```  
+`Result: False`   
+
+---
+  
+Check if no items are truthy  
+  
+```  
+none_of(flags)  
+```  
+```json
+{
+  "flags": [
+    false,
+    false,
+    false
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Count items matching a string condition  
+  
+```  
+count_of(employees, `department == 'Engineering'`) == 2  
+```  
+```json
+{
+  "employees": [
+    {
+      "name": "Alice",
+      "department": "Engineering"
+    },
+    {
+      "name": "Bob",
+      "department": "Marketing"
+    },
+    {
+      "name": "Charlie",
+      "department": "Engineering"
+    },
+    {
+      "name": "David",
+      "department": "Sales"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Check if any employee has &#x27;manager&#x27; in their title  
+  
+```  
+any_of(employees, `'Manager' in title`)  
+```  
+```json
+{
+  "employees": [
+    {
+      "name": "Alice",
+      "title": "Senior Engineer"
+    },
+    {
+      "name": "Bob",
+      "title": "Project Manager"
+    },
+    {
+      "name": "Charlie",
+      "title": "Developer"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test functions with empty list  
+  
+```  
+count_of(empty_list) == 0 and any_of(empty_list) == false and all_of(empty_list) == true and none_of(empty_list) == true  
+```  
+```json
+{
+  "empty_list": []
 }
 ```  
 `Result: True`   
