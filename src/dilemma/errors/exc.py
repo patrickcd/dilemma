@@ -10,7 +10,7 @@ from .messages import format_error
 class DilemmaError(Exception):
     """Base exception for all Dilemma-specific errors."""
 
-    template_key = None  # Template key to use from error_messages
+    template_key: Optional[str] = None  # Template key to use from error_messages
 
     def __init__(self, *args, template_key: Optional[str] = None, **context):
         """

@@ -5,7 +5,7 @@ from dilemma.lang import evaluate
 
 # Import strategies from other test modules
 try:
-    from tests.test_hypo_basic_math import (
+    from tests.test_hypo_basic_math import (  # type: ignore
         integers_st,
         addition_expressions,
         subtraction_expressions,

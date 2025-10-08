@@ -5,11 +5,13 @@ from ..logconf import get_logger
 logger = get_logger("resolvers")
 
 # Dictionary to store instantiated resolvers by name
-_resolvers = {}
-_default_resolver = None
+_resolvers: dict[str, type] = {}
+_default_resolver: str | None = None
 
 
-def register_resolver(resolver_class, name=None, default=True):
+def register_resolver(
+    resolver_class: type, name: str | None = None, default: bool = True
+):
     """Register a resolver with the system.
 
     Args:

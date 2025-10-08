@@ -15,8 +15,8 @@ Options:
     --verbose, -v   Show detailed output of changes
 """
 import click
-from bowler import Query
-from fissix.fixer_util import String
+from bowler import Query # type: ignore
+from fissix.fixer_util import String # type: ignore
 from pathlib import Path
 import re
 import os
