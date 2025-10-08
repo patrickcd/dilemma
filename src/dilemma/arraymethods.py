@@ -5,21 +5,22 @@ from .errors import DilemmaError, ContainerError
 
 
 class ArrayMethods:
-
     def _ensure_iterable(self, value: Any, func_name: str) -> Sequence[Any]:
         if not isinstance(value, (list, tuple)):
-            raise ContainerError(template_key="wrong_container",
-                                 operation=f"{func_name} (expects list/tuple)")
+            raise ContainerError(
+                template_key="wrong_container",
+                operation=f"{func_name} (expects list/tuple)",
+            )
         return value
 
     def _eval_predicate_on_item(self, pred_token: Token, item: Any) -> bool:
         # pred_token is a RESOLVER_EXPR token like `...`
         raw_expr = pred_token.value[1:-1]  # strip backticks
-        
+
         # Instead of using resolve_path, we need to evaluate this as a dilemma expression
         # Import here to avoid circular imports
         from . import lang
-        
+
         try:
             # Evaluate the expression with the current item as context
             result = lang.evaluate(raw_expr, item)
@@ -28,6 +29,7 @@ class ArrayMethods:
             # Log the error for debugging but return False to continue processing
             try:
                 from .logconf import get_logger
+
                 log = get_logger(__name__)
                 log.debug(
                     f"Predicate evaluation failed for '{raw_expr}' with item {item}: {e}"
