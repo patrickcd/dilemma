@@ -44,6 +44,22 @@ def suggest_correction(interactive_parser, token):
             "MINUS": "- (minus)",
             "MULT": "* (multiply)",
             "DIV": "/ (divide)",
+            "LPAR": "( (opening parenthesis)",
+            "RPAR": ") (closing parenthesis)",
+            "RESOLVER_EXPR": "backticked expression (`expression`)",
+            "FUNC_NAME": "function name (count_of, any_of, all_of, none_of)",
+            "__ANON_8": "$now (current datetime)",
+            "TRUE": "true",
+            "FALSE": "false",
+            "VARIABLE": "variable name",
+            "STRING": "quoted string",
+            "INTEGER": "integer number",
+            "FLOAT": "decimal number",
+            "EXACTLY": "exactly (for quantified expressions)",
+            "ANY": "any (for quantified expressions)",
+            "ALL": "all (for quantified expressions)",
+            "NONE": "none (for quantified expressions)",
+            "AT": "at (for 'at least'/'at most' expressions)",
         }
 
         # Generate readable suggestions
@@ -95,6 +111,7 @@ def parsing_error_handling(expression: str, parse_func: Callable):
             context=error_context,
             line=ute.line,
             column=ute.column,
+            token_value=ute.token.value,
             suggestions=suggestions,
         )
     except UnexpectedCharacters as uce:
