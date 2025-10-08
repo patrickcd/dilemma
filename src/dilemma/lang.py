@@ -84,9 +84,17 @@ grammar = r"""
          | "false" -> false_value
          | "$now" -> now_value
          | func_call
+         | array_quantified
          | VARIABLE -> variable
          | RESOLVER_EXPR -> resolver_expression
          | "(" expr ")" -> paren
+
+    ?array_quantified: "at" "least" INTEGER "of" expr "has" RESOLVER_EXPR      -> at_least_of
+                     | "at" "most"  INTEGER "of" expr "has" RESOLVER_EXPR      -> at_most_of
+                     | "exactly"    INTEGER "of" expr "has" RESOLVER_EXPR      -> exactly_of
+                     | "any"  "of" expr "has" RESOLVER_EXPR                    -> any_of_sugar
+                     | "all"  "of" expr "has" RESOLVER_EXPR                    -> all_of_sugar
+                     | "none" "of" expr "has" RESOLVER_EXPR                    -> none_of_sugar
 
     // Define reserved keywords
     // But use string literals in rules above for "or", "and", "True", "False"
@@ -325,6 +333,37 @@ class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
             return datetime.fromisoformat(value["__datetime__"])
 
         return value
+
+    # Array quantified sugar methods
+    def at_least_of(self, items):
+        """Transform 'at least N of X has P' to count_of(X, P) >= N"""
+        n, coll, pred = int(items[0]), items[1], items[2]
+        return self.func_call([Token("FUNC_NAME", "count_of"), coll, pred]) >= n
+
+    def at_most_of(self, items):
+        """Transform 'at most N of X has P' to count_of(X, P) <= N"""
+        n, coll, pred = int(items[0]), items[1], items[2]
+        return self.func_call([Token("FUNC_NAME", "count_of"), coll, pred]) <= n
+
+    def exactly_of(self, items):
+        """Transform 'exactly N of X has P' to count_of(X, P) == N"""
+        n, coll, pred = int(items[0]), items[1], items[2]
+        return self.func_call([Token("FUNC_NAME", "count_of"), coll, pred]) == n
+
+    def any_of_sugar(self, items):
+        """Transform 'any of X has P' to any_of(X, P)"""
+        coll, pred = items[0], items[1]
+        return self.func_call([Token("FUNC_NAME", "any_of"), coll, pred])
+
+    def all_of_sugar(self, items):
+        """Transform 'all of X has P' to all_of(X, P)"""
+        coll, pred = items[0], items[1]
+        return self.func_call([Token("FUNC_NAME", "all_of"), coll, pred])
+
+    def none_of_sugar(self, items):
+        """Transform 'none of X has P' to none_of(X, P)"""
+        coll, pred = items[0], items[1]
+        return self.func_call([Token("FUNC_NAME", "none_of"), coll, pred])
 
 
 # Thread-local storage for the parser

@@ -216,6 +216,1249 @@ bar's closing_time upcoming within (bar.distance / bike.speed)  hours
 ---
   
   
+### Array Sugar Advanced  
+Real-world business logic: at least 3 orders over $100  
+  
+```  
+at least 3 of orders has `total > 100`  
+```  
+```json
+{
+  "orders": [
+    {
+      "id": "ORD001",
+      "total": 150.5,
+      "status": "completed"
+    },
+    {
+      "id": "ORD002",
+      "total": 89.99,
+      "status": "pending"
+    },
+    {
+      "id": "ORD003",
+      "total": 200.0,
+      "status": "completed"
+    },
+    {
+      "id": "ORD004",
+      "total": 125.75,
+      "status": "shipped"
+    },
+    {
+      "id": "ORD005",
+      "total": 300.0,
+      "status": "completed"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+System monitoring: at most 2 services with errors  
+  
+```  
+at most 2 of services has `error_count > 0`  
+```  
+```json
+{
+  "services": [
+    {
+      "name": "auth-service",
+      "error_count": 1,
+      "status": "degraded"
+    },
+    {
+      "name": "payment-service",
+      "error_count": 0,
+      "status": "healthy"
+    },
+    {
+      "name": "notification-service",
+      "error_count": 3,
+      "status": "critical"
+    },
+    {
+      "name": "user-service",
+      "error_count": 0,
+      "status": "healthy"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Team management: exactly 2 senior developers  
+  
+```  
+exactly 2 of team_members has `level == 'senior' and role == 'developer'`  
+```  
+```json
+{
+  "team_members": [
+    {
+      "name": "Alice",
+      "role": "developer",
+      "level": "senior",
+      "years_experience": 8
+    },
+    {
+      "name": "Bob",
+      "role": "developer",
+      "level": "junior",
+      "years_experience": 2
+    },
+    {
+      "name": "Charlie",
+      "role": "developer",
+      "level": "senior",
+      "years_experience": 12
+    },
+    {
+      "name": "Diana",
+      "role": "designer",
+      "level": "senior",
+      "years_experience": 10
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Security audit: any server has critical vulnerabilities  
+  
+```  
+any of servers has `vulnerabilities.critical > 0`  
+```  
+```json
+{
+  "servers": [
+    {
+      "hostname": "web-01",
+      "vulnerabilities": {
+        "critical": 0,
+        "high": 2,
+        "medium": 5
+      }
+    },
+    {
+      "hostname": "db-01",
+      "vulnerabilities": {
+        "critical": 1,
+        "high": 0,
+        "medium": 3
+      }
+    },
+    {
+      "hostname": "cache-01",
+      "vulnerabilities": {
+        "critical": 0,
+        "high": 1,
+        "medium": 2
+      }
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Compliance check: all departments meet data retention policies  
+  
+```  
+all of departments has `data_retention_policy.implemented == true and audit_score >= 85`  
+```  
+```json
+{
+  "departments": [
+    {
+      "name": "Finance",
+      "data_retention_policy": {
+        "implemented": true,
+        "last_updated": "2024-01-15"
+      },
+      "audit_score": 92
+    },
+    {
+      "name": "HR",
+      "data_retention_policy": {
+        "implemented": true,
+        "last_updated": "2024-02-10"
+      },
+      "audit_score": 88
+    },
+    {
+      "name": "Marketing",
+      "data_retention_policy": {
+        "implemented": false,
+        "last_updated": "2023-12-01"
+      },
+      "audit_score": 78
+    }
+  ]
+}
+```  
+`Result: False`   
+
+---
+  
+Operations: no critical alerts in the last hour  
+  
+```  
+none of alerts has `severity == 'critical' and age_minutes < 60`  
+```  
+```json
+{
+  "alerts": [
+    {
+      "id": "ALT001",
+      "severity": "warning",
+      "age_minutes": 15,
+      "message": "High CPU usage"
+    },
+    {
+      "id": "ALT002",
+      "severity": "critical",
+      "age_minutes": 45,
+      "message": "Database connection failed"
+    },
+    {
+      "id": "ALT003",
+      "severity": "info",
+      "age_minutes": 120,
+      "message": "Scheduled maintenance completed"
+    }
+  ]
+}
+```  
+`Result: False`   
+
+---
+  
+Inventory: at least 5 items low stock AND exactly 2 items out of stock  
+  
+```  
+at least 5 of products has `stock_level < 10` and exactly 2 of products has `stock_level == 0`  
+```  
+```json
+{
+  "products": [
+    {
+      "sku": "PROD001",
+      "name": "Widget A",
+      "stock_level": 5,
+      "reorder_point": 10
+    },
+    {
+      "sku": "PROD002",
+      "name": "Widget B",
+      "stock_level": 0,
+      "reorder_point": 15
+    },
+    {
+      "sku": "PROD003",
+      "name": "Widget C",
+      "stock_level": 3,
+      "reorder_point": 8
+    },
+    {
+      "sku": "PROD004",
+      "name": "Widget D",
+      "stock_level": 25,
+      "reorder_point": 20
+    },
+    {
+      "sku": "PROD005",
+      "name": "Widget E",
+      "stock_level": 0,
+      "reorder_point": 12
+    },
+    {
+      "sku": "PROD006",
+      "name": "Widget F",
+      "stock_level": 7,
+      "reorder_point": 10
+    },
+    {
+      "sku": "PROD007",
+      "name": "Widget G",
+      "stock_level": 2,
+      "reorder_point": 5
+    },
+    {
+      "sku": "PROD008",
+      "name": "Widget H",
+      "stock_level": 9,
+      "reorder_point": 15
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Performance monitoring: at most 1 service below SLA  
+  
+```  
+at most 1 of microservices has `uptime_percentage < 99.9`  
+```  
+```json
+{
+  "microservices": [
+    {
+      "name": "user-api",
+      "uptime_percentage": 99.95,
+      "response_time_ms": 45
+    },
+    {
+      "name": "payment-api",
+      "uptime_percentage": 99.87,
+      "response_time_ms": 120
+    },
+    {
+      "name": "inventory-api",
+      "uptime_percentage": 99.99,
+      "response_time_ms": 32
+    },
+    {
+      "name": "shipping-api",
+      "uptime_percentage": 99.92,
+      "response_time_ms": 78
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Analytics: exactly 3 users with high engagement  
+  
+```  
+exactly 3 of users has `session_count > 50 and avg_session_duration > 300`  
+```  
+```json
+{
+  "users": [
+    {
+      "user_id": "USR001",
+      "session_count": 75,
+      "avg_session_duration": 420,
+      "last_login": "2024-10-08"
+    },
+    {
+      "user_id": "USR002",
+      "session_count": 25,
+      "avg_session_duration": 180,
+      "last_login": "2024-10-07"
+    },
+    {
+      "user_id": "USR003",
+      "session_count": 60,
+      "avg_session_duration": 350,
+      "last_login": "2024-10-08"
+    },
+    {
+      "user_id": "USR004",
+      "session_count": 55,
+      "avg_session_duration": 310,
+      "last_login": "2024-10-08"
+    },
+    {
+      "user_id": "USR005",
+      "session_count": 40,
+      "avg_session_duration": 250,
+      "last_login": "2024-10-06"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Risk management: any portfolio exceeds risk tolerance  
+  
+```  
+any of portfolios has `risk_score > 7.5 and exposure_percentage > 0.15`  
+```  
+```json
+{
+  "portfolios": [
+    {
+      "portfolio_id": "PF001",
+      "risk_score": 6.2,
+      "exposure_percentage": 0.12,
+      "total_value": 150000
+    },
+    {
+      "portfolio_id": "PF002",
+      "risk_score": 8.1,
+      "exposure_percentage": 0.08,
+      "total_value": 250000
+    },
+    {
+      "portfolio_id": "PF003",
+      "risk_score": 5.9,
+      "exposure_percentage": 0.18,
+      "total_value": 180000
+    },
+    {
+      "portfolio_id": "PF004",
+      "risk_score": 7.3,
+      "exposure_percentage": 0.14,
+      "total_value": 220000
+    }
+  ]
+}
+```  
+`Result: False`   
+
+---
+  
+Content moderation: all posts reviewed and none flagged as spam  
+  
+```  
+all of posts has `reviewed == true` and none of posts has `flags contains 'spam'`  
+```  
+```json
+{
+  "posts": [
+    {
+      "post_id": "PST001",
+      "reviewed": true,
+      "flags": [
+        "inappropriate"
+      ],
+      "author": "user123"
+    },
+    {
+      "post_id": "PST002",
+      "reviewed": true,
+      "flags": [],
+      "author": "user456"
+    },
+    {
+      "post_id": "PST003",
+      "reviewed": false,
+      "flags": [
+        "spam"
+      ],
+      "author": "user789"
+    },
+    {
+      "post_id": "PST004",
+      "reviewed": true,
+      "flags": [
+        "spam",
+        "inappropriate"
+      ],
+      "author": "user101"
+    }
+  ]
+}
+```  
+`Result: False`   
+
+---
+  
+Auto-scaling: at least 2 nodes with high CPU and exactly 1 with low memory  
+  
+```  
+at least 2 of nodes has `cpu_usage > 85` and exactly 1 of nodes has `memory_usage < 20`  
+```  
+```json
+{
+  "nodes": [
+    {
+      "node_id": "NODE001",
+      "cpu_usage": 92,
+      "memory_usage": 45,
+      "disk_usage": 67
+    },
+    {
+      "node_id": "NODE002",
+      "cpu_usage": 78,
+      "memory_usage": 15,
+      "disk_usage": 82
+    },
+    {
+      "node_id": "NODE003",
+      "cpu_usage": 89,
+      "memory_usage": 56,
+      "disk_usage": 34
+    },
+    {
+      "node_id": "NODE004",
+      "cpu_usage": 65,
+      "memory_usage": 78,
+      "disk_usage": 91
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+QA pipeline: none of test suites have failing tests  
+  
+```  
+none of test_suites has `failed_tests > 0 or test_coverage < 80`  
+```  
+```json
+{
+  "test_suites": [
+    {
+      "name": "unit_tests",
+      "passed_tests": 245,
+      "failed_tests": 0,
+      "test_coverage": 94.5
+    },
+    {
+      "name": "integration_tests",
+      "passed_tests": 78,
+      "failed_tests": 0,
+      "test_coverage": 87.2
+    },
+    {
+      "name": "e2e_tests",
+      "passed_tests": 32,
+      "failed_tests": 0,
+      "test_coverage": 82.1
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Customer success: at most 3 customers with low satisfaction  
+  
+```  
+at most 3 of customers has `satisfaction_score < 7 and support_tickets > 5`  
+```  
+```json
+{
+  "customers": [
+    {
+      "customer_id": "CUST001",
+      "satisfaction_score": 8.5,
+      "support_tickets": 2,
+      "churn_risk": false
+    },
+    {
+      "customer_id": "CUST002",
+      "satisfaction_score": 6.2,
+      "support_tickets": 8,
+      "churn_risk": true
+    },
+    {
+      "customer_id": "CUST003",
+      "satisfaction_score": 9.1,
+      "support_tickets": 1,
+      "churn_risk": false
+    },
+    {
+      "customer_id": "CUST004",
+      "satisfaction_score": 5.8,
+      "support_tickets": 12,
+      "churn_risk": true
+    },
+    {
+      "customer_id": "CUST005",
+      "satisfaction_score": 7.9,
+      "support_tickets": 3,
+      "churn_risk": false
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+DevOps: all environments healthy and exactly 0 with pending deployments  
+  
+```  
+all of environments has `health_status == 'green'` and exactly 0 of environments has `pending_deployments > 0`  
+```  
+```json
+{
+  "environments": [
+    {
+      "name": "development",
+      "health_status": "green",
+      "pending_deployments": 0,
+      "last_deployment": "2024-10-08T10:30:00Z"
+    },
+    {
+      "name": "staging",
+      "health_status": "green",
+      "pending_deployments": 0,
+      "last_deployment": "2024-10-08T09:15:00Z"
+    },
+    {
+      "name": "production",
+      "health_status": "green",
+      "pending_deployments": 0,
+      "last_deployment": "2024-10-07T14:45:00Z"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+  
+### Array Sugar Combined  
+Combine array sugar with string pattern matching  
+  
+```  
+at least 2 of files has `name like '*.pdf'` and any of files has `name like '*.doc'`  
+```  
+```json
+{
+  "files": [
+    {
+      "name": "report.pdf",
+      "size": 1024
+    },
+    {
+      "name": "manual.pdf",
+      "size": 2048
+    },
+    {
+      "name": "notes.doc",
+      "size": 512
+    },
+    {
+      "name": "image.jpg",
+      "size": 256
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Combine array sugar with date state checking  
+  
+```  
+exactly 2 of events has `date is $past` and none of events has `date is $future`  
+```  
+```json
+{
+  "events": [
+    {
+      "name": "Conference",
+      "date": "2025-10-07 22:06:45 UTC"
+    },
+    {
+      "name": "Meeting",
+      "date": "2025-10-09 22:06:45 UTC"
+    },
+    {
+      "name": "Workshop",
+      "date": "2025-10-01 22:06:45 UTC"
+    }
+  ]
+}
+```  
+`Result: False`   
+
+---
+  
+Array sugar with date time windows  
+  
+```  
+at least 1 of tasks has `due_date upcoming within 24 hours`  
+```  
+```json
+{
+  "tasks": [
+    {
+      "title": "Review PR",
+      "due_date": "2025-10-08 21:06:45 UTC"
+    },
+    {
+      "title": "Write tests",
+      "due_date": "2025-10-09 22:06:45 UTC"
+    },
+    {
+      "title": "Deploy",
+      "due_date": "2025-10-01 22:06:45 UTC"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Array sugar with nested object string operations  
+  
+```  
+any of users has `profile.email like '*@company.com'` and all of users has `status != 'inactive'`  
+```  
+```json
+{
+  "users": [
+    {
+      "name": "Alice",
+      "profile": {
+        "email": "alice@company.com"
+      },
+      "status": "active"
+    },
+    {
+      "name": "Bob",
+      "profile": {
+        "email": "bob@external.org"
+      },
+      "status": "active"
+    },
+    {
+      "name": "Charlie",
+      "profile": {
+        "email": "charlie@company.com"
+      },
+      "status": "pending"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Array sugar with possessive syntax  
+  
+```  
+exactly 1 of employees has `manager's department == 'Engineering'`  
+```  
+```json
+{
+  "employees": [
+    {
+      "name": "Alice",
+      "manager": {
+        "name": "Sarah",
+        "department": "Engineering"
+      }
+    },
+    {
+      "name": "Bob",
+      "manager": {
+        "name": "Mike",
+        "department": "Marketing"
+      }
+    },
+    {
+      "name": "Charlie",
+      "manager": {
+        "name": "Lisa",
+        "department": "Sales"
+      }
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Complex string conditions in array sugar  
+  
+```  
+at most 2 of products has `name like '*Pro*' and category == 'Software'`  
+```  
+```json
+{
+  "products": [
+    {
+      "name": "Video Pro",
+      "category": "Software",
+      "price": 299
+    },
+    {
+      "name": "Audio Pro",
+      "category": "Software",
+      "price": 199
+    },
+    {
+      "name": "Design Pro",
+      "category": "Hardware",
+      "price": 399
+    },
+    {
+      "name": "Basic Editor",
+      "category": "Software",
+      "price": 99
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Array sugar with date before/after comparisons  
+  
+```  
+all of projects has `start_date before end_date` and at least 1 of projects has `end_date after '2024-12-01'`  
+```  
+```json
+{
+  "projects": [
+    {
+      "name": "Project Alpha",
+      "start_date": "2024-10-01",
+      "end_date": "2024-12-15"
+    },
+    {
+      "name": "Project Beta",
+      "start_date": "2024-09-15",
+      "end_date": "2024-11-30"
+    },
+    {
+      "name": "Project Gamma",
+      "start_date": "2024-11-01",
+      "end_date": "2025-01-15"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Array sugar with same day date comparisons  
+  
+```  
+exactly 2 of meetings has `start_time same_day_as end_time`  
+```  
+```json
+{
+  "meetings": [
+    {
+      "title": "Standup",
+      "start_time": "2024-10-08T09:00:00Z",
+      "end_time": "2024-10-08T09:30:00Z"
+    },
+    {
+      "title": "Planning",
+      "start_time": "2024-10-08T14:00:00Z",
+      "end_time": "2024-10-09T10:00:00Z"
+    },
+    {
+      "title": "Review",
+      "start_time": "2024-10-07T15:00:00Z",
+      "end_time": "2024-10-07T16:00:00Z"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Array sugar with older than time comparisons  
+  
+```  
+none of logs has `timestamp older than 1 hour`  
+```  
+```json
+{
+  "logs": [
+    {
+      "message": "System started",
+      "timestamp": "2025-10-08 21:06:45 UTC"
+    },
+    {
+      "message": "User login",
+      "timestamp": "2025-10-08 22:06:45 UTC"
+    },
+    {
+      "message": "Data processed",
+      "timestamp": "2025-10-07 22:06:45 UTC"
+    }
+  ]
+}
+```  
+`Result: False`   
+
+---
+  
+Combine string contains with date operations  
+  
+```  
+any of alerts has `'Critical' in message and created_at is $past`  
+```  
+```json
+{
+  "alerts": [
+    {
+      "id": 1,
+      "message": "Critical system failure detected",
+      "created_at": "2025-10-07 22:06:45 UTC"
+    },
+    {
+      "id": 2,
+      "message": "Warning: high memory usage",
+      "created_at": "2025-10-08 22:06:45 UTC"
+    },
+    {
+      "id": 3,
+      "message": "Info: backup completed",
+      "created_at": "2025-10-09 22:06:45 UTC"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Array sugar with negated pattern matching  
+  
+```  
+all of documents has `filename not like '*.tmp'` and at least 3 of documents has `filename like '*.pdf'`  
+```  
+```json
+{
+  "documents": [
+    {
+      "filename": "report.pdf",
+      "size": 1024
+    },
+    {
+      "filename": "manual.pdf",
+      "size": 2048
+    },
+    {
+      "filename": "guide.pdf",
+      "size": 1536
+    },
+    {
+      "filename": "notes.txt",
+      "size": 256
+    },
+    {
+      "filename": "data.csv",
+      "size": 512
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Array sugar with literal date strings  
+  
+```  
+exactly 2 of milestones has `target_date before '2025-01-01'` and none of milestones has `target_date before '2024-01-01'`  
+```  
+```json
+{
+  "milestones": [
+    {
+      "name": "Beta Release",
+      "target_date": "2024-11-15"
+    },
+    {
+      "name": "GA Release",
+      "target_date": "2025-02-01"
+    },
+    {
+      "name": "Feature Freeze",
+      "target_date": "2024-12-01"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Complex nested conditions combining multiple features  
+  
+```  
+at least 2 of orders has `customer's profile.tier == 'Premium' and total > 100 and created_date is $past`  
+```  
+```json
+{
+  "orders": [
+    {
+      "id": "ORD001",
+      "total": 150,
+      "created_date": "2025-10-07 22:06:45 UTC",
+      "customer": {
+        "name": "Alice",
+        "profile": {
+          "tier": "Premium"
+        }
+      }
+    },
+    {
+      "id": "ORD002",
+      "total": 250,
+      "created_date": "2025-10-07 22:06:45 UTC",
+      "customer": {
+        "name": "Bob",
+        "profile": {
+          "tier": "Premium"
+        }
+      }
+    },
+    {
+      "id": "ORD003",
+      "total": 50,
+      "created_date": "2025-10-07 22:06:45 UTC",
+      "customer": {
+        "name": "Charlie",
+        "profile": {
+          "tier": "Basic"
+        }
+      }
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Mix string equality and pattern matching in array sugar  
+  
+```  
+any of files has `type == 'document' and name like '*.pdf'` and none of files has `type == 'image' and name like '*.pdf'`  
+```  
+```json
+{
+  "files": [
+    {
+      "name": "report.pdf",
+      "type": "document"
+    },
+    {
+      "name": "photo.jpg",
+      "type": "image"
+    },
+    {
+      "name": "manual.pdf",
+      "type": "document"
+    },
+    {
+      "name": "chart.png",
+      "type": "image"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Combine date ranges with string operations  
+  
+```  
+all of events has `start_date before end_date` and exactly 1 of events has `title like '*Workshop*'`  
+```  
+```json
+{
+  "events": [
+    {
+      "title": "Team Workshop",
+      "start_date": "2024-10-10",
+      "end_date": "2024-10-11"
+    },
+    {
+      "title": "Product Launch",
+      "start_date": "2024-11-01",
+      "end_date": "2024-11-02"
+    },
+    {
+      "title": "Training Session",
+      "start_date": "2024-12-01",
+      "end_date": "2024-12-03"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Combine upcoming within time windows with string matching  
+  
+```  
+at most 1 of tasks has `deadline upcoming within 7 days and priority == 'high'`  
+```  
+```json
+{
+  "tasks": [
+    {
+      "title": "Fix critical bug",
+      "deadline": "2025-10-08 21:06:45 UTC",
+      "priority": "high"
+    },
+    {
+      "title": "Update documentation",
+      "deadline": "2025-10-09 22:06:45 UTC",
+      "priority": "medium"
+    },
+    {
+      "title": "Review code",
+      "deadline": "2025-10-01 22:06:45 UTC",
+      "priority": "low"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Combine arithmetic operations with date comparisons in array sugar  
+  
+```  
+exactly 2 of products has `price > 100 and launch_date is $past`  
+```  
+```json
+{
+  "products": [
+    {
+      "name": "Premium Widget",
+      "price": 150,
+      "launch_date": "2025-10-07 22:06:45 UTC"
+    },
+    {
+      "name": "Basic Widget",
+      "price": 50,
+      "launch_date": "2025-10-07 22:06:45 UTC"
+    },
+    {
+      "name": "Pro Widget",
+      "price": 200,
+      "launch_date": "2025-10-01 22:06:45 UTC"
+    },
+    {
+      "name": "Future Widget",
+      "price": 300,
+      "launch_date": "2025-10-09 22:06:45 UTC"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Multiple different time comparison types in one expression  
+  
+```  
+any of events has `start_time is $today` and all of events has `end_time after start_time` and none of events has `duration older than 1 year`  
+```  
+```json
+{
+  "events": [
+    {
+      "name": "Daily Standup",
+      "start_time": "2025-10-08 22:06:45 UTC",
+      "end_time": "2025-10-09 22:06:45 UTC",
+      "duration": "2025-09-01"
+    },
+    {
+      "name": "Weekly Review",
+      "start_time": "2025-10-07 22:06:45 UTC",
+      "end_time": "2025-10-09 22:06:45 UTC",
+      "duration": "2025-08-01"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Case insensitive pattern matching in array sugar  
+  
+```  
+at least 2 of files has `extension like '*.PDF'` and exactly 1 of files has `name like '*REPORT*'`  
+```  
+```json
+{
+  "files": [
+    {
+      "name": "annual_report.pdf",
+      "extension": ".pdf"
+    },
+    {
+      "name": "monthly_summary.pdf",
+      "extension": ".pdf"
+    },
+    {
+      "name": "notes.txt",
+      "extension": ".txt"
+    },
+    {
+      "name": "data.csv",
+      "extension": ".csv"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Complex boolean combinations with array sugar and basic operations  
+  
+```  
+(at least 1 of users has `status == 'active'`) and (none of users has `last_login older than 30 days`) or (all of users has `role != 'admin'`)  
+```  
+```json
+{
+  "users": [
+    {
+      "name": "Alice",
+      "status": "active",
+      "last_login": "2025-10-07 22:06:45 UTC",
+      "role": "user"
+    },
+    {
+      "name": "Bob",
+      "status": "inactive",
+      "last_login": "2025-10-08 21:06:45 UTC",
+      "role": "user"
+    },
+    {
+      "name": "Charlie",
+      "status": "active",
+      "last_login": "2025-10-08 22:06:45 UTC",
+      "role": "moderator"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+  
 ### Maths  
 Multiply two integers  
   
@@ -290,7 +1533,7 @@ past_date is $past
 ```  
 ```json
 {
-  "past_date": "2025-10-07 20:51:29 UTC"
+  "past_date": "2025-10-07 22:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -304,7 +1547,7 @@ future_date is $future
 ```  
 ```json
 {
-  "future_date": "2025-10-09 20:51:29 UTC"
+  "future_date": "2025-10-09 22:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -318,7 +1561,7 @@ today_date is $today
 ```  
 ```json
 {
-  "today_date": "2025-10-08 20:51:29 UTC"
+  "today_date": "2025-10-08 22:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -334,7 +1577,7 @@ recent_event upcoming within 12 hours
 ```  
 ```json
 {
-  "recent_event": "2025-10-08 19:51:29 UTC"
+  "recent_event": "2025-10-08 21:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -348,7 +1591,7 @@ old_event older than 1 week
 ```  
 ```json
 {
-  "old_event": "2025-10-01 20:51:29 UTC"
+  "old_event": "2025-10-01 22:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -364,8 +1607,8 @@ start_date before end_date
 ```  
 ```json
 {
-  "start_date": "2025-10-07 20:51:29 UTC",
-  "end_date": "2025-10-09 20:51:29 UTC"
+  "start_date": "2025-10-07 22:06:45 UTC",
+  "end_date": "2025-10-09 22:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -379,8 +1622,8 @@ end_date after start_date
 ```  
 ```json
 {
-  "start_date": "2025-10-07 20:51:29 UTC",
-  "end_date": "2025-10-09 20:51:29 UTC"
+  "start_date": "2025-10-07 22:06:45 UTC",
+  "end_date": "2025-10-09 22:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -426,8 +1669,8 @@ project_start is $past and project_end is $future
 ```  
 ```json
 {
-  "project_start": "2025-10-07 20:51:29 UTC",
-  "project_end": "2025-10-09 20:51:29 UTC"
+  "project_start": "2025-10-07 22:06:45 UTC",
+  "project_end": "2025-10-09 22:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -441,8 +1684,8 @@ last_login upcoming within 4 hours and signup_date older than 1 day
 ```  
 ```json
 {
-  "last_login": "2025-10-08 19:51:29 UTC",
-  "signup_date": "2025-10-07 20:51:29 UTC"
+  "last_login": "2025-10-08 21:06:45 UTC",
+  "signup_date": "2025-10-07 22:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -492,7 +1735,7 @@ hour_ago upcoming within 2 hours
 ```  
 ```json
 {
-  "hour_ago": "2025-10-08 19:51:29 UTC"
+  "hour_ago": "2025-10-08 21:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -506,7 +1749,7 @@ hour_ago upcoming within 120 minutes
 ```  
 ```json
 {
-  "hour_ago": "2025-10-08 19:51:29 UTC"
+  "hour_ago": "2025-10-08 21:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -520,7 +1763,7 @@ week_ago older than 6 days
 ```  
 ```json
 {
-  "week_ago": "2025-10-01 20:51:29 UTC"
+  "week_ago": "2025-10-01 22:06:45 UTC"
 }
 ```  
 `Result: True`   
@@ -1027,11 +2270,11 @@ user.account.is_active and (user.subscription.level == 'premium' or user.account
     "account": {
       "is_active": true,
       "credits": 150,
-      "created_at": "2025-10-01 20:51:29 UTC"
+      "created_at": "2025-10-01 22:06:45 UTC"
     },
     "subscription": {
       "level": "basic",
-      "renewal_date": "2025-11-07 20:51:29 UTC"
+      "renewal_date": "2025-11-07 22:06:45 UTC"
     }
   }
 }
@@ -1054,8 +2297,8 @@ and (
 {
   "project": {
     "status": "in_progress",
-    "start_date": "2025-10-01 20:51:29 UTC",
-    "deadline": "2025-11-07 20:51:29 UTC",
+    "start_date": "2025-10-01 22:06:45 UTC",
+    "deadline": "2025-11-07 22:06:45 UTC",
     "metrics": {
       "completion": 45,
       "quality": 98
@@ -1089,7 +2332,7 @@ and (
 {
   "order": {
     "status": "confirmed",
-    "created_at": "2025-10-08 19:51:29 UTC",
+    "created_at": "2025-10-08 21:06:45 UTC",
     "items": {
       "count": 7,
       "categories": [
@@ -1099,7 +2342,7 @@ and (
     },
     "customer": {
       "tier": "gold",
-      "since": "2025-10-01 20:51:29 UTC"
+      "since": "2025-10-01 22:06:45 UTC"
     },
     "total_value": 250
   }
@@ -1123,15 +2366,15 @@ and (
 ```json
 {
   "user": {
-    "last_login": "2025-10-01 20:51:29 UTC",
+    "last_login": "2025-10-01 22:06:45 UTC",
     "auto_login": true,
     "registration_date": "2023-01-15",
     "account": {
-      "trial_ends": "2025-10-07 20:51:29 UTC",
+      "trial_ends": "2025-10-07 22:06:45 UTC",
       "subscription": {
         "status": "active",
         "plan": "premium",
-        "next_payment": "2025-11-07 20:51:29 UTC"
+        "next_payment": "2025-11-07 22:06:45 UTC"
       }
     }
   }
@@ -1164,7 +2407,7 @@ and ('admin' in user.roles or user.tasks.pending > 0)
       },
       "theme": "dark"
     },
-    "last_seen": "2025-10-01 20:51:29 UTC",
+    "last_seen": "2025-10-01 22:06:45 UTC",
     "preferences": {
       "urgent_only": false,
       "language": "en"
@@ -1329,7 +2572,7 @@ Combine JQ with regular Dilemma expressions
   "user": {
     "membership": {
       "level": "gold",
-      "since": "2025-10-01 20:51:29 UTC"
+      "since": "2025-10-01 22:06:45 UTC"
     },
     "account": {
       "active": true,
@@ -1520,15 +2763,15 @@ Use JQ to extract a date for comparison
     "milestones": [
       {
         "name": "alpha",
-        "date": "2025-11-07 20:51:29 UTC"
+        "date": "2025-11-07 22:06:45 UTC"
       },
       {
         "name": "beta",
-        "date": "2025-10-07 20:51:29 UTC"
+        "date": "2025-10-07 22:06:45 UTC"
       },
       {
         "name": "release",
-        "date": "2025-10-08 22:51:29 UTC"
+        "date": "2025-10-09 00:06:45 UTC"
       }
     ]
   }
@@ -2005,6 +3248,416 @@ count_of(empty_list) == 0 and any_of(empty_list) == false and all_of(empty_list)
 ```json
 {
   "empty_list": []
+}
+```  
+`Result: True`   
+
+---
+  
+  
+### Array Sugar  
+Test &#x27;at least N of X has predicate&#x27; natural language sugar  
+  
+```  
+at least 2 of users has `age >= 25`  
+```  
+```json
+{
+  "users": [
+    {
+      "name": "Alice",
+      "age": 25
+    },
+    {
+      "name": "Bob",
+      "age": 30
+    },
+    {
+      "name": "Charlie",
+      "age": 20
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test &#x27;at most N of X has predicate&#x27; natural language sugar  
+  
+```  
+at most 1 of products has `price > 100`  
+```  
+```json
+{
+  "products": [
+    {
+      "name": "Widget A",
+      "price": 50
+    },
+    {
+      "name": "Widget B",
+      "price": 150
+    },
+    {
+      "name": "Widget C",
+      "price": 75
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test &#x27;exactly N of X has predicate&#x27; natural language sugar  
+  
+```  
+exactly 2 of employees has `department == 'Engineering'`  
+```  
+```json
+{
+  "employees": [
+    {
+      "name": "Alice",
+      "department": "Engineering"
+    },
+    {
+      "name": "Bob",
+      "department": "Marketing"
+    },
+    {
+      "name": "Charlie",
+      "department": "Engineering"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test &#x27;any of X has predicate&#x27; natural language sugar  
+  
+```  
+any of tasks has `status == 'urgent'`  
+```  
+```json
+{
+  "tasks": [
+    {
+      "id": 1,
+      "status": "normal"
+    },
+    {
+      "id": 2,
+      "status": "urgent"
+    },
+    {
+      "id": 3,
+      "status": "low"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test &#x27;all of X has predicate&#x27; natural language sugar  
+  
+```  
+all of orders has `paid == true`  
+```  
+```json
+{
+  "orders": [
+    {
+      "id": 1,
+      "paid": true
+    },
+    {
+      "id": 2,
+      "paid": false
+    },
+    {
+      "id": 3,
+      "paid": true
+    }
+  ]
+}
+```  
+`Result: False`   
+
+---
+  
+Test &#x27;none of X has predicate&#x27; natural language sugar  
+  
+```  
+none of items has `defective == true`  
+```  
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "defective": false
+    },
+    {
+      "id": 2,
+      "defective": false
+    },
+    {
+      "id": 3,
+      "defective": false
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test sugar with complex boolean predicates  
+  
+```  
+at least 1 of users has `age > 21 and active == true`  
+```  
+```json
+{
+  "users": [
+    {
+      "name": "Alice",
+      "age": 25,
+      "active": true
+    },
+    {
+      "name": "Bob",
+      "age": 18,
+      "active": true
+    },
+    {
+      "name": "Charlie",
+      "age": 30,
+      "active": false
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test sugar combined with logical operators  
+  
+```  
+exactly 2 of team has `role == 'developer'` and any of team has `role == 'lead'`  
+```  
+```json
+{
+  "team": [
+    {
+      "name": "Alice",
+      "role": "lead"
+    },
+    {
+      "name": "Bob",
+      "role": "developer"
+    },
+    {
+      "name": "Charlie",
+      "role": "developer"
+    },
+    {
+      "name": "David",
+      "role": "designer"
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test sugar with string pattern matching  
+  
+```  
+at least 2 of files has `name like '*.txt'`  
+```  
+```json
+{
+  "files": [
+    {
+      "name": "document.txt",
+      "size": 1024
+    },
+    {
+      "name": "readme.txt",
+      "size": 512
+    },
+    {
+      "name": "image.jpg",
+      "size": 2048
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test sugar with nested object property access  
+  
+```  
+exactly 1 of projects has `team.size > 5`  
+```  
+```json
+{
+  "projects": [
+    {
+      "name": "Project A",
+      "team": {
+        "size": 3,
+        "lead": "Alice"
+      }
+    },
+    {
+      "name": "Project B",
+      "team": {
+        "size": 7,
+        "lead": "Bob"
+      }
+    },
+    {
+      "name": "Project C",
+      "team": {
+        "size": 4,
+        "lead": "Charlie"
+      }
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test sugar expressions that should count zero  
+  
+```  
+exactly 0 of users has `age > 100` and none of users has `name == 'Nobody'`  
+```  
+```json
+{
+  "users": [
+    {
+      "name": "Alice",
+      "age": 25
+    },
+    {
+      "name": "Bob",
+      "age": 30
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test sugar with empty collections  
+  
+```  
+exactly 0 of empty_list has `value > 0` and all of empty_list has `value < 1000`  
+```  
+```json
+{
+  "empty_list": []
+}
+```  
+`Result: True`   
+
+---
+  
+Test using sugar result in comparisons  
+  
+```  
+exactly 3 of scores has `points > 80` == true  
+```  
+```json
+{
+  "scores": [
+    {
+      "player": "Alice",
+      "points": 95
+    },
+    {
+      "player": "Bob",
+      "points": 72
+    },
+    {
+      "player": "Charlie",
+      "points": 88
+    },
+    {
+      "player": "David",
+      "points": 91
+    }
+  ]
+}
+```  
+`Result: True`   
+
+---
+  
+Test sugar in arithmetic context (boolean to number conversion)  
+  
+```  
+at least 1 of items has `value > 5` + 2  
+```  
+```json
+{
+  "items": [
+    {
+      "value": 10
+    },
+    {
+      "value": 2
+    },
+    {
+      "value": 8
+    }
+  ]
+}
+```  
+`Result: 3`   
+
+---
+  
+Test multiple sugar conditions in one expression  
+  
+```  
+at least 2 of users has `active == true` and at most 1 of users has `role == 'admin'`  
+```  
+```json
+{
+  "users": [
+    {
+      "name": "Alice",
+      "active": true,
+      "role": "user"
+    },
+    {
+      "name": "Bob",
+      "active": true,
+      "role": "admin"
+    },
+    {
+      "name": "Charlie",
+      "active": false,
+      "role": "user"
+    }
+  ]
 }
 ```  
 `Result: True`   
