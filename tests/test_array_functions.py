@@ -55,9 +55,9 @@ class TestArrayFunctions:
         }
         
         assert evaluate('any_of(items, `status == "active"`)', context) == True
-        assert evaluate('any_of(items, `status == "deleted"`)', context) == False
+        assert evaluate('any_of(items, `status == "deleted"`)', context) is False
         assert evaluate('any_of(items, `priority > 2`)', context) == True
-        assert evaluate('any_of(items, `priority > 5`)', context) == False
+        assert evaluate('any_of(items, `priority > 5`)', context) is False
 
     def test_any_of_without_condition(self):
         """Test any_of without condition (check if any item is truthy)"""
@@ -71,9 +71,9 @@ class TestArrayFunctions:
         
         assert evaluate('any_of(all_true)', context) == True
         assert evaluate('any_of(mixed_true)', context) == True
-        assert evaluate('any_of(all_false)', context) == False
+        assert evaluate('any_of(all_false)', context) is False
         assert evaluate('any_of(mixed_values)', context) == True  # "hello" is truthy
-        assert evaluate('any_of(empty)', context) == False
+        assert evaluate('any_of(empty)', context) is False
 
     def test_all_of_with_condition(self):
         """Test all_of with various conditions"""
@@ -86,8 +86,8 @@ class TestArrayFunctions:
         }
         
         assert evaluate('all_of(products, `price > 0`)', context) == True
-        assert evaluate('all_of(products, `price > 10`)', context) == False
-        assert evaluate('all_of(products, `in_stock`)', context) == False
+        assert evaluate('all_of(products, `price > 10`)', context) is False
+        assert evaluate('all_of(products, `in_stock`)', context) is False
 
     def test_all_of_without_condition(self):
         """Test all_of without condition (check if all items are truthy)"""
@@ -99,8 +99,8 @@ class TestArrayFunctions:
         }
         
         assert evaluate('all_of(all_true)', context) == True
-        assert evaluate('all_of(with_false)', context) == False
-        assert evaluate('all_of(with_zero)', context) == False
+        assert evaluate('all_of(with_false)', context) is False
+        assert evaluate('all_of(with_zero)', context) is False
         assert evaluate('all_of(empty)', context) == True  # All of empty is vacuously true
 
     def test_none_of_with_condition(self):
@@ -114,7 +114,7 @@ class TestArrayFunctions:
         }
         
         assert evaluate('none_of(employees, `salary > 100000`)', context) == True
-        assert evaluate('none_of(employees, `salary > 50000`)', context) == False
+        assert evaluate('none_of(employees, `salary > 50000`)', context) is False
         assert evaluate('none_of(employees, `department == "hr"`)', context) == True
 
     def test_none_of_without_condition(self):
@@ -126,7 +126,7 @@ class TestArrayFunctions:
         }
         
         assert evaluate('none_of(all_false)', context) == True
-        assert evaluate('none_of(with_true)', context) == False
+        assert evaluate('none_of(with_true)', context) is False
         assert evaluate('none_of(empty)', context) == True  # None of empty is vacuously true
 
     def test_function_with_non_list_arguments(self):

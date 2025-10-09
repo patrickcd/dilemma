@@ -22,7 +22,7 @@ class TestArraySugar:
         assert evaluate('at least 3 of users has `age > 25`', context) == False  # Only 2 users
         assert evaluate('at least 3 of users has `active`', context) == True  # 3 active users
         assert evaluate('at least 1 of users has `name == "Alice"`', context) == True
-        assert evaluate('at least 2 of users has `name == "Alice"`', context) == False
+        assert evaluate('at least 2 of users has `name == "Alice"`', context) is False
 
     def test_at_most_of_sugar(self):
         """Test 'at most N of X has predicate' sugar"""
@@ -55,7 +55,7 @@ class TestArraySugar:
         
         # Test various "exactly" conditions
         assert evaluate('exactly 2 of employees has `department == "Engineering"`', context) == True
-        assert evaluate('exactly 1 of employees has `department == "Engineering"`', context) == False
+        assert evaluate('exactly 1 of employees has `department == "Engineering"`', context) is False
         assert evaluate('exactly 1 of employees has `department == "Marketing"`', context) == True
         assert evaluate('exactly 4 of employees has `salary > 0`', context) == True
         assert evaluate('exactly 0 of employees has `salary > 100000`', context) == True
@@ -72,10 +72,10 @@ class TestArraySugar:
         
         # Test various "any of" conditions
         assert evaluate('any of tasks has `status == "active"`', context) == True
-        assert evaluate('any of tasks has `status == "deleted"`', context) == False
+        assert evaluate('any of tasks has `status == "deleted"`', context) is False
         assert evaluate('any of tasks has `completed`', context) == True
         assert evaluate('any of tasks has `priority > 2`', context) == True
-        assert evaluate('any of tasks has `priority > 5`', context) == False
+        assert evaluate('any of tasks has `priority > 5`', context) is False
 
     def test_all_of_sugar(self):
         """Test 'all of X has predicate' sugar"""
@@ -90,11 +90,11 @@ class TestArraySugar:
         # Test various "all of" conditions
         assert evaluate('all of orders has `paid`', context) == True
         assert evaluate('all of orders has `total > 0`', context) == True
-        assert evaluate('all of orders has `total > 60`', context) == False
+        assert evaluate('all of orders has `total > 60`', context) is False
         
         # Test with one false case
         context['orders'][1]['paid'] = False
-        assert evaluate('all of orders has `paid`', context) == False
+        assert evaluate('all of orders has `paid`', context) is False
 
     def test_none_of_sugar(self):
         """Test 'none of X has predicate' sugar"""
@@ -109,11 +109,11 @@ class TestArraySugar:
         # Test various "none of" conditions
         assert evaluate('none of items has `defective`', context) == True
         assert evaluate('none of items has `category == "furniture"`', context) == True
-        assert evaluate('none of items has `category == "electronics"`', context) == False
+        assert evaluate('none of items has `category == "electronics"`', context) is False
         
         # Test with one true case
         context['items'][0]['defective'] = True
-        assert evaluate('none of items has `defective`', context) == False
+        assert evaluate('none of items has `defective`', context) is False
 
     def test_sugar_in_complex_expressions(self):
         """Test sugar syntax in complex boolean expressions"""
@@ -184,9 +184,9 @@ class TestArraySugar:
         
         # Empty list cases
         assert evaluate('exactly 0 of empty_list has `value > 0`', context) == True
-        assert evaluate('at least 1 of empty_list has `value > 0`', context) == False
+        assert evaluate('at least 1 of empty_list has `value > 0`', context) is False
         assert evaluate('at most 0 of empty_list has `value > 0`', context) == True
-        assert evaluate('any of empty_list has `value > 0`', context) == False
+        assert evaluate('any of empty_list has `value > 0`', context) is False
         assert evaluate('all of empty_list has `value > 0`', context) == True  # Vacuously true
         assert evaluate('none of empty_list has `value > 0`', context) == True
         

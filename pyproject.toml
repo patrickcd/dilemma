@@ -123,7 +123,7 @@ directory = "reports"
 
 [tool.ruff]
 target-version = "py312"
-extend-exclude = ["docs", "test", "tests"]
+extend-exclude = ["docs"]
 line-length = 90
 
 [tool.ruff.lint]
@@ -163,7 +163,7 @@ disallow_untyped_defs = false  # Too strict for transformer patterns
 disallow_incomplete_defs = false  # Too strict
 check_untyped_defs = false  # Too strict
 disallow_untyped_decorators = false  # Issues with @binary_op
-no_implicit_optional = true  
+no_implicit_optional = true
 warn_redundant_casts = true
 warn_no_return = true
 warn_unreachable = true
@@ -184,7 +184,7 @@ exclude = [
 [[tool.mypy.overrides]]
 module = [
     "jsonpath_ng",
-    "jsonpath_ng.ext", 
+    "jsonpath_ng.ext",
     "jq",
     "lark",
     "lark.visitors",
@@ -192,6 +192,9 @@ module = [
     "aiohttp",  # Add this
 ]
 ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = ["tests"]
 
 [tool.uv.sources]
 python-markdown-generator = { git = "https://github.com/Nicceboy/python-markdown-generator" }
@@ -201,5 +204,3 @@ dev = [
     "python-markdown-generator",
     "twine>=6.1.0",
 ]
-
-
