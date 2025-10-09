@@ -108,15 +108,60 @@ For more complex data access, JQ-style expressions are supported:
 - Syntax: `` `expression` ``
 - Allows querying complex JSON structures
 
+## Array Operations and Quantifiers
+
+The language provides powerful array operations for evaluating conditions across collections of data.
+
+### Array Functions
+
+These functions operate on arrays and return numerical or boolean results:
+
+- `count_of(array)`: Returns the total number of items in the array
+- `count_of(array, condition)`: Returns the count of items that satisfy the condition
+- `any_of(array, condition)`: Returns `true` if any item satisfies the condition
+- `all_of(array, condition)`: Returns `true` if all items satisfy the condition
+- `none_of(array, condition)`: Returns `true` if no items satisfy the condition
+
+### Array Sugar Syntax (Human-Friendly Quantifiers)
+
+For more readable expressions, the language supports natural language quantifiers:
+
+#### Exact Quantity
+- `exactly N of array has condition`: True if exactly N items satisfy the condition
+
+#### Minimum Quantity
+- `at least N of array has condition`: True if N or more items satisfy the condition
+
+#### Maximum Quantity
+- `at most N of array has condition`: True if N or fewer items satisfy the condition
+
+#### Convenience Quantifiers
+- `any of array has condition`: Equivalent to `any_of(array, condition)`
+- `all of array has condition`: Equivalent to `all_of(array, condition)`
+- `none of array has condition`: Equivalent to `none_of(array, condition)`
+
+### Array Condition Syntax
+
+Array conditions are specified using JQ-style backtick expressions that are evaluated against each item in the array:
+
+```
+`property > value`
+`nested.property == "string"`
+`status in ["active", "pending"]`
+```
+
+
+
 ## Operator Precedence
 
 Operators follow standard precedence rules:
 1. Parentheses `()`
-2. Multiplication, division `*`, `/`
-3. Addition, subtraction `+`, `-`
-4. Comparison operators `==`, `!=`, `<`, `>`, `<=`, `>=`, etc.
-5. Logical AND `and`
-6. Logical OR `or`
+2. Array functions and quantifiers (`count_of`, `any_of`, `at least`, etc.)
+3. Multiplication, division `*`, `/`
+4. Addition, subtraction `+`, `-`
+5. Comparison operators `==`, `!=`, `<`, `>`, `<=`, `>=`, etc.
+6. Logical AND `and`
+7. Logical OR `or`
 
 ## Examples
 
@@ -146,6 +191,18 @@ Here are some examples of Dilemma Expression Language usage:
   ```
   Evaluates to `true` if `fruits` is a list that contains `"apple"`.
 
+- Array quantification:
+  ```
+  at least 3 of orders has `total > 100`
+  ```
+  Evaluates to `true` if 3 or more orders have a total greater than 100.
+
+- Array functions:
+  ```
+  count_of(users, `active == true`) > 10
+  ```
+  Evaluates to `true` if more than 10 users are active.
+
 - JQ expression:
   ```
   `.[0].name`
@@ -161,6 +218,8 @@ The language provides error handling for various scenarios:
 - Type mismatch errors
 - Invalid syntax
 - Excessive string length (strings have a maximum length limit)
+- Container errors (using array operations on non-array values)
+- Invalid array conditions or malformed JQ expressions
 
 ## Implementation Details
 
