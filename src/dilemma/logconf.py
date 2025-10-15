@@ -11,5 +11,6 @@ def get_logger(name="dilemma"):
         handler = logging.StreamHandler()
         formatter = logging.Formatter("[%(asctime)s] %(levelname)s %(name)s: %(message)s")
         handler.setFormatter(formatter)
+        handler.setLevel(logging.WARNING)
         logger.addHandler(handler)
     return logger

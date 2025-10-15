@@ -2,7 +2,12 @@ import threading
 
 import pytest
 
-from dilemma.lang import evaluate, MAX_STRING_LENGTH, ExpressionTransformer, compile_expression
+from dilemma.lang import (
+    evaluate,
+    MAX_STRING_LENGTH,
+    ExpressionTransformer,
+    compile_expression,
+)
 from dilemma.errors import DilemmaError, VariableError, TypeMismatchError
 
 
@@ -88,7 +93,6 @@ def test_other_visit_errors(monkeypatch):
 
     # Check that the error message contains the expression
     assert "3 * 4" in str(excinfo.value)
-
 
 
 def test_comparison_operators():
@@ -185,7 +189,7 @@ def test_variables_processing_json_error(monkeypatch):
 
     # Test that the error path in ExpressionTransformer.__init__ is triggered
     with pytest.raises(DilemmaError) as excinfo:
-        evaluate("1 + 1", variables={"trigger_error": "value"})
+        evaluate("1 + 1", context={"trigger_error": "value"})
 
     # Check the error message matches what we expect
     assert "Failed to process variables" in str(excinfo.value)
@@ -279,7 +283,6 @@ def test_jq_expression_errors():
     with pytest.raises(VariableError) as excinfo:
         evaluate("`invalid[syntax`", variables)
 
-
     # Empty JQ expression
     with pytest.raises(VariableError) as excinfo:
         evaluate("``", variables)
@@ -296,27 +299,61 @@ def test_valid_string_concatenation():
         assert evaluate(expr) == expected
 
 
-@pytest.mark.parametrize("expr,error_type,error_msg", [
-    # String length limit test
-    (f"'{'a' * (MAX_STRING_LENGTH // 2)}' + '{'b' * (MAX_STRING_LENGTH // 2 + 1)}'",
-     TypeMismatchError, "String result exceeds maximum allowed length"),
-
-    # Mixing strings with other types
-    ("'hello' + 5", TypeMismatchError, "'+' operator cannot mix string and non-string types"),
-    ("5 + 'hello'", TypeMismatchError, "'+' operator cannot mix string and non-string types"),
-
-    # Subtraction with strings
-    ("'hello' - 'h'", TypeMismatchError, "'-' operator not supported with string operands"),
-    ("'hello' - 5", TypeMismatchError, "'-' operator not supported with string operands"),
-
-    # Multiplication with strings
-    ("'hello' * 3", TypeMismatchError, "'*' operator not supported with string operands"),
-    ("3 * 'hello'", TypeMismatchError, "'*' operator not supported with string operands"),
-
-    # Division with strings
-    ("'hello' / 'h'", TypeMismatchError, "'/' operator not supported with string operands"),
-    ("'hello' / 5", TypeMismatchError, "'/' operator not supported with string operands"),
-])
+@pytest.mark.parametrize(
+    "expr,error_type,error_msg",
+    [
+        # String length limit test
+        (
+            f"'{'a' * (MAX_STRING_LENGTH // 2)}' + '{'b' * (MAX_STRING_LENGTH // 2 + 1)}'",
+            TypeMismatchError,
+            "String result exceeds maximum allowed length",
+        ),
+        # Mixing strings with other types
+        (
+            "'hello' + 5",
+            TypeMismatchError,
+            "'+' operator cannot mix string and non-string types",
+        ),
+        (
+            "5 + 'hello'",
+            TypeMismatchError,
+            "'+' operator cannot mix string and non-string types",
+        ),
+        # Subtraction with strings
+        (
+            "'hello' - 'h'",
+            TypeMismatchError,
+            "'-' operator not supported with string operands",
+        ),
+        (
+            "'hello' - 5",
+            TypeMismatchError,
+            "'-' operator not supported with string operands",
+        ),
+        # Multiplication with strings
+        (
+            "'hello' * 3",
+            TypeMismatchError,
+            "'*' operator not supported with string operands",
+        ),
+        (
+            "3 * 'hello'",
+            TypeMismatchError,
+            "'*' operator not supported with string operands",
+        ),
+        # Division with strings
+        (
+            "'hello' / 'h'",
+            TypeMismatchError,
+            "'/' operator not supported with string operands",
+        ),
+        (
+            "'hello' / 5",
+            TypeMismatchError,
+            "'/' operator not supported with string operands",
+        ),
+    ],
+)
 def test_string_math_restrictions(expr, error_type, error_msg):
     """Test restrictions on mathematical operations with strings"""
     with pytest.raises(error_type) as excinfo:
@@ -326,9 +363,5 @@ def test_string_math_restrictions(expr, error_type, error_msg):
 
 def test_possesive_lookup():
     expr = "user's name =='bob'"
-    context = {
-        'user': {
-            'name': 'bob'
-        }
-    }
+    context = {"user": {"name": "bob"}}
     assert evaluate(expr, context) is True

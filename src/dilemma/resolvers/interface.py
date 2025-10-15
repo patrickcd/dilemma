@@ -1,5 +1,6 @@
 """Interface for variable resolvers in dilemma."""
 
+import logging
 import traceback
 from ..errors import VariableError
 from ..logconf import get_logger
@@ -23,12 +24,13 @@ class ResolverSpec:
         try:
             if raw:
                 # For raw expressions, use dedicated method
-                self.logger.debug(f"Resolving raw expression: {path}")
+                self.logger.debug("Resolving raw expression: %s", path)
                 result = self._execute_raw_query(path, context)
             else:
                 # For standard path expressions, convert then execute
                 converted_path = self._convert_path(path)
-                self.logger.debug(f"Converted path '{path}' to '{converted_path}'")
+                if self.logger.isEnabledFor(logging.DEBUG):
+                    self.logger.debug("Converted path '%s' to '%s'", path, converted_path)
                 result = self._execute_query(converted_path, context)
 
             # Handle null/missing results
@@ -48,7 +50,7 @@ class ResolverSpec:
         except ImportError as e:
             # Special handling for missing dependencies
             self.logger.error(
-                f"Missing dependency for {resolver_type} resolver: {str(e)}"
+                "Missing dependency for %s resolver: %s", resolver_type, str(e)
             )
             raise VariableError(
                 template_key="resolver_unavailable",

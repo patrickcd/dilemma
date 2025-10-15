@@ -38,9 +38,10 @@ repos:
       - id: mypy
         name: mypy
         language: system
-        entry: mypy src/
+        entry: bash -c 'MYPYPATH=src mypy src/'
         types: [python]
         exclude: ^tests/
+        pass_filenames: false
         stages: [pre-commit]
 
       - id: pytest-failfast

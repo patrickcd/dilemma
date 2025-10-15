@@ -51,8 +51,8 @@ Instead of writing an expression like this:
 // Complex JavaScript approach
 audit_signoffs.filter((signoff) => {
     return signoff.user.role == 'Audit' && new Date(signoff.timestamp) < new Date()
-}).length >= 3 
-&& project.status == 'review' 
+}).length >= 3
+&& project.status == 'review'
 && documents.filter((doc) => doc.verified).length === documents.length
 ```
 
@@ -124,7 +124,7 @@ Extensive [Examples](https://github.com/patrickcd/dilemma/blob/main/docs/example
 # Dot notation for nested objects
 "user.profile.settings.theme == 'dark'"
 
-# Natural possessive syntax  
+# Natural possessive syntax
 "user's subscription's status == 'premium'"
 
 # Array/list access
@@ -181,7 +181,7 @@ For complex data manipulation, use JQ expressions in backticks:
 # Filter and transform arrays - working with provided context
 evaluate('`[.users[] | select(.active == true) | .name]`', context)
 
-# Mathematical operations on arrays  
+# Mathematical operations on arrays
 evaluate('`[.sales[].amount] | add` > 10000', context)
 
 # Complex conditionals
@@ -189,6 +189,8 @@ evaluate('`[.products[] | select(.price > 100 and .category == "electronics")] |
 ```
 
 ## Performance Optimization
+
+### Same expression, multiple contexts
 
 For repeated evaluations, compile expressions once:
 
@@ -206,6 +208,41 @@ for user_data in users:
         # send_premium_content(user_data)
         pass
 ```
+
+### Same data, multiple expressions
+
+If evaluating multiple expressions against the same data, use ProcessedContent instead of passing in
+a dictionary of values. This saves the json dump/load cycle that Dilemma uses to sanitize data.
+
+```python
+from dilemma import evaluate, ProcessedContext
+
+# Sample data
+data = {
+    "users": [
+        {"name": "Alice", "age": 30, "active": True},
+        {"name": "Bob", "age": 25, "active": False},
+        {"name": "Charlie", "age": 35, "active": True}
+    ],
+    "threshold": 28
+}
+
+# Process the data once for safety and optimization
+context = ProcessedContext(data)
+
+# Evaluate multiple expressions efficiently
+expressions = [
+    "users[0].name == 'Alice'",     # True
+    "users[1].age < threshold",     # True
+    "users[2].active",              # True
+    "any_of(users, `active`)"       # True
+]
+
+for expr in expressions:
+    result = evaluate(expr, context)
+    print(f"{expr} = {result}")
+```
+
 
 ## Error Handling
 
@@ -233,7 +270,7 @@ except VariableError as e:
 ## Safety & Security
 
 - ✅ No arbitrary Python code execution
-- ✅ No access to imports or builtins  
+- ✅ No access to imports or builtins
 - ✅ Sandboxed evaluation environment
 - ✅ Input validation and sanitization
 - ✅ Memory and complexity limits

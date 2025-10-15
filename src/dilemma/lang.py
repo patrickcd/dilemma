@@ -6,6 +6,7 @@ import json
 import threading
 import fnmatch
 from datetime import datetime
+from typing import Union
 
 from lark import Token
 from lark import Lark, Transformer
@@ -105,7 +106,7 @@ grammar = r"""
     VARIABLE: /(?!or\b|and\b|true\b|false\b|is\b|contains\b|like\b|in\b|count_of\b|any_of\b|all_of\b|none_of\b)[a-zA-Z_][a-zA-Z0-9_]*(?:'s\s+[a-zA-Z_][a-zA-Z0-9_]*|\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
 
     func_call: FUNC_NAME "(" expr ("," RESOLVER_EXPR)? ")"
-    
+
     // JQ expression syntax: `expression` - must be matched as a single token
     // Define this before the STRING token to give it higher precedence
     RESOLVER_EXPR: /`[^`]*`/
@@ -391,21 +392,46 @@ class CompiledExpression:
         self.expression = expression
         self.parse_tree = parse_tree
 
-    def evaluate(self, variables: dict | str | None = None) -> int | float | bool | str:
+    def evaluate(
+        self, context: Union[dict, str, "ProcessedContext", None] = None
+    ) -> Union[int, float, bool, str]:
         """
-        Evaluate this compiled expression with the provided variables.
+        Evaluate this compiled expression with the provided context.
 
         Args:
-            variables: Dictionary or JSON string containing variable values
+            context: Dictionary, JSON string, or ProcessedContext containing variable values
 
         Returns:
             The result of evaluating the expression
         """
-        processed_json = _process_variables(variables)
+        processed_json = _extract_processed_json(context)
 
         with execution_error_handling(self.expression):
             transformer = ExpressionTransformer(processed_json=processed_json)
             return transformer.transform(self.parse_tree)
+
+
+class ProcessedContext:
+    """
+    Represents a pre-processed variable context that can be reused across multiple
+    expression evaluations for improved performance.
+
+    This class encapsulates the JSON round-trip safety processing, allowing you to
+    process variables once and reuse the safe representation multiple times.
+    """
+
+    def __init__(self, variables: dict | str | None = None):
+        """
+        Process variables into a safe, JSON-compatible format.
+
+        Args:
+            variables: Dictionary or JSON string containing variable values
+        """
+        self.processed_json = _process_variables(variables)
+
+    def get_processed_json(self) -> dict:
+        """Return the processed JSON object."""
+        return self.processed_json
 
 
 # Helper function to process variables
@@ -436,6 +462,24 @@ def _process_variables(variables: dict | str | None = None) -> dict:
     return processed_json
 
 
+def _extract_processed_json(
+    context: Union[dict, str, "ProcessedContext", None] = None,
+) -> dict:
+    """
+    Extract processed JSON from various context types.
+
+    Args:
+        context: Raw variables, JSON string, or ProcessedContext instance
+
+    Returns:
+        Processed JSON object ready for expression evaluation
+    """
+    if isinstance(context, ProcessedContext):
+        return context.get_processed_json()
+    else:
+        return _process_variables(context)
+
+
 def compile_expression(expression: str) -> CompiledExpression:
     """
     Compile an expression into a reusable CompiledExpression object that can be
@@ -458,17 +502,20 @@ def compile_expression(expression: str) -> CompiledExpression:
 
 # Function to evaluate expressions
 def evaluate(
-    expression: str, variables: dict | str | None = None
-) -> int | float | bool | str:
+    expression: str, context: Union[dict, str, "ProcessedContext", None] = None
+) -> Union[int, float, bool, str]:
     """
-    Evaluate an expression with integers, arithmetic operations, comparisons,
-    and variables.
+    Evaluate an expression against the given context.
+
+    Args:
+        expression: The expression string to evaluate
+        context: Dictionary, JSON string, or ProcessedContext containing variable values
 
     For better performance when evaluating the same expression multiple times with
-    different variable contexts, use the compile() function instead.
+    different variable contexts, use compile_expression().
     """
 
-    processed_json = _process_variables(variables)
+    processed_json = _extract_processed_json(context)
     parser = build_parser()
 
     with parsing_error_handling(expression, parser.parse):
