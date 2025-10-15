@@ -52,6 +52,7 @@ Instead of writing an expression like this:
 audit_signoffs.filter((signoff) => {
     return signoff.user.role == 'Audit' && new Date(signoff.timestamp) < new Date()
 }).length >= 3
+&& 'status' in project
 && project.status == 'review'
 && documents.filter((doc) => doc.verified).length === documents.length
 ```
@@ -62,9 +63,9 @@ Your users can express the business rules like this:
 
 // dilemma expression language
 
-    at least 3 of signoffs has `user.role == 'Audit' and timestamp is $past`
-    and project.status == 'review'
-    and all of documents has `verified == true`
+    at least 3 of signoffs matches | user.role == 'Audit' and timestamp is $past |
+    and project has 'status' and project.status == 'review'
+    and all of documents matches | verified == true |
 ```
 
 For array operations, instead of complex function calls:
@@ -74,7 +75,7 @@ count_of(orders, `status == 'pending'`) >= 3 and any_of(orders, `total > 1000`)
 
 User can enjoy a more natural language:
 ```php
-at least 3 of orders has `status == 'pending'` and any of orders has `total > 1000`
+at least 3 of orders matches |status == 'pending'| and any of orders matches |total > 1000|
 ```
 
 ## Features
@@ -100,8 +101,8 @@ result = evaluate("2 * (3 + 4)")  # Returns 14
 result = evaluate("age >= 18 and status == 'active'", {"age": 25, "status": "active"})
 
 # Natural language array operations
-result = evaluate("at least 2 of users has `status == 'active'`", context)
-result = evaluate("none of orders has `amount > 1000`", context)
+result = evaluate("at least 2 of users matches | status == 'active' |", context)
+result = evaluate("none of orders matches | amount > 1000 |", context)
 
 # Date operations
 result = evaluate("user.last_login upcoming within 7 days", context)
@@ -133,6 +134,10 @@ Extensive [Examples](https://github.com/patrickcd/dilemma/blob/main/docs/example
 # Check membership
 "'admin' in user.roles"
 "user.permissions contains 'read'"
+
+# Check property existence
+
+" user has 'address' and 'Mesters Vig' in user.address"
 ```
 
 ### Natural Language Array Operations
@@ -141,18 +146,18 @@ Dilemma provides intuitive sugar syntax for common array operations:
 
 ```python
 # Quantity-based checks
-"at least 3 of orders has `status == 'shipped'`"
-"at most 2 of users has `role == 'admin'`"
-"exactly 1 of servers has `status == 'maintenance'`"
+"at least 3 of orders matches | status == 'shipped' |"
+"at most 2 of users matches | role == 'admin' |"
+"exactly 1 of servers matches | status == 'maintenance' |"
 
 # Existence checks
-"any of products has `price > 100`"
-"all of users has `email_verified == true`"
-"none of alerts has `severity == 'critical'`"
+"any of products matches | price > 100 |"
+"all of users matches | email_verified == true |"
+"none of alerts matches | severity == 'critical' |"
 
 # Combined with other operations
-"at least 5 of reviews has `rating >= 4` and user.subscription is $active"
-"any of files has `name like '*.pdf'` and all of files has `size < 10000000`"
+"at least 5 of reviews matches | rating >= 4 | and user.subscription is $active"
+"any of files matches |name like '*.pdf'| and all of files matches |size < 10000000|"
 ```
 
 ### Date and Time Operations
@@ -199,7 +204,7 @@ from dilemma import compile_expression
 
 # Compile once - including array sugar syntax
 eligibility_check = compile_expression(
-    "user.age >= 18 and user.subscription.active and at least 1 of user.orders has `status == 'completed'`"
+    "user.age >= 18 and user.subscription.active and at least 1 of user.orders matches | status == 'completed' |"
 )
 
 # Evaluate many times with different contexts
@@ -263,9 +268,9 @@ except VariableError as e:
 - **Access control** - `"user.roles contains 'admin' or resource.owner == user.id"`
 - **Data filtering** - `"created_at upcoming within 24 hours and status == 'pending'"`
 - **Workflow conditions** - `"approval.status == 'approved' and budget.remaining >= cost"`
-- **Quality assurance** - `"all of tests has \`status == 'passed'\` and none of builds has \`errors > 0\`"`
-- **Inventory management** - `"at least 10 of products has \`stock > 0\` and any of suppliers has \`delivery_time < 3\`"`
-- **Security monitoring** - `"none of login_attempts has \`failed_count > 5\` and all of sessions has \`encrypted == true\`"`
+- **Quality assurance** - `"all of tests match |status == 'passed'| and none of builds match |errors > 0|"`
+- **Inventory management** - `"at least 10 of products match |stock > 0| and any of suppliers match |delivery_time < 3|"`
+- **Security monitoring** - `"none of login_attempts match |failed_count > 5| and all of sessions match |encrypted == true|"`
 
 ## Safety & Security
 

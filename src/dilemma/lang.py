@@ -56,6 +56,7 @@ grammar = r"""
                | sum ">=" sum -> ge
                | sum "in" sum -> contains
                | sum "contains" sum -> contained_in
+               | sum "has" sum -> has_property
                | sum "like" sum -> pattern_match
                | sum "not" "like" sum -> pattern_not_match
                | sum "is" "$past" -> date_is_past
@@ -90,12 +91,12 @@ grammar = r"""
          | RESOLVER_EXPR -> resolver_expression
          | "(" expr ")" -> paren
 
-    ?array_quantified: "at" "least" INTEGER "of" expr "has" RESOLVER_EXPR      -> at_least_of
-                     | "at" "most"  INTEGER "of" expr "has" RESOLVER_EXPR      -> at_most_of
-                     | "exactly"    INTEGER "of" expr "has" RESOLVER_EXPR      -> exactly_of
-                     | "any"  "of" expr "has" RESOLVER_EXPR                    -> any_of_sugar
-                     | "all"  "of" expr "has" RESOLVER_EXPR                    -> all_of_sugar
-                     | "none" "of" expr "has" RESOLVER_EXPR                    -> none_of_sugar
+    ?array_quantified: "at" "least" INTEGER "of" expr ("match" | "matches") ARRAY_EXPR      -> at_least_of
+                     | "at" "most"  INTEGER "of" expr ("match" | "matches") ARRAY_EXPR      -> at_most_of
+                     | "exactly"    INTEGER "of" expr ("match" | "matches") ARRAY_EXPR      -> exactly_of
+                     | "any"  "of" expr ("match" | "matches") ARRAY_EXPR                    -> any_of_sugar
+                     | "all"  "of" expr ("match" | "matches") ARRAY_EXPR                    -> all_of_sugar
+                     | "none" "of" expr ("match" | "matches") ARRAY_EXPR                    -> none_of_sugar
 
     // Define reserved keywords
     // But use string literals in rules above for "or", "and", "True", "False"
@@ -103,9 +104,13 @@ grammar = r"""
 
     FUNC_NAME: /(count_of|any_of|all_of|none_of)/
 
-    VARIABLE: /(?!or\b|and\b|true\b|false\b|is\b|contains\b|like\b|in\b|count_of\b|any_of\b|all_of\b|none_of\b)[a-zA-Z_][a-zA-Z0-9_]*(?:'s\s+[a-zA-Z_][a-zA-Z0-9_]*|\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
+    VARIABLE: /(?!or\b|and\b|true\b|false\b|is\b|contains\b|like\b|in\b|has\b|match\b|matches\b|count_of\b|any_of\b|all_of\b|none_of\b)[a-zA-Z_][a-zA-Z0-9_]*(?:'s\s+[a-zA-Z_][a-zA-Z0-9_]*|\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*/
 
     func_call: FUNC_NAME "(" expr ("," RESOLVER_EXPR)? ")"
+
+    // Array expression syntax: |expression| - must be matched as a single token
+    // Used for array quantified expressions to avoid conflicts with jq syntax
+    ARRAY_EXPR: /\|[^|]*\|/
 
     // JQ expression syntax: `expression` - must be matched as a single token
     // Define this before the STRING token to give it higher precedence
@@ -277,6 +282,32 @@ class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
         )
 
     @binary_op
+    def has_property(self, left, right) -> bool:
+        """
+        Check if the left operand (object) has the right operand as a property/key.
+
+        This is similar to 'in' but with more natural syntax: object has property
+        instead of property in object.
+
+        Examples:
+        - user has 'name'      -> checks if user object has a 'name' key
+        - config has debug     -> checks if config object has a 'debug' key
+        - user has field_name  -> checks using variable field_name as key
+        """
+        if isinstance(left, dict):
+            # For dictionaries, check if the key exists
+            return right in left
+        elif isinstance(left, (list, tuple)):
+            # For lists/tuples, check if the item exists in the collection
+            return right in left
+        elif hasattr(left, right) and isinstance(right, str):
+            # For objects with attributes, check if attribute exists
+            return hasattr(left, right)
+        else:
+            # For other types, return False (they don't have properties)
+            return False
+
+    @binary_op
     def pattern_match(self, left, right) -> bool:
         """
         Implements case-insensitive wildcard pattern matching using fnmatch.
@@ -325,6 +356,22 @@ class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
         """Process a backticked expression using the configured resolver"""
         # Extract the expression from the token: `expression` -> expression
         raw_expr = items[0].value[1:-1]  # Remove ` prefix and ` suffix
+
+        # Use the resolver system to evaluate with raw=True
+        value = resolve_path(raw_expr, self.processed_json, raw=True)
+
+        # Handle datetime reconstruction
+        if isinstance(value, dict) and "__datetime__" in value:
+            return datetime.fromisoformat(value["__datetime__"])
+
+        return value
+
+    def array_expression(
+        self, items: list[Token]
+    ) -> int | float | bool | str | list | dict | datetime:
+        """Process a pipe-delimited expression for array quantified operations"""
+        # Extract the expression from the token: |expression| -> expression
+        raw_expr = items[0].value[1:-1]  # Remove | prefix and | suffix
 
         # Use the resolver system to evaluate with raw=True
         value = resolve_path(raw_expr, self.processed_json, raw=True)

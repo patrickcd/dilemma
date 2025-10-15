@@ -1,40 +1,40 @@
-# Dilemma Expression Examples  
-This document contains examples of using the Dilemma expression language.  
-  
-  
-### String  
-Check if a filename matches a pattern with wildcard  
-  
-```  
-'document.pdf' like '*.pdf'  
-```  
-`Result: True`   
+# Dilemma Expression Examples
+This document contains examples of using the Dilemma expression language.
+
+
+### String
+Check if a filename matches a pattern with wildcard
+
+```
+'document.pdf' like '*.pdf'
+```
+`Result: True`
 
 ---
-  
-Check if two words are equal  
-  
-```  
-'hello' is 'hello'  
-```  
-`Result: True`   
+
+Check if two words are equal
+
+```
+'hello' is 'hello'
+```
+`Result: True`
 
 ---
-  
-Check if two words are not equal  
-  
-```  
-'hello' is not 'world'  
-```  
-`Result: True`   
+
+Check if two words are not equal
+
+```
+'hello' is not 'world'
+```
+`Result: True`
 
 ---
-  
-Check if two words are not equal  
-  
-```  
- friend.snores is not 'often'  
-```  
+
+Check if two words are not equal
+
+```
+ friend.snores is not 'often'
+```
 ```json
 {
   "friend": {
@@ -42,122 +42,122 @@ Check if two words are not equal
     "snores": "often"
   }
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Check if a phrase contains a word  
-  
-```  
-'world' in 'hello world'  
-```  
-`Result: True`   
+
+Check if a phrase contains a word
+
+```
+'world' in 'hello world'
+```
+`Result: True`
 
 ---
-  
-Check if two variables are equal  
-  
-```  
-var1 is var2  
-```  
+
+Check if two variables are equal
+
+```
+var1 is var2
+```
 ```json
 {
   "var1": "hello",
   "var2": "hello"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check if a string matches a pattern with ? (single character wildcard)  
-  
-```  
-'user123' like 'user???'  
-```  
-`Result: True`   
+
+Check if a string matches a pattern with ? (single character wildcard)
+
+```
+'user123' like 'user???'
+```
+`Result: True`
 
 ---
-  
-Demonstrate case-insensitive matching with the &#x27;like&#x27; operator  
-  
-```  
-'Hello.TXT' like '*.txt'  
-```  
-`Result: True`   
+
+Demonstrate case-insensitive matching with the &#x27;like&#x27; operator
+
+```
+'Hello.TXT' like '*.txt'
+```
+`Result: True`
 
 ---
-  
-Match a variable against a pattern  
-  
-```  
-filename like '*.jpg'  
-```  
+
+Match a variable against a pattern
+
+```
+filename like '*.jpg'
+```
 ```json
 {
   "filename": "vacation-photo.JPG"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check a variable doen&#x27;t match  a pattern  
-  
-```  
-filename not like '*.jpg'  
-```  
+
+Check a variable doen&#x27;t match  a pattern
+
+```
+filename not like '*.jpg'
+```
 ```json
 {
   "filename": "vacation-photo.JPG"
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Check if two words are equal  
-  
-```  
-'hello' == 'hello'  
-```  
-`Result: True`   
+
+Check if two words are equal
+
+```
+'hello' == 'hello'
+```
+`Result: True`
 
 ---
-  
-Check if two words are not equal  
-  
-```  
-'hello' != 'world'  
-```  
-`Result: True`   
+
+Check if two words are not equal
+
+```
+'hello' != 'world'
+```
+`Result: True`
 
 ---
-  
-  
-### Critical Path  
-Test lookup of nested attributes by possesive English syntax  
-  
-```  
-user's name == 'bob'  
-```  
+
+
+### Critical Path
+Test lookup of nested attributes by possesive English syntax
+
+```
+user's name == 'bob'
+```
 ```json
 {
   "user": {
     "name": "bob"
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test lookup of nested attributes by possesive English syntax  
-  
-```  
-'admin' in user's roles   
-```  
+
+Test lookup of nested attributes by possesive English syntax
+
+```
+'admin' in user's roles
+```
 ```json
 {
   "user": {
@@ -168,16 +168,16 @@ Test lookup of nested attributes by possesive English syntax
     ]
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test lookup of nested attributes by possesive English syntax  
-  
-```  
- user's roles contains 'reader'   
-```  
+
+Test lookup of nested attributes by possesive English syntax
+
+```
+ user's roles contains 'reader'
+```
 ```json
 {
   "user": {
@@ -188,16 +188,16 @@ Test lookup of nested attributes by possesive English syntax
     ]
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Is it too late to reach the bar before last orders?  
-  
-```  
-bar's closing_time upcoming within (bar.distance / bike.speed)  hours  
-```  
+
+Is it too late to reach the bar before last orders?
+
+```
+bar's closing_time upcoming within (bar.distance / bike.speed)  hours
+```
 ```json
 {
   "bar": {
@@ -210,18 +210,18 @@ bar's closing_time upcoming within (bar.distance / bike.speed)  hours
     "units": "mph"
   }
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-  
-### Array Sugar Advanced  
-Real-world business logic: at least 3 orders over $100  
-  
-```  
-at least 3 of orders has `total > 100`  
-```  
+
+
+### Array Sugar Advanced
+Real-world business logic: at least 3 orders over $100
+
+```
+at least 3 of orders matches | total > 100 |
+```
 ```json
 {
   "orders": [
@@ -252,16 +252,16 @@ at least 3 of orders has `total > 100`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-System monitoring: at most 2 services with errors  
-  
-```  
-at most 2 of services has `error_count > 0`  
-```  
+
+System monitoring: at most 2 services with errors
+
+```
+at most 2 of services matches | error_count > 0 |
+```
 ```json
 {
   "services": [
@@ -287,16 +287,16 @@ at most 2 of services has `error_count > 0`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Team management: exactly 2 senior developers  
-  
-```  
-exactly 2 of team_members has `level == 'senior' and role == 'developer'`  
-```  
+
+Team management: exactly 2 senior developers
+
+```
+exactly 2 of team_members matches | level == 'senior' and role == 'developer' |
+```
 ```json
 {
   "team_members": [
@@ -326,16 +326,16 @@ exactly 2 of team_members has `level == 'senior' and role == 'developer'`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Security audit: any server has critical vulnerabilities  
-  
-```  
-any of servers has `vulnerabilities.critical > 0`  
-```  
+
+Security audit: any server has critical vulnerabilities
+
+```
+any of servers matches | vulnerabilities.critical > 0 |
+```
 ```json
 {
   "servers": [
@@ -365,16 +365,16 @@ any of servers has `vulnerabilities.critical > 0`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Compliance check: all departments meet data retention policies  
-  
-```  
-all of departments has `data_retention_policy.implemented == true and audit_score >= 85`  
-```  
+
+Compliance check: all departments meet data retention policies
+
+```
+all of departments matches | data_retention_policy.implemented == true and audit_score >= 85 |
+```
 ```json
 {
   "departments": [
@@ -404,16 +404,16 @@ all of departments has `data_retention_policy.implemented == true and audit_scor
     }
   ]
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Operations: no critical alerts in the last hour  
-  
-```  
-none of alerts has `severity == 'critical' and age_minutes < 60`  
-```  
+
+Operations: no critical alerts in the last hour
+
+```
+none of alerts matches | severity == 'critical' and age_minutes < 60 |
+```
 ```json
 {
   "alerts": [
@@ -437,16 +437,16 @@ none of alerts has `severity == 'critical' and age_minutes < 60`
     }
   ]
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Inventory: at least 5 items low stock AND exactly 2 items out of stock  
-  
-```  
-at least 5 of products has `stock_level < 10` and exactly 2 of products has `stock_level == 0`  
-```  
+
+Inventory: at least 5 items low stock AND exactly 2 items out of stock
+
+```
+at least 5 of products matches |stock_level < 10| and exactly 2 of products matches |stock_level == 0|
+```
 ```json
 {
   "products": [
@@ -500,16 +500,16 @@ at least 5 of products has `stock_level < 10` and exactly 2 of products has `sto
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Performance monitoring: at most 1 service below SLA  
-  
-```  
-at most 1 of microservices has `uptime_percentage < 99.9`  
-```  
+
+Performance monitoring: at most 1 service below SLA
+
+```
+at most 1 of microservices matches | uptime_percentage < 99.9 |
+```
 ```json
 {
   "microservices": [
@@ -535,16 +535,16 @@ at most 1 of microservices has `uptime_percentage < 99.9`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Analytics: exactly 3 users with high engagement  
-  
-```  
-exactly 3 of users has `session_count > 50 and avg_session_duration > 300`  
-```  
+
+Analytics: exactly 3 users with high engagement
+
+```
+exactly 3 of users matches | session_count > 50 and avg_session_duration > 300 |
+```
 ```json
 {
   "users": [
@@ -580,16 +580,16 @@ exactly 3 of users has `session_count > 50 and avg_session_duration > 300`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Risk management: any portfolio exceeds risk tolerance  
-  
-```  
-any of portfolios has `risk_score > 7.5 and exposure_percentage > 0.15`  
-```  
+
+Risk management: any portfolio exceeds risk tolerance
+
+```
+any of portfolios matches | risk_score > 7.5 and exposure_percentage > 0.15 |
+```
 ```json
 {
   "portfolios": [
@@ -619,16 +619,16 @@ any of portfolios has `risk_score > 7.5 and exposure_percentage > 0.15`
     }
   ]
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Content moderation: all posts reviewed and none flagged as spam  
-  
-```  
-all of posts has `reviewed == true` and none of posts has `flags contains 'spam'`  
-```  
+
+Content moderation: all posts reviewed and none flagged as spam
+
+```
+all of posts matches |reviewed == true| and none of posts matches |flags contains 'spam'|
+```
 ```json
 {
   "posts": [
@@ -665,16 +665,16 @@ all of posts has `reviewed == true` and none of posts has `flags contains 'spam'
     }
   ]
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Auto-scaling: at least 2 nodes with high CPU and exactly 1 with low memory  
-  
-```  
-at least 2 of nodes has `cpu_usage > 85` and exactly 1 of nodes has `memory_usage < 20`  
-```  
+
+Auto-scaling: at least 2 nodes with high CPU and exactly 1 with low memory
+
+```
+at least 2 of nodes matches |cpu_usage > 85| and exactly 1 of nodes matches |memory_usage < 20|
+```
 ```json
 {
   "nodes": [
@@ -704,16 +704,16 @@ at least 2 of nodes has `cpu_usage > 85` and exactly 1 of nodes has `memory_usag
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-QA pipeline: none of test suites have failing tests  
-  
-```  
-none of test_suites has `failed_tests > 0 or test_coverage < 80`  
-```  
+
+QA pipeline: none of test suites have failing tests
+
+```
+none of test_suites matches | failed_tests > 0 or test_coverage < 80 |
+```
 ```json
 {
   "test_suites": [
@@ -737,16 +737,16 @@ none of test_suites has `failed_tests > 0 or test_coverage < 80`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Customer success: at most 3 customers with low satisfaction  
-  
-```  
-at most 3 of customers has `satisfaction_score < 7 and support_tickets > 5`  
-```  
+
+Customer success: at most 3 customers with low satisfaction
+
+```
+at most 3 of customers matches | satisfaction_score < 7 and support_tickets > 5 |
+```
 ```json
 {
   "customers": [
@@ -782,16 +782,16 @@ at most 3 of customers has `satisfaction_score < 7 and support_tickets > 5`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-DevOps: all environments healthy and exactly 0 with pending deployments  
-  
-```  
-all of environments has `health_status == 'green'` and exactly 0 of environments has `pending_deployments > 0`  
-```  
+
+DevOps: all environments healthy and exactly 0 with pending deployments
+
+```
+all of environments matches |health_status == 'green'| and exactly 0 of environments matches |pending_deployments > 0|
+```
 ```json
 {
   "environments": [
@@ -815,18 +815,18 @@ all of environments has `health_status == 'green'` and exactly 0 of environments
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Array Sugar Combined  
-Combine array sugar with string pattern matching  
-  
-```  
-at least 2 of files has `name like '*.pdf'` and any of files has `name like '*.doc'`  
-```  
+
+
+### Array Sugar Combined
+Combine array sugar with string pattern matching
+
+```
+at least 2 of files matches |name like '*.pdf'| and any of files matches |name like '*.doc'|
+```
 ```json
 {
   "files": [
@@ -848,70 +848,70 @@ at least 2 of files has `name like '*.pdf'` and any of files has `name like '*.d
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Combine array sugar with date state checking  
-  
-```  
-exactly 2 of events has `date is $past` and none of events has `date is $future`  
-```  
+
+Combine array sugar with date state checking
+
+```
+exactly 2 of events matches |date is $past| and none of events matches |date is $future|
+```
 ```json
 {
   "events": [
     {
       "name": "Conference",
-      "date": "2025-10-07 22:06:45 UTC"
+      "date": "2025-10-14 23:56:44 UTC"
     },
     {
       "name": "Meeting",
-      "date": "2025-10-09 22:06:45 UTC"
+      "date": "2025-10-16 23:56:44 UTC"
     },
     {
       "name": "Workshop",
-      "date": "2025-10-01 22:06:45 UTC"
+      "date": "2025-10-08 23:56:44 UTC"
     }
   ]
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Array sugar with date time windows  
-  
-```  
-at least 1 of tasks has `due_date upcoming within 24 hours`  
-```  
+
+Array sugar with date time windows
+
+```
+at least 1 of tasks matches | due_date upcoming within 24 hours |
+```
 ```json
 {
   "tasks": [
     {
       "title": "Review PR",
-      "due_date": "2025-10-08 21:06:45 UTC"
+      "due_date": "2025-10-15 22:56:44 UTC"
     },
     {
       "title": "Write tests",
-      "due_date": "2025-10-09 22:06:45 UTC"
+      "due_date": "2025-10-16 23:56:44 UTC"
     },
     {
       "title": "Deploy",
-      "due_date": "2025-10-01 22:06:45 UTC"
+      "due_date": "2025-10-08 23:56:44 UTC"
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Array sugar with nested object string operations  
-  
-```  
-any of users has `profile.email like '*@company.com'` and all of users has `status != 'inactive'`  
-```  
+
+Array sugar with nested object string operations
+
+```
+any of users matches |profile.email like '*@company.com'| and all of users matches |status != 'inactive'|
+```
 ```json
 {
   "users": [
@@ -938,16 +938,16 @@ any of users has `profile.email like '*@company.com'` and all of users has `stat
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Array sugar with possessive syntax  
-  
-```  
-exactly 1 of employees has `manager's department == 'Engineering'`  
-```  
+
+Array sugar with possessive syntax
+
+```
+exactly 1 of employees matches | manager's department == 'Engineering' |
+```
 ```json
 {
   "employees": [
@@ -974,16 +974,16 @@ exactly 1 of employees has `manager's department == 'Engineering'`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Complex string conditions in array sugar  
-  
-```  
-at most 2 of products has `name like '*Pro*' and category == 'Software'`  
-```  
+
+Complex string conditions in array sugar
+
+```
+at most 2 of products matches | name like '*Pro*' and category == 'Software' |
+```
 ```json
 {
   "products": [
@@ -1009,16 +1009,16 @@ at most 2 of products has `name like '*Pro*' and category == 'Software'`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Array sugar with date before/after comparisons  
-  
-```  
-all of projects has `start_date before end_date` and at least 1 of projects has `end_date after '2024-12-01'`  
-```  
+
+Array sugar with date before/after comparisons
+
+```
+all of projects matches |start_date before end_date| and at least 1 of projects matches |end_date after '2024-12-01'|
+```
 ```json
 {
   "projects": [
@@ -1039,16 +1039,16 @@ all of projects has `start_date before end_date` and at least 1 of projects has 
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Array sugar with same day date comparisons  
-  
-```  
-exactly 2 of meetings has `start_time same_day_as end_time`  
-```  
+
+Array sugar with same day date comparisons
+
+```
+exactly 2 of meetings matches | start_time same_day_as end_time |
+```
 ```json
 {
   "meetings": [
@@ -1069,73 +1069,73 @@ exactly 2 of meetings has `start_time same_day_as end_time`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Array sugar with older than time comparisons  
-  
-```  
-none of logs has `timestamp older than 1 hour`  
-```  
+
+Array sugar with older than time comparisons
+
+```
+none of logs matches | timestamp older than 1 hour |
+```
 ```json
 {
   "logs": [
     {
       "message": "System started",
-      "timestamp": "2025-10-08 21:06:45 UTC"
+      "timestamp": "2025-10-15 22:56:44 UTC"
     },
     {
       "message": "User login",
-      "timestamp": "2025-10-08 22:06:45 UTC"
+      "timestamp": "2025-10-15 23:56:44 UTC"
     },
     {
       "message": "Data processed",
-      "timestamp": "2025-10-07 22:06:45 UTC"
+      "timestamp": "2025-10-14 23:56:44 UTC"
     }
   ]
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Combine string contains with date operations  
-  
-```  
-any of alerts has `'Critical' in message and created_at is $past`  
-```  
+
+Combine string contains with date operations
+
+```
+any of alerts matches | 'Critical' in message and created_at is $past |
+```
 ```json
 {
   "alerts": [
     {
       "id": 1,
       "message": "Critical system failure detected",
-      "created_at": "2025-10-07 22:06:45 UTC"
+      "created_at": "2025-10-14 23:56:44 UTC"
     },
     {
       "id": 2,
       "message": "Warning: high memory usage",
-      "created_at": "2025-10-08 22:06:45 UTC"
+      "created_at": "2025-10-15 23:56:44 UTC"
     },
     {
       "id": 3,
       "message": "Info: backup completed",
-      "created_at": "2025-10-09 22:06:45 UTC"
+      "created_at": "2025-10-16 23:56:44 UTC"
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Array sugar with negated pattern matching  
-  
-```  
-all of documents has `filename not like '*.tmp'` and at least 3 of documents has `filename like '*.pdf'`  
-```  
+
+Array sugar with negated pattern matching
+
+```
+all of documents matches |filename not like '*.tmp'| and at least 3 of documents matches |filename like '*.pdf'|
+```
 ```json
 {
   "documents": [
@@ -1161,16 +1161,16 @@ all of documents has `filename not like '*.tmp'` and at least 3 of documents has
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Array sugar with literal date strings  
-  
-```  
-exactly 2 of milestones has `target_date before '2025-01-01'` and none of milestones has `target_date before '2024-01-01'`  
-```  
+
+Array sugar with literal date strings
+
+```
+exactly 2 of milestones matches |target_date before '2025-01-01'| and none of milestones matches |target_date before '2024-01-01'|
+```
 ```json
 {
   "milestones": [
@@ -1188,23 +1188,23 @@ exactly 2 of milestones has `target_date before '2025-01-01'` and none of milest
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Complex nested conditions combining multiple features  
-  
-```  
-at least 2 of orders has `customer's profile.tier == 'Premium' and total > 100 and created_date is $past`  
-```  
+
+Complex nested conditions combining multiple features
+
+```
+at least 2 of orders matches | customer's profile.tier == 'Premium' and total > 100 and created_date is $past |
+```
 ```json
 {
   "orders": [
     {
       "id": "ORD001",
       "total": 150,
-      "created_date": "2025-10-07 22:06:45 UTC",
+      "created_date": "2025-10-14 23:56:44 UTC",
       "customer": {
         "name": "Alice",
         "profile": {
@@ -1215,7 +1215,7 @@ at least 2 of orders has `customer's profile.tier == 'Premium' and total > 100 a
     {
       "id": "ORD002",
       "total": 250,
-      "created_date": "2025-10-07 22:06:45 UTC",
+      "created_date": "2025-10-14 23:56:44 UTC",
       "customer": {
         "name": "Bob",
         "profile": {
@@ -1226,7 +1226,7 @@ at least 2 of orders has `customer's profile.tier == 'Premium' and total > 100 a
     {
       "id": "ORD003",
       "total": 50,
-      "created_date": "2025-10-07 22:06:45 UTC",
+      "created_date": "2025-10-14 23:56:44 UTC",
       "customer": {
         "name": "Charlie",
         "profile": {
@@ -1236,16 +1236,16 @@ at least 2 of orders has `customer's profile.tier == 'Premium' and total > 100 a
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Mix string equality and pattern matching in array sugar  
-  
-```  
-any of files has `type == 'document' and name like '*.pdf'` and none of files has `type == 'image' and name like '*.pdf'`  
-```  
+
+Mix string equality and pattern matching in array sugar
+
+```
+any of files matches |type == 'document' and name like '*.pdf'| and none of files matches |type == 'image' and name like '*.pdf'|
+```
 ```json
 {
   "files": [
@@ -1267,16 +1267,16 @@ any of files has `type == 'document' and name like '*.pdf'` and none of files ha
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Combine date ranges with string operations  
-  
-```  
-all of events has `start_date before end_date` and exactly 1 of events has `title like '*Workshop*'`  
-```  
+
+Combine date ranges with string operations
+
+```
+all of events matches |start_date before end_date| and exactly 1 of events matches |title like '*Workshop*'|
+```
 ```json
 {
   "events": [
@@ -1297,108 +1297,108 @@ all of events has `start_date before end_date` and exactly 1 of events has `titl
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Combine upcoming within time windows with string matching  
-  
-```  
-at most 1 of tasks has `deadline upcoming within 7 days and priority == 'high'`  
-```  
+
+Combine upcoming within time windows with string matching
+
+```
+at most 1 of tasks matches | deadline upcoming within 7 days and priority == 'high' |
+```
 ```json
 {
   "tasks": [
     {
       "title": "Fix critical bug",
-      "deadline": "2025-10-08 21:06:45 UTC",
+      "deadline": "2025-10-15 22:56:44 UTC",
       "priority": "high"
     },
     {
       "title": "Update documentation",
-      "deadline": "2025-10-09 22:06:45 UTC",
+      "deadline": "2025-10-16 23:56:44 UTC",
       "priority": "medium"
     },
     {
       "title": "Review code",
-      "deadline": "2025-10-01 22:06:45 UTC",
+      "deadline": "2025-10-08 23:56:44 UTC",
       "priority": "low"
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Combine arithmetic operations with date comparisons in array sugar  
-  
-```  
-exactly 2 of products has `price > 100 and launch_date is $past`  
-```  
+
+Combine arithmetic operations with date comparisons in array sugar
+
+```
+exactly 2 of products matches | price > 100 and launch_date is $past |
+```
 ```json
 {
   "products": [
     {
       "name": "Premium Widget",
       "price": 150,
-      "launch_date": "2025-10-07 22:06:45 UTC"
+      "launch_date": "2025-10-14 23:56:44 UTC"
     },
     {
       "name": "Basic Widget",
       "price": 50,
-      "launch_date": "2025-10-07 22:06:45 UTC"
+      "launch_date": "2025-10-14 23:56:44 UTC"
     },
     {
       "name": "Pro Widget",
       "price": 200,
-      "launch_date": "2025-10-01 22:06:45 UTC"
+      "launch_date": "2025-10-08 23:56:44 UTC"
     },
     {
       "name": "Future Widget",
       "price": 300,
-      "launch_date": "2025-10-09 22:06:45 UTC"
+      "launch_date": "2025-10-16 23:56:44 UTC"
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Multiple different time comparison types in one expression  
-  
-```  
-any of events has `start_time is $today` and all of events has `end_time after start_time` and none of events has `duration older than 1 year`  
-```  
+
+Multiple different time comparison types in one expression
+
+```
+any of events matches |start_time is $today| and all of events matches |end_time after start_time| and none of events matches |duration older than 1 year|
+```
 ```json
 {
   "events": [
     {
       "name": "Daily Standup",
-      "start_time": "2025-10-08 22:06:45 UTC",
-      "end_time": "2025-10-09 22:06:45 UTC",
+      "start_time": "2025-10-15 23:56:44 UTC",
+      "end_time": "2025-10-16 23:56:44 UTC",
       "duration": "2025-09-01"
     },
     {
       "name": "Weekly Review",
-      "start_time": "2025-10-07 22:06:45 UTC",
-      "end_time": "2025-10-09 22:06:45 UTC",
+      "start_time": "2025-10-14 23:56:44 UTC",
+      "end_time": "2025-10-16 23:56:44 UTC",
       "duration": "2025-08-01"
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Case insensitive pattern matching in array sugar  
-  
-```  
-at least 2 of files has `extension like '*.PDF'` and exactly 1 of files has `name like '*REPORT*'`  
-```  
+
+Case insensitive pattern matching in array sugar
+
+```
+at least 2 of files matches |extension like '*.PDF'| and exactly 1 of files matches |name like '*REPORT*'|
+```
 ```json
 {
   "files": [
@@ -1420,96 +1420,414 @@ at least 2 of files has `extension like '*.PDF'` and exactly 1 of files has `nam
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Complex boolean combinations with array sugar and basic operations  
-  
-```  
-(at least 1 of users has `status == 'active'`) and (none of users has `last_login older than 30 days`) or (all of users has `role != 'admin'`)  
-```  
+
+Complex boolean combinations with array sugar and basic operations
+
+```
+(at least 1 of users matches |status == 'active'|) and (none of users matches |last_login older than 30 days|) or (all of users matches |role != 'admin'|)
+```
 ```json
 {
   "users": [
     {
       "name": "Alice",
       "status": "active",
-      "last_login": "2025-10-07 22:06:45 UTC",
+      "last_login": "2025-10-14 23:56:44 UTC",
       "role": "user"
     },
     {
       "name": "Bob",
       "status": "inactive",
-      "last_login": "2025-10-08 21:06:45 UTC",
+      "last_login": "2025-10-15 22:56:44 UTC",
       "role": "user"
     },
     {
       "name": "Charlie",
       "status": "active",
-      "last_login": "2025-10-08 22:06:45 UTC",
+      "last_login": "2025-10-15 23:56:44 UTC",
       "role": "moderator"
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Maths  
-Multiply two integers  
-  
-```  
-8 * 8  
-```  
-`Result: 64`   
+
+
+### Property Existence
+Check if an object has a specific property using string literal
+
+```
+user has 'email'
+```
+```json
+{
+  "user": {
+    "name": "Alice Smith",
+    "email": "alice@example.com",
+    "age": 28
+  }
+}
+```
+`Result: True`
 
 ---
-  
-Divide two integers  
-  
-```  
-64 / 8  
-```  
-`Result: 8`   
+
+Check for a property that doesn&#x27;t exist
+
+```
+user has 'phone'
+```
+```json
+{
+  "user": {
+    "name": "Bob Jones",
+    "email": "bob@example.com"
+  }
+}
+```
+`Result: False`
 
 ---
-  
-Add two integers  
-  
-```  
-8 + 8  
-```  
-`Result: 16`   
+
+Use a variable to specify the property name to check
+
+```
+config has required_field
+```
+```json
+{
+  "config": {
+    "database_url": "postgresql://localhost/myapp",
+    "debug_mode": true,
+    "secret_key": "my-secret-key"
+  },
+  "required_field": "database_url"
+}
+```
+`Result: True`
 
 ---
-  
-Subtract two integers  
-  
-```  
-8 - 8  
-```  
-`Result: 0`   
+
+Check if a nested object has a property
+
+```
+user.profile has 'bio'
+```
+```json
+{
+  "user": {
+    "name": "Charlie Brown",
+    "profile": {
+      "bio": "Software developer and coffee enthusiast",
+      "location": "San Francisco",
+      "website": "https://charlie.dev"
+    }
+  }
+}
+```
+`Result: True`
 
 ---
-  
-Multiply two floating point numbers  
-  
-```  
-0.5 * 8.0  
-```  
-`Result: 4.0`   
+
+Check properties in deeply nested structures
+
+```
+app.settings.security has 'encryption'
+```
+```json
+{
+  "app": {
+    "name": "MyApp",
+    "settings": {
+      "ui": {
+        "theme": "dark",
+        "language": "en"
+      },
+      "security": {
+        "encryption": "AES-256",
+        "two_factor": true
+      }
+    }
+  }
+}
+```
+`Result: True`
 
 ---
-  
-Use variables in expressions  
-  
-```  
-banana.price * order.quantity  
-```  
+
+Check if a list contains an item using &#x27;has&#x27; (similar to &#x27;contains&#x27;)
+
+```
+user.roles has 'admin'
+```
+```json
+{
+  "user": {
+    "username": "adminuser",
+    "roles": [
+      "user",
+      "admin",
+      "moderator"
+    ]
+  }
+}
+```
+`Result: True`
+
+---
+
+Combine &#x27;has&#x27; with logical operators for complex conditions
+
+```
+user has 'email' and user has 'verified' and user.verified
+```
+```json
+{
+  "user": {
+    "name": "Diana Prince",
+    "email": "diana@example.com",
+    "verified": true,
+    "created_at": "2024-01-15"
+  }
+}
+```
+`Result: True`
+
+---
+
+Check multiple properties with OR logic
+
+```
+contact has 'email' or contact has 'phone'
+```
+```json
+{
+  "contact": {
+    "name": "Emergency Contact",
+    "phone": "+1-555-0123"
+  }
+}
+```
+`Result: True`
+
+---
+
+Combine property existence check with value comparison
+
+```
+user has 'role' and user.role == 'admin'
+```
+```json
+{
+  "user": {
+    "username": "superuser",
+    "role": "admin",
+    "permissions": [
+      "read",
+      "write",
+      "delete"
+    ]
+  }
+}
+```
+`Result: True`
+
+---
+
+Check for missing property in nested structure
+
+```
+product.details has 'warranty'
+```
+```json
+{
+  "product": {
+    "name": "Laptop",
+    "price": 999.99,
+    "details": {
+      "brand": "TechCorp",
+      "model": "Pro 2024",
+      "color": "silver"
+    }
+  }
+}
+```
+`Result: False`
+
+---
+
+Check properties in empty objects
+
+```
+empty_config has 'setting'
+```
+```json
+{
+  "empty_config": {},
+  "non_empty": {
+    "setting": "value"
+  }
+}
+```
+`Result: False`
+
+---
+
+
+### Syntax Comparison
+Demonstrate improved readability compared to &#x27;in&#x27; operator
+
+```
+customer.preferences has 'newsletter' and customer.account has 'premium'
+```
+```json
+{
+  "customer": {
+    "name": "Jane Customer",
+    "preferences": {
+      "newsletter": true,
+      "marketing": false
+    },
+    "account": {
+      "premium": true,
+      "credits": 150
+    }
+  }
+}
+```
+`Result: True`
+
+---
+
+
+### Real World Usage
+Real-world example: validate required fields in user registration
+
+```
+registration has 'username' and registration has 'email' and registration has 'password'
+```
+```json
+{
+  "registration": {
+    "username": "newuser123",
+    "email": "newuser@example.com",
+    "password": "secure-password",
+    "terms_accepted": true
+  }
+}
+```
+`Result: True`
+
+---
+
+Check if specific feature flags exist in configuration
+
+```
+features has 'dark_mode' and features has 'notifications'
+```
+```json
+{
+  "features": {
+    "dark_mode": true,
+    "notifications": false,
+    "beta_features": true
+  }
+}
+```
+`Result: True`
+
+---
+
+Validate API response structure
+
+```
+response has 'data' and response has 'status' and response.status == 'success'
+```
+```json
+{
+  "response": {
+    "status": "success",
+    "data": {
+      "users": [
+        {
+          "id": 1,
+          "name": "Alice"
+        },
+        {
+          "id": 2,
+          "name": "Bob"
+        }
+      ]
+    },
+    "meta": {
+      "total": 2,
+      "page": 1
+    }
+  }
+}
+```
+`Result: True`
+
+---
+
+
+### Maths
+Multiply two integers
+
+```
+8 * 8
+```
+`Result: 64`
+
+---
+
+Divide two integers
+
+```
+64 / 8
+```
+`Result: 8`
+
+---
+
+Add two integers
+
+```
+8 + 8
+```
+`Result: 16`
+
+---
+
+Subtract two integers
+
+```
+8 - 8
+```
+`Result: 0`
+
+---
+
+Multiply two floating point numbers
+
+```
+0.5 * 8.0
+```
+`Result: 4.0`
+
+---
+
+Use variables in expressions
+
+```
+banana.price * order.quantity
+```
 ```json
 {
   "banana": {
@@ -1519,264 +1837,264 @@ banana.price * order.quantity
     "quantity": 8
   }
 }
-```  
-`Result: 16`   
+```
+`Result: 16`
 
 ---
-  
-  
-### Date State  
-Verify a date in the past  
-  
-```  
-past_date is $past  
-```  
+
+
+### Date State
+Verify a date in the past
+
+```
+past_date is $past
+```
 ```json
 {
-  "past_date": "2025-10-07 22:06:45 UTC"
+  "past_date": "2025-10-14 23:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Verify a date in the future  
-  
-```  
-future_date is $future  
-```  
+
+Verify a date in the future
+
+```
+future_date is $future
+```
 ```json
 {
-  "future_date": "2025-10-09 22:06:45 UTC"
+  "future_date": "2025-10-16 23:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Verify a date is $today  
-  
-```  
-today_date is $today  
-```  
+
+Verify a date is $today
+
+```
+today_date is $today
+```
 ```json
 {
-  "today_date": "2025-10-08 22:06:45 UTC"
+  "today_date": "2025-10-15 23:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Time Window  
-Check event upcoming within recent hours  
-  
-```  
-recent_event upcoming within 12 hours  
-```  
+
+
+### Time Window
+Check event upcoming within recent hours
+
+```
+recent_event upcoming within 12 hours
+```
 ```json
 {
-  "recent_event": "2025-10-08 21:06:45 UTC"
+  "recent_event": "2025-10-15 22:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check event older than a week  
-  
-```  
-old_event older than 1 week  
-```  
+
+Check event older than a week
+
+```
+old_event older than 1 week
+```
 ```json
 {
-  "old_event": "2025-10-01 22:06:45 UTC"
+  "old_event": "2025-10-08 23:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Date Comparison  
-Compare two dates with before  
-  
-```  
-start_date before end_date  
-```  
+
+
+### Date Comparison
+Compare two dates with before
+
+```
+start_date before end_date
+```
 ```json
 {
-  "start_date": "2025-10-07 22:06:45 UTC",
-  "end_date": "2025-10-09 22:06:45 UTC"
+  "start_date": "2025-10-14 23:56:44 UTC",
+  "end_date": "2025-10-16 23:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Compare two dates with after  
-  
-```  
-end_date after start_date  
-```  
+
+Compare two dates with after
+
+```
+end_date after start_date
+```
 ```json
 {
-  "start_date": "2025-10-07 22:06:45 UTC",
-  "end_date": "2025-10-09 22:06:45 UTC"
+  "start_date": "2025-10-14 23:56:44 UTC",
+  "end_date": "2025-10-16 23:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check same day (should be true)  
-  
-```  
-same_day_morning same_day_as same_day_evening  
-```  
+
+Check same day (should be true)
+
+```
+same_day_morning same_day_as same_day_evening
+```
 ```json
 {
   "same_day_morning": "2023-05-10T08:00:00Z",
   "same_day_evening": "2023-05-10T20:00:00Z"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check same day (should be false)  
-  
-```  
-different_days same_day_as other_day  
-```  
+
+Check same day (should be false)
+
+```
+different_days same_day_as other_day
+```
 ```json
 {
   "different_days": "2023-05-10T08:00:00Z",
   "other_day": "2023-05-11T08:00:00Z"
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-  
-### Complex  
-Check if project is currently active  
-  
-```  
-project_start is $past and project_end is $future  
-```  
+
+
+### Complex
+Check if project is currently active
+
+```
+project_start is $past and project_end is $future
+```
 ```json
 {
-  "project_start": "2025-10-07 22:06:45 UTC",
-  "project_end": "2025-10-09 22:06:45 UTC"
+  "project_start": "2025-10-14 23:56:44 UTC",
+  "project_end": "2025-10-16 23:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Recent login but account not new  
-  
-```  
-last_login upcoming within 4 hours and signup_date older than 1 day  
-```  
+
+Recent login but account not new
+
+```
+last_login upcoming within 4 hours and signup_date older than 1 day
+```
 ```json
 {
-  "last_login": "2025-10-08 21:06:45 UTC",
-  "signup_date": "2025-10-07 22:06:45 UTC"
+  "last_login": "2025-10-15 22:56:44 UTC",
+  "signup_date": "2025-10-14 23:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### String Dates  
-Compare ISO formatted date string  
-  
-```  
-iso_date before '2030-01-01'  
-```  
+
+
+### String Dates
+Compare ISO formatted date string
+
+```
+iso_date before '2030-01-01'
+```
 ```json
 {
   "iso_date": "2023-05-10T00:00:00Z"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check literal date is $past  
-  
-```  
-'2020-01-01' is $past  
-```  
-`Result: True`   
+
+Check literal date is $past
+
+```
+'2020-01-01' is $past
+```
+`Result: True`
 
 ---
-  
-Check literal date older than period  
-  
-```  
-'2020-01-01' older than 1 year  
-```  
-`Result: True`   
+
+Check literal date older than period
+
+```
+'2020-01-01' older than 1 year
+```
+`Result: True`
 
 ---
-  
-  
-### Time Units  
-Use hours time unit  
-  
-```  
-hour_ago upcoming within 2 hours  
-```  
+
+
+### Time Units
+Use hours time unit
+
+```
+hour_ago upcoming within 2 hours
+```
 ```json
 {
-  "hour_ago": "2025-10-08 21:06:45 UTC"
+  "hour_ago": "2025-10-15 22:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Use minutes time unit  
-  
-```  
-hour_ago upcoming within 120 minutes  
-```  
+
+Use minutes time unit
+
+```
+hour_ago upcoming within 120 minutes
+```
 ```json
 {
-  "hour_ago": "2025-10-08 21:06:45 UTC"
+  "hour_ago": "2025-10-15 22:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Use days time unit  
-  
-```  
-week_ago older than 6 days  
-```  
+
+Use days time unit
+
+```
+week_ago older than 6 days
+```
 ```json
 {
-  "week_ago": "2025-10-01 22:06:45 UTC"
+  "week_ago": "2025-10-08 23:56:44 UTC"
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### List Operations  
-Check if an element exists in a list using &#x27;in&#x27;  
-  
-```  
-'admin' in user.roles  
-```  
+
+
+### List Operations
+Check if an element exists in a list using &#x27;in&#x27;
+
+```
+'admin' in user.roles
+```
 ```json
 {
   "user": {
@@ -1788,16 +2106,16 @@ Check if an element exists in a list using &#x27;in&#x27;
     "name": "John Doe"
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Use a variable as the item to check in a list  
-  
-```  
-requested_role in available_roles  
-```  
+
+Use a variable as the item to check in a list
+
+```
+requested_role in available_roles
+```
 ```json
 {
   "requested_role": "manager",
@@ -1808,16 +2126,16 @@ requested_role in available_roles
     "guest"
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Alternative contains syntax for list membership  
-  
-```  
-permissions contains 'delete'  
-```  
+
+Alternative contains syntax for list membership
+
+```
+permissions contains 'delete'
+```
 ```json
 {
   "permissions": [
@@ -1827,16 +2145,16 @@ permissions contains 'delete'
     "share"
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check behavior when element is not in list  
-  
-```  
-'superadmin' in user.roles  
-```  
+
+Check behavior when element is not in list
+
+```
+'superadmin' in user.roles
+```
 ```json
 {
   "user": {
@@ -1847,18 +2165,18 @@ Check behavior when element is not in list
     ]
   }
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-  
-### Object Operations  
-Check if a key exists in a dictionary  
-  
-```  
-'address' in user.profile  
-```  
+
+
+### Object Operations
+Check if a key exists in a dictionary
+
+```
+'address' in user.profile
+```
 ```json
 {
   "user": {
@@ -1870,16 +2188,16 @@ Check if a key exists in a dictionary
     }
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Use a variable to check dictionary key membership  
-  
-```  
-required_field in form_data  
-```  
+
+Use a variable to check dictionary key membership
+
+```
+required_field in form_data
+```
 ```json
 {
   "required_field": "tax_id",
@@ -1889,16 +2207,16 @@ required_field in form_data
     "address": "456 Business Ave"
   }
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Use contains operator with dictionary  
-  
-```  
-config contains 'debug_mode'  
-```  
+
+Use contains operator with dictionary
+
+```
+config contains 'debug_mode'
+```
 ```json
 {
   "config": {
@@ -1908,18 +2226,18 @@ config contains 'debug_mode'
     "theme": "dark"
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Mixed Collections  
-Check membership in a list nested upcoming within a dictionary  
-  
-```  
-'python' in user.skills.programming  
-```  
+
+
+### Mixed Collections
+Check membership in a list nested upcoming within a dictionary
+
+```
+'python' in user.skills.programming
+```
 ```json
 {
   "user": {
@@ -1937,16 +2255,16 @@ Check membership in a list nested upcoming within a dictionary
     }
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Combine collection operators with other logical operators  
-  
-```  
-'admin' in user.roles and user.settings contains 'notifications' and user.settings.notifications  
-```  
+
+Combine collection operators with other logical operators
+
+```
+'admin' in user.roles and user.settings contains 'notifications' and user.settings.notifications
+```
 ```json
 {
   "user": {
@@ -1961,18 +2279,18 @@ Combine collection operators with other logical operators
     }
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Collection Equality  
-Compare two lists for equality  
-  
-```  
-user.permissions == required_permissions  
-```  
+
+
+### Collection Equality
+Compare two lists for equality
+
+```
+user.permissions == required_permissions
+```
 ```json
 {
   "user": {
@@ -1988,16 +2306,16 @@ user.permissions == required_permissions
     "delete"
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Compare two dictionaries for equality  
-  
-```  
-user.preferences == default_preferences  
-```  
+
+Compare two dictionaries for equality
+
+```
+user.preferences == default_preferences
+```
 ```json
 {
   "user": {
@@ -2011,18 +2329,18 @@ user.preferences == default_preferences
     "font_size": "medium"
   }
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-  
-### Complex Scenarios  
-Use membership test with a composite condition  
-  
-```  
-(user.role in admin_roles) or (user.domain in approved_domains and user.verified)  
-```  
+
+
+### Complex Scenarios
+Use membership test with a composite condition
+
+```
+(user.role in admin_roles) or (user.domain in approved_domains and user.verified)
+```
 ```json
 {
   "user": {
@@ -2040,18 +2358,18 @@ Use membership test with a composite condition
     "partner.org"
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Path Syntax  
-Look up elements in arrays using indexing  
-  
-```  
-teams[0].name == 'Frontend'  
-```  
+
+
+### Path Syntax
+Look up elements in arrays using indexing
+
+```
+teams[0].name == 'Frontend'
+```
 ```json
 {
   "teams": [
@@ -2071,16 +2389,16 @@ teams[0].name == 'Frontend'
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Use nested array indexing in paths  
-  
-```  
-departments[0].teams[1].name == 'Backend'  
-```  
+
+Use nested array indexing in paths
+
+```
+departments[0].teams[1].name == 'Backend'
+```
 ```json
 {
   "departments": [
@@ -2117,16 +2435,16 @@ departments[0].teams[1].name == 'Backend'
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test property of an element accessed through indexing  
-  
-```  
-users[1].role == 'admin' and users[1].verified  
-```  
+
+Test property of an element accessed through indexing
+
+```
+users[1].role == 'admin' and users[1].verified
+```
 ```json
 {
   "users": [
@@ -2142,16 +2460,16 @@ users[1].role == 'admin' and users[1].verified
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Combine array indexing with membership test  
-  
-```  
-'testing' in projects[0].tags and projects[1].status == 'completed'  
-```  
+
+Combine array indexing with membership test
+
+```
+'testing' in projects[0].tags and projects[1].status == 'completed'
+```
 ```json
 {
   "projects": [
@@ -2174,18 +2492,18 @@ Combine array indexing with membership test
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Complex Path Operations  
-Complex expression combining array lookups with object properties  
-  
-```  
-organization.departments[0].teams[0].members[1] == 'Bob' and organization.departments[1].teams[0].members[0] == 'Eve'  
-```  
+
+
+### Complex Path Operations
+Complex expression combining array lookups with object properties
+
+```
+organization.departments[0].teams[0].members[1] == 'Bob' and organization.departments[1].teams[0].members[0] == 'Eve'
+```
 ```json
 {
   "organization": {
@@ -2225,18 +2543,18 @@ organization.departments[0].teams[0].members[1] == 'Bob' and organization.depart
     ]
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Container Operations  
-Check if containers are empty using &#x27;is $empty&#x27;  
-  
-```  
-ghost_crew is $empty and deserted_mansion is $empty and (treasure_chest is $empty) == false  
-```  
+
+
+### Container Operations
+Check if containers are empty using &#x27;is $empty&#x27;
+
+```
+ghost_crew is $empty and deserted_mansion is $empty and (treasure_chest is $empty) == false
+```
 ```json
 {
   "ghost_crew": [],
@@ -2252,53 +2570,53 @@ ghost_crew is $empty and deserted_mansion is $empty and (treasure_chest is $empt
     "crystal_orb": 750
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Nested Objects  
-Check if user is eligible for premium features  
-  
-```  
-user.account.is_active and (user.subscription.level == 'premium' or user.account.credits > 100)  
-```  
+
+
+### Nested Objects
+Check if user is eligible for premium features
+
+```
+user.account.is_active and (user.subscription.level == 'premium' or user.account.credits > 100)
+```
 ```json
 {
   "user": {
     "account": {
       "is_active": true,
       "credits": 150,
-      "created_at": "2025-10-01 22:06:45 UTC"
+      "created_at": "2025-10-08 23:56:44 UTC"
     },
     "subscription": {
       "level": "basic",
-      "renewal_date": "2025-11-07 22:06:45 UTC"
+      "renewal_date": "2025-11-14 23:56:44 UTC"
     }
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Evaluate complex project status conditions  
-  
-```  
+
+Evaluate complex project status conditions
+
+```
 project.status == 'in_progress'
 and (
   project.metrics.completion > 50
   or (project.team.size >= 3 and project.priority == 'high')
 )
-  
-```  
+
+```
 ```json
 {
   "project": {
     "status": "in_progress",
-    "start_date": "2025-10-01 22:06:45 UTC",
-    "deadline": "2025-11-07 22:06:45 UTC",
+    "start_date": "2025-10-08 23:56:44 UTC",
+    "deadline": "2025-11-14 23:56:44 UTC",
     "metrics": {
       "completion": 45,
       "quality": 98
@@ -2310,29 +2628,29 @@ and (
     "priority": "high"
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Mixed Date Logic  
-Check if order is eligible for express shipping  
-  
-```  
+
+
+### Mixed Date Logic
+Check if order is eligible for express shipping
+
+```
 order.status == 'confirmed'
 and order.created_at upcoming within 24 hours
 and (
   order.items.count < 5
   or (order.customer.tier == 'gold' and order.total_value > 100)
 )
-  
-```  
+
+```
 ```json
 {
   "order": {
     "status": "confirmed",
-    "created_at": "2025-10-08 21:06:45 UTC",
+    "created_at": "2025-10-15 22:56:44 UTC",
     "items": {
       "count": 7,
       "categories": [
@@ -2342,58 +2660,58 @@ and (
     },
     "customer": {
       "tier": "gold",
-      "since": "2025-10-01 22:06:45 UTC"
+      "since": "2025-10-08 23:56:44 UTC"
     },
     "total_value": 250
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Multiple date conditions with nested properties  
-  
-```  
+
+Multiple date conditions with nested properties
+
+```
 (user.last_login upcoming within 7 days or user.auto_login)
 and (
   user.account.trial_ends is $future
   or
   user.account.subscription.status == 'active'
 )
-  
-```  
+
+```
 ```json
 {
   "user": {
-    "last_login": "2025-10-01 22:06:45 UTC",
+    "last_login": "2025-10-08 23:56:44 UTC",
     "auto_login": true,
     "registration_date": "2023-01-15",
     "account": {
-      "trial_ends": "2025-10-07 22:06:45 UTC",
+      "trial_ends": "2025-10-14 23:56:44 UTC",
       "subscription": {
         "status": "active",
         "plan": "premium",
-        "next_payment": "2025-11-07 22:06:45 UTC"
+        "next_payment": "2025-11-14 23:56:44 UTC"
       }
     }
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Complex Precedence  
-Test operator precedence with mixed conditions  
-  
-```  
+
+
+### Complex Precedence
+Test operator precedence with mixed conditions
+
+```
 user.settings.notifications.enabled
 and (user.last_seen older than 1 day or user.preferences.urgent_only)
 and ('admin' in user.roles or user.tasks.pending > 0)
-  
-```  
+
+```
 ```json
 {
   "user": {
@@ -2407,7 +2725,7 @@ and ('admin' in user.roles or user.tasks.pending > 0)
       },
       "theme": "dark"
     },
-    "last_seen": "2025-10-01 22:06:45 UTC",
+    "last_seen": "2025-10-08 23:56:44 UTC",
     "preferences": {
       "urgent_only": false,
       "language": "en"
@@ -2419,18 +2737,18 @@ and ('admin' in user.roles or user.tasks.pending > 0)
     }
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Jq Basics  
-Basic JQ expression to access a nested property  
-  
-```  
-`.user.profile.name` == 'Alice'  
-```  
+
+
+### Jq Basics
+Basic JQ expression to access a nested property
+
+```
+`.user.profile.name` == 'Alice'
+```
 ```json
 {
   "user": {
@@ -2443,18 +2761,18 @@ Basic JQ expression to access a nested property
     }
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Jq Arrays  
-Access elements in an array using JQ indexing  
-  
-```  
-`.team[1].role` == 'developer'  
-```  
+
+
+### Jq Arrays
+Access elements in an array using JQ indexing
+
+```
+`.team[1].role` == 'developer'
+```
 ```json
 {
   "team": [
@@ -2472,16 +2790,16 @@ Access elements in an array using JQ indexing
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check array length using JQ pipe function  
-  
-```  
-`.products | length` > 2  
-```  
+
+Check array length using JQ pipe function
+
+```
+`.products | length` > 2
+```
 ```json
 {
   "products": [
@@ -2499,16 +2817,16 @@ Check array length using JQ pipe function
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check if any array element matches a condition  
-  
-```  
-`.users[] | select(.role == "admin") | .name` == 'Eva'  
-```  
+
+Check if any array element matches a condition
+
+```
+`.users[] | select(.role == "admin") | .name` == 'Eva'
+```
 ```json
 {
   "users": [
@@ -2526,18 +2844,18 @@ Check if any array element matches a condition
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Jq Filtering  
-Filter array elements based on a condition  
-  
-```  
-`.orders[] | select(.status == "completed") | .id` == 1003  
-```  
+
+
+### Jq Filtering
+Filter array elements based on a condition
+
+```
+`.orders[] | select(.status == "completed") | .id` == 1003
+```
 ```json
 {
   "orders": [
@@ -2555,24 +2873,24 @@ Filter array elements based on a condition
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Jq Mixed  
-Combine JQ with regular Dilemma expressions  
-  
-```  
-`.user.membership.level` == 'gold' and user.account.active == true  
-```  
+
+
+### Jq Mixed
+Combine JQ with regular Dilemma expressions
+
+```
+`.user.membership.level` == 'gold' and user.account.active == true
+```
 ```json
 {
   "user": {
     "membership": {
       "level": "gold",
-      "since": "2025-10-01 22:06:45 UTC"
+      "since": "2025-10-08 23:56:44 UTC"
     },
     "account": {
       "active": true,
@@ -2580,18 +2898,18 @@ Combine JQ with regular Dilemma expressions
     }
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Jq Advanced  
-Complex data transformation with JQ  
-  
-```  
-`.departments[] | select(.name == "Engineering").employees | map(.salary) | add / length` > 75000  
-```  
+
+
+### Jq Advanced
+Complex data transformation with JQ
+
+```
+`.departments[] | select(.name == "Engineering").employees | map(.salary) | add / length` > 75000
+```
 ```json
 {
   "departments": [
@@ -2627,16 +2945,16 @@ Complex data transformation with JQ
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check if an array contains a specific value  
-  
-```  
-`.user.permissions | contains(["edit"])`  
-```  
+
+Check if an array contains a specific value
+
+```
+`.user.permissions | contains(["edit"])`
+```
 ```json
 {
   "user": {
@@ -2649,16 +2967,16 @@ Check if an array contains a specific value
     ]
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Use JQ to conditionally create and check an object  
-  
-```  
-`if .user.premium then {access: "full"} else {access: "limited"} end | .access` == 'full'  
-```  
+
+Use JQ to conditionally create and check an object
+
+```
+`if .user.premium then {access: "full"} else {access: "limited"} end | .access` == 'full'
+```
 ```json
 {
   "user": {
@@ -2666,16 +2984,16 @@ Use JQ to conditionally create and check an object
     "account_type": "business"
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Complex JQ expression with deeply nested parentheses and operations  
-  
-```  
-`.employees | map( ((.performance.rating * 0.5) + ((.projects | map(select(.status == "completed") | .difficulty) | add // 0) * 0.3) + (if (.years_experience > 5) then ((.leadership_score // 0) * 0.2) else ((.learning_speed // 0) * 0.2) end) ) * (if .department == "Engineering" then 1.1 else 1 end) ) | add / length` > 75  
-```  
+
+Complex JQ expression with deeply nested parentheses and operations
+
+```
+`.employees | map( ((.performance.rating * 0.5) + ((.projects | map(select(.status == "completed") | .difficulty) | add // 0) * 0.3) + (if (.years_experience > 5) then ((.leadership_score // 0) * 0.2) else ((.learning_speed // 0) * 0.2) end) ) * (if .department == "Engineering" then 1.1 else 1 end) ) | add / length` > 75
+```
 ```json
 {
   "employees": [
@@ -2744,18 +3062,18 @@ Complex JQ expression with deeply nested parentheses and operations
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Jq With Dates  
-Use JQ to extract a date for comparison  
-  
-```  
-`.project.milestones[] | select(.name == "beta").date` is $past  
-```  
+
+
+### Jq With Dates
+Use JQ to extract a date for comparison
+
+```
+`.project.milestones[] | select(.name == "beta").date` is $past
+```
 ```json
 {
   "project": {
@@ -2763,31 +3081,31 @@ Use JQ to extract a date for comparison
     "milestones": [
       {
         "name": "alpha",
-        "date": "2025-11-07 22:06:45 UTC"
+        "date": "2025-11-14 23:56:44 UTC"
       },
       {
         "name": "beta",
-        "date": "2025-10-07 22:06:45 UTC"
+        "date": "2025-10-14 23:56:44 UTC"
       },
       {
         "name": "release",
-        "date": "2025-10-09 00:06:45 UTC"
+        "date": "2025-10-16 01:56:44 UTC"
       }
     ]
   }
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Jq Parsing  
-Simple JQ expression nested inside multiple levels of Dilemma parentheses  
-  
-```  
-(5 + ((`.users | length` * 2) - 1)) > 5  
-```  
+
+
+### Jq Parsing
+Simple JQ expression nested inside multiple levels of Dilemma parentheses
+
+```
+(5 + ((`.users | length` * 2) - 1)) > 5
+```
 ```json
 {
   "users": [
@@ -2805,65 +3123,65 @@ Simple JQ expression nested inside multiple levels of Dilemma parentheses
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Errors  
-Test division by zero error  
-  
-```  
-12 / 0  
-```  
-**Expected Error:**  
-```  
+
+
+### Errors
+Test division by zero error
+
+```
+12 / 0
+```
+**Expected Error:**
+```
 It is not possible to divide by zero (12 / 0 ).
 You can guard against this error by checking that
-the value of the right-hand side is not zero.  
-```  
+the value of the right-hand side is not zero.
+```
 
 ---
-  
-Error message for an unknown variable name  
-  
-```  
-bob  
-```  
-**Expected Error:**  
-```  
+
+Error message for an unknown variable name
+
+```
+bob
+```
+**Expected Error:**
+```
 The word &#x27;bob&#x27; is not recognised.
 Unquoted words should refer names of data items in the context.
 Possibly a spelling mistake?
-If you intended this word to be used for a comparison put it in quotation marks.  
-```  
+If you intended this word to be used for a comparison put it in quotation marks.
+```
 
 ---
-  
-Error message for an unknown variable path  
-  
-```  
-bob's age  
-```  
-**Expected Error:**  
-```  
+
+Error message for an unknown variable path
+
+```
+bob's age
+```
+**Expected Error:**
+```
 Lookup for a value matching &#x27;bob&#x27;s age&#x27; failed.
 The first part of this phrase is expected to be the name of an item in the context,
 subsequent parts are the names of nested items
 Possibly a spelling mistake? Please check the context.
-If you intended this word to be used for a comparison put it in quotation marks.  
-```  
+If you intended this word to be used for a comparison put it in quotation marks.
+```
 
 ---
-  
-  
-### Function Operations  
-Count members in a list that match a condition  
-  
-```  
-count_of(roles, `'write' in permissions`) == 3  
-```  
+
+
+### Function Operations
+Count members in a list that match a condition
+
+```
+count_of(roles, `'write' in permissions`) == 3
+```
 ```json
 {
   "roles": [
@@ -2898,16 +3216,16 @@ count_of(roles, `'write' in permissions`) == 3
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Count all members in a list (no condition)  
-  
-```  
-count_of(roles) == 4  
-```  
+
+Count all members in a list (no condition)
+
+```
+count_of(roles) == 4
+```
 ```json
 {
   "roles": [
@@ -2942,16 +3260,16 @@ count_of(roles) == 4
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Count items that match a numeric condition  
-  
-```  
-count_of(scores, `score > 80`) == 2  
-```  
+
+Count items that match a numeric condition
+
+```
+count_of(scores, `score > 80`) == 2
+```
 ```json
 {
   "scores": [
@@ -2973,16 +3291,16 @@ count_of(scores, `score > 80`) == 2
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check if any item matches a condition  
-  
-```  
-any_of(users, `age >= 18`)  
-```  
+
+Check if any item matches a condition
+
+```
+any_of(users, `age >= 18`)
+```
 ```json
 {
   "users": [
@@ -3000,16 +3318,16 @@ any_of(users, `age >= 18`)
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check if any item is truthy  
-  
-```  
-any_of(flags)  
-```  
+
+Check if any item is truthy
+
+```
+any_of(flags)
+```
 ```json
 {
   "flags": [
@@ -3018,16 +3336,16 @@ any_of(flags)
     false
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check if any item matches condition (false case)  
-  
-```  
-any_of(users, `age > 100`)  
-```  
+
+Check if any item matches condition (false case)
+
+```
+any_of(users, `age > 100`)
+```
 ```json
 {
   "users": [
@@ -3041,16 +3359,16 @@ any_of(users, `age > 100`)
     }
   ]
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Check if all items match a condition (true case)  
-  
-```  
-all_of(products, `price > 0`)  
-```  
+
+Check if all items match a condition (true case)
+
+```
+all_of(products, `price > 0`)
+```
 ```json
 {
   "products": [
@@ -3068,16 +3386,16 @@ all_of(products, `price > 0`)
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check if all items match a condition (false case)  
-  
-```  
-all_of(products, `price > 20`)  
-```  
+
+Check if all items match a condition (false case)
+
+```
+all_of(products, `price > 20`)
+```
 ```json
 {
   "products": [
@@ -3095,16 +3413,16 @@ all_of(products, `price > 20`)
     }
   ]
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Check if all items are truthy  
-  
-```  
-all_of(flags)  
-```  
+
+Check if all items are truthy
+
+```
+all_of(flags)
+```
 ```json
 {
   "flags": [
@@ -3113,16 +3431,16 @@ all_of(flags)
     true
   ]
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Check if no items match a condition (true case)  
-  
-```  
-none_of(users, `age > 100`)  
-```  
+
+Check if no items match a condition (true case)
+
+```
+none_of(users, `age > 100`)
+```
 ```json
 {
   "users": [
@@ -3136,16 +3454,16 @@ none_of(users, `age > 100`)
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check if no items match a condition (false case)  
-  
-```  
-none_of(users, `age >= 18`)  
-```  
+
+Check if no items match a condition (false case)
+
+```
+none_of(users, `age >= 18`)
+```
 ```json
 {
   "users": [
@@ -3159,16 +3477,16 @@ none_of(users, `age >= 18`)
     }
   ]
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Check if no items are truthy  
-  
-```  
-none_of(flags)  
-```  
+
+Check if no items are truthy
+
+```
+none_of(flags)
+```
 ```json
 {
   "flags": [
@@ -3177,16 +3495,16 @@ none_of(flags)
     false
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Count items matching a string condition  
-  
-```  
-count_of(employees, `department == 'Engineering'`) == 2  
-```  
+
+Count items matching a string condition
+
+```
+count_of(employees, `department == 'Engineering'`) == 2
+```
 ```json
 {
   "employees": [
@@ -3208,16 +3526,16 @@ count_of(employees, `department == 'Engineering'`) == 2
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Check if any employee has &#x27;manager&#x27; in their title  
-  
-```  
-any_of(employees, `'Manager' in title`)  
-```  
+
+Check if any employee has &#x27;manager&#x27; in their title
+
+```
+any_of(employees, `'Manager' in title`)
+```
 ```json
 {
   "employees": [
@@ -3235,32 +3553,32 @@ any_of(employees, `'Manager' in title`)
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test functions with empty list  
-  
-```  
-count_of(empty_list) == 0 and any_of(empty_list) == false and all_of(empty_list) == true and none_of(empty_list) == true  
-```  
+
+Test functions with empty list
+
+```
+count_of(empty_list) == 0 and any_of(empty_list) == false and all_of(empty_list) == true and none_of(empty_list) == true
+```
 ```json
 {
   "empty_list": []
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-  
-### Array Sugar  
-Test &#x27;at least N of X has predicate&#x27; natural language sugar  
-  
-```  
-at least 2 of users has `age >= 25`  
-```  
+
+
+### Array Sugar
+Test &#x27;at least N of X has predicate&#x27; natural language sugar
+
+```
+at least 2 of users matches | age >= 25 |
+```
 ```json
 {
   "users": [
@@ -3278,16 +3596,16 @@ at least 2 of users has `age >= 25`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test &#x27;at most N of X has predicate&#x27; natural language sugar  
-  
-```  
-at most 1 of products has `price > 100`  
-```  
+
+Test &#x27;at most N of X has predicate&#x27; natural language sugar
+
+```
+at most 1 of products matches | price > 100 |
+```
 ```json
 {
   "products": [
@@ -3305,16 +3623,16 @@ at most 1 of products has `price > 100`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test &#x27;exactly N of X has predicate&#x27; natural language sugar  
-  
-```  
-exactly 2 of employees has `department == 'Engineering'`  
-```  
+
+Test &#x27;exactly N of X has predicate&#x27; natural language sugar
+
+```
+exactly 2 of employees matches | department == 'Engineering' |
+```
 ```json
 {
   "employees": [
@@ -3332,16 +3650,16 @@ exactly 2 of employees has `department == 'Engineering'`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test &#x27;any of X has predicate&#x27; natural language sugar  
-  
-```  
-any of tasks has `status == 'urgent'`  
-```  
+
+Test &#x27;any of X has predicate&#x27; natural language sugar
+
+```
+any of tasks matches | status == 'urgent' |
+```
 ```json
 {
   "tasks": [
@@ -3359,16 +3677,16 @@ any of tasks has `status == 'urgent'`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test &#x27;all of X has predicate&#x27; natural language sugar  
-  
-```  
-all of orders has `paid == true`  
-```  
+
+Test &#x27;all of X has predicate&#x27; natural language sugar
+
+```
+all of orders matches | paid == true |
+```
 ```json
 {
   "orders": [
@@ -3386,16 +3704,16 @@ all of orders has `paid == true`
     }
   ]
 }
-```  
-`Result: False`   
+```
+`Result: False`
 
 ---
-  
-Test &#x27;none of X has predicate&#x27; natural language sugar  
-  
-```  
-none of items has `defective == true`  
-```  
+
+Test &#x27;none of X has predicate&#x27; natural language sugar
+
+```
+none of items matches | defective == true |
+```
 ```json
 {
   "items": [
@@ -3413,16 +3731,16 @@ none of items has `defective == true`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test sugar with complex boolean predicates  
-  
-```  
-at least 1 of users has `age > 21 and active == true`  
-```  
+
+Test sugar with complex boolean predicates
+
+```
+at least 1 of users matches | age > 21 and active == true |
+```
 ```json
 {
   "users": [
@@ -3443,16 +3761,16 @@ at least 1 of users has `age > 21 and active == true`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test sugar combined with logical operators  
-  
-```  
-exactly 2 of team has `role == 'developer'` and any of team has `role == 'lead'`  
-```  
+
+Test sugar combined with logical operators
+
+```
+exactly 2 of team matches |role == 'developer'| and any of team matches |role == 'lead'|
+```
 ```json
 {
   "team": [
@@ -3474,16 +3792,16 @@ exactly 2 of team has `role == 'developer'` and any of team has `role == 'lead'`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test sugar with string pattern matching  
-  
-```  
-at least 2 of files has `name like '*.txt'`  
-```  
+
+Test sugar with string pattern matching
+
+```
+at least 2 of files matches | name like '*.txt' |
+```
 ```json
 {
   "files": [
@@ -3501,16 +3819,16 @@ at least 2 of files has `name like '*.txt'`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test sugar with nested object property access  
-  
-```  
-exactly 1 of projects has `team.size > 5`  
-```  
+
+Test sugar with nested object property access
+
+```
+exactly 1 of projects matches | team.size > 5 |
+```
 ```json
 {
   "projects": [
@@ -3537,16 +3855,16 @@ exactly 1 of projects has `team.size > 5`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test sugar expressions that should count zero  
-  
-```  
-exactly 0 of users has `age > 100` and none of users has `name == 'Nobody'`  
-```  
+
+Test sugar expressions that should count zero
+
+```
+exactly 0 of users matches |age > 100| and none of users matches |name == 'Nobody'|
+```
 ```json
 {
   "users": [
@@ -3560,30 +3878,30 @@ exactly 0 of users has `age > 100` and none of users has `name == 'Nobody'`
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test sugar with empty collections  
-  
-```  
-exactly 0 of empty_list has `value > 0` and all of empty_list has `value < 1000`  
-```  
+
+Test sugar with empty collections
+
+```
+exactly 0 of empty_list matches |value > 0| and all of empty_list matches |value < 1000|
+```
 ```json
 {
   "empty_list": []
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test using sugar result in comparisons  
-  
-```  
-exactly 3 of scores has `points > 80` == true  
-```  
+
+Test using sugar result in comparisons
+
+```
+exactly 3 of scores matches | points > 80 | == true
+```
 ```json
 {
   "scores": [
@@ -3605,16 +3923,16 @@ exactly 3 of scores has `points > 80` == true
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  
-Test sugar in arithmetic context (boolean to number conversion)  
-  
-```  
-at least 1 of items has `value > 5` + 2  
-```  
+
+Test sugar in arithmetic context (boolean to number conversion)
+
+```
+at least 1 of items matches | value > 5 | + 2
+```
 ```json
 {
   "items": [
@@ -3629,16 +3947,16 @@ at least 1 of items has `value > 5` + 2
     }
   ]
 }
-```  
-`Result: 3`   
+```
+`Result: 3`
 
 ---
-  
-Test multiple sugar conditions in one expression  
-  
-```  
-at least 2 of users has `active == true` and at most 1 of users has `role == 'admin'`  
-```  
+
+Test multiple sugar conditions in one expression
+
+```
+at least 2 of users matches |active == true| and at most 1 of users matches |role == 'admin'|
+```
 ```json
 {
   "users": [
@@ -3659,8 +3977,7 @@ at least 2 of users has `active == true` and at most 1 of users has `role == 'ad
     }
   ]
 }
-```  
-`Result: True`   
+```
+`Result: True`
 
 ---
-  

@@ -1,7 +1,7 @@
 - name: sugar_with_string_patterns
   category: array_sugar_combined
   description: "Combine array sugar with string pattern matching"
-  expression: "at least 2 of files has `name like '*.pdf'` and any of files has `name like '*.doc'`"
+  expression: "at least 2 of files matches |name like '*.pdf'| and any of files matches |name like '*.doc'|"
   expected: true
   context:
       files:
@@ -17,7 +17,7 @@
 - name: sugar_with_date_comparisons
   category: array_sugar_combined
   description: "Combine array sugar with date state checking"
-  expression: "exactly 2 of events has `date is $past` and none of events has `date is $future`"
+  expression: "exactly 2 of events matches |date is $past| and none of events matches |date is $future|"
   expected: false
   context:
       events:
@@ -31,7 +31,7 @@
 - name: sugar_with_date_windows
   category: array_sugar_combined
   description: "Array sugar with date time windows"
-  expression: "at least 1 of tasks has `due_date upcoming within 24 hours`"
+  expression: "at least 1 of tasks matches | due_date upcoming within 24 hours |"
   expected: true
   context:
       tasks:
@@ -45,7 +45,7 @@
 - name: sugar_with_nested_string_operations
   category: array_sugar_combined
   description: "Array sugar with nested object string operations"
-  expression: "any of users has `profile.email like '*@company.com'` and all of users has `status != 'inactive'`"
+  expression: "any of users matches |profile.email like '*@company.com'| and all of users matches |status != 'inactive'|"
   expected: true
   context:
       users:
@@ -65,7 +65,7 @@
 - name: sugar_with_possessive_lookup
   category: array_sugar_combined
   description: "Array sugar with possessive syntax"
-  expression: "exactly 1 of employees has `manager's department == 'Engineering'`"
+  expression: "exactly 1 of employees matches | manager's department == 'Engineering' |"
   expected: true
   context:
       employees:
@@ -85,7 +85,7 @@
 - name: sugar_with_multiple_string_conditions
   category: array_sugar_combined
   description: "Complex string conditions in array sugar"
-  expression: "at most 2 of products has `name like '*Pro*' and category == 'Software'`"
+  expression: "at most 2 of products matches | name like '*Pro*' and category == 'Software' |"
   expected: true
   context:
       products:
@@ -105,7 +105,7 @@
 - name: sugar_with_date_before_after
   category: array_sugar_combined
   description: "Array sugar with date before/after comparisons"
-  expression: "all of projects has `start_date before end_date` and at least 1 of projects has `end_date after '2024-12-01'`"
+  expression: "all of projects matches |start_date before end_date| and at least 1 of projects matches |end_date after '2024-12-01'|"
   expected: true
   context:
       projects:
@@ -122,7 +122,7 @@
 - name: sugar_with_same_day_comparisons
   category: array_sugar_combined
   description: "Array sugar with same day date comparisons"
-  expression: "exactly 2 of meetings has `start_time same_day_as end_time`"
+  expression: "exactly 2 of meetings matches | start_time same_day_as end_time |"
   expected: true
   context:
       meetings:
@@ -139,7 +139,7 @@
 - name: sugar_with_time_units_older_than
   category: array_sugar_combined
   description: "Array sugar with older than time comparisons"
-  expression: "none of logs has `timestamp older than 1 hour`"
+  expression: "none of logs matches | timestamp older than 1 hour |"
   expected: false
   context:
       logs:
@@ -153,7 +153,7 @@
 - name: sugar_with_string_contains_and_dates
   category: array_sugar_combined
   description: "Combine string contains with date operations"
-  expression: "any of alerts has `'Critical' in message and created_at is $past`"
+  expression: "any of alerts matches | 'Critical' in message and created_at is $past |"
   expected: true
   context:
       alerts:
@@ -170,7 +170,7 @@
 - name: sugar_with_pattern_not_like
   category: array_sugar_combined
   description: "Array sugar with negated pattern matching"
-  expression: "all of documents has `filename not like '*.tmp'` and at least 3 of documents has `filename like '*.pdf'`"
+  expression: "all of documents matches |filename not like '*.tmp'| and at least 3 of documents matches |filename like '*.pdf'|"
   expected: true
   context:
       documents:
@@ -188,7 +188,7 @@
 - name: sugar_with_literal_dates
   category: array_sugar_combined
   description: "Array sugar with literal date strings"
-  expression: "exactly 2 of milestones has `target_date before '2025-01-01'` and none of milestones has `target_date before '2024-01-01'`"
+  expression: "exactly 2 of milestones matches |target_date before '2025-01-01'| and none of milestones matches |target_date before '2024-01-01'|"
   expected: true
   context:
       milestones:
@@ -202,7 +202,7 @@
 - name: sugar_with_complex_nested_conditions
   category: array_sugar_combined
   description: "Complex nested conditions combining multiple features"
-  expression: "at least 2 of orders has `customer's profile.tier == 'Premium' and total > 100 and created_date is $past`"
+  expression: "at least 2 of orders matches | customer's profile.tier == 'Premium' and total > 100 and created_date is $past |"
   expected: true
   context:
       orders:
@@ -231,7 +231,7 @@
 - name: sugar_with_string_equality_and_patterns
   category: array_sugar_combined
   description: "Mix string equality and pattern matching in array sugar"
-  expression: "any of files has `type == 'document' and name like '*.pdf'` and none of files has `type == 'image' and name like '*.pdf'`"
+  expression: "any of files matches |type == 'document' and name like '*.pdf'| and none of files matches |type == 'image' and name like '*.pdf'|"
   expected: true
   context:
       files:
@@ -247,7 +247,7 @@
 - name: sugar_with_date_ranges_and_strings
   category: array_sugar_combined
   description: "Combine date ranges with string operations"
-  expression: "all of events has `start_date before end_date` and exactly 1 of events has `title like '*Workshop*'`"
+  expression: "all of events matches |start_date before end_date| and exactly 1 of events matches |title like '*Workshop*'|"
   expected: true
   context:
       events:
@@ -264,7 +264,7 @@
 - name: sugar_with_upcoming_within_and_strings
   category: array_sugar_combined
   description: "Combine upcoming within time windows with string matching"
-  expression: "at most 1 of tasks has `deadline upcoming within 7 days and priority == 'high'`"
+  expression: "at most 1 of tasks matches | deadline upcoming within 7 days and priority == 'high' |"
   expected: true
   context:
       tasks:
@@ -281,7 +281,7 @@
 - name: sugar_with_arithmetic_and_dates
   category: array_sugar_combined
   description: "Combine arithmetic operations with date comparisons in array sugar"
-  expression: "exactly 2 of products has `price > 100 and launch_date is $past`"
+  expression: "exactly 2 of products matches | price > 100 and launch_date is $past |"
   expected: true
   context:
       products:
@@ -301,7 +301,7 @@
 - name: sugar_with_multiple_time_comparisons
   category: array_sugar_combined
   description: "Multiple different time comparison types in one expression"
-  expression: "any of events has `start_time is $today` and all of events has `end_time after start_time` and none of events has `duration older than 1 year`"
+  expression: "any of events matches |start_time is $today| and all of events matches |end_time after start_time| and none of events matches |duration older than 1 year|"
   expected: true
   context:
       events:
@@ -317,7 +317,7 @@
 - name: sugar_with_case_insensitive_patterns
   category: array_sugar_combined
   description: "Case insensitive pattern matching in array sugar"
-  expression: "at least 2 of files has `extension like '*.PDF'` and exactly 1 of files has `name like '*REPORT*'`"
+  expression: "at least 2 of files matches |extension like '*.PDF'| and exactly 1 of files matches |name like '*REPORT*'|"
   expected: true
   context:
       files:
@@ -333,7 +333,7 @@
 - name: sugar_with_complex_boolean_logic
   category: array_sugar_combined
   description: "Complex boolean combinations with array sugar and basic operations"
-  expression: "(at least 1 of users has `status == 'active'`) and (none of users has `last_login older than 30 days`) or (all of users has `role != 'admin'`)"
+  expression: "(at least 1 of users matches |status == 'active'|) and (none of users matches |last_login older than 30 days|) or (all of users matches |role != 'admin'|)"
   expected: true
   context:
       users:

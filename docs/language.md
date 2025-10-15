@@ -193,7 +193,7 @@ Here are some examples of Dilemma Expression Language usage:
 
 - Array quantification:
   ```
-  at least 3 of orders has `total > 100`
+  at least 3 of orders matches | total > 100 |
   ```
   Evaluates to `true` if 3 or more orders have a total greater than 100.
 

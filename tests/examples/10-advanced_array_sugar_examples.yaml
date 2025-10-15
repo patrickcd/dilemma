@@ -1,7 +1,7 @@
 - name: at_least_complex_business_logic
   category: array_sugar_advanced
   description: "Real-world business logic: at least 3 orders over $100"
-  expression: "at least 3 of orders has `total > 100`"
+  expression: "at least 3 of orders matches | total > 100 |"
   expected: true
   context:
       orders:
@@ -24,7 +24,7 @@
 - name: at_most_error_monitoring
   category: array_sugar_advanced
   description: "System monitoring: at most 2 services with errors"
-  expression: "at most 2 of services has `error_count > 0`"
+  expression: "at most 2 of services matches | error_count > 0 |"
   expected: true
   context:
       services:
@@ -44,7 +44,7 @@
 - name: exactly_team_composition
   category: array_sugar_advanced
   description: "Team management: exactly 2 senior developers"
-  expression: "exactly 2 of team_members has `level == 'senior' and role == 'developer'`"
+  expression: "exactly 2 of team_members matches | level == 'senior' and role == 'developer' |"
   expected: true
   context:
       team_members:
@@ -68,7 +68,7 @@
 - name: any_security_vulnerability
   category: array_sugar_advanced
   description: "Security audit: any server has critical vulnerabilities"
-  expression: "any of servers has `vulnerabilities.critical > 0`"
+  expression: "any of servers matches | vulnerabilities.critical > 0 |"
   expected: true
   context:
       servers:
@@ -91,7 +91,7 @@
 - name: all_compliance_requirements
   category: array_sugar_advanced
   description: "Compliance check: all departments meet data retention policies"
-  expression: "all of departments has `data_retention_policy.implemented == true and audit_score >= 85`"
+  expression: "all of departments matches | data_retention_policy.implemented == true and audit_score >= 85 |"
   expected: false
   context:
       departments:
@@ -114,7 +114,7 @@
 - name: none_critical_alerts
   category: array_sugar_advanced
   description: "Operations: no critical alerts in the last hour"
-  expression: "none of alerts has `severity == 'critical' and age_minutes < 60`"
+  expression: "none of alerts matches | severity == 'critical' and age_minutes < 60 |"
   expected: false
   context:
       alerts:
@@ -134,7 +134,7 @@
 - name: inventory_management_combined
   category: array_sugar_advanced
   description: "Inventory: at least 5 items low stock AND exactly 2 items out of stock"
-  expression: "at least 5 of products has `stock_level < 10` and exactly 2 of products has `stock_level == 0`"
+  expression: "at least 5 of products matches |stock_level < 10| and exactly 2 of products matches |stock_level == 0|"
   expected: true
   context:
       products:
@@ -174,7 +174,7 @@
 - name: performance_metrics_threshold
   category: array_sugar_advanced
   description: "Performance monitoring: at most 1 service below SLA"
-  expression: "at most 1 of microservices has `uptime_percentage < 99.9`"
+  expression: "at most 1 of microservices matches | uptime_percentage < 99.9 |"
   expected: true
   context:
       microservices:
@@ -194,7 +194,7 @@
 - name: user_engagement_analysis
   category: array_sugar_advanced
   description: "Analytics: exactly 3 users with high engagement"
-  expression: "exactly 3 of users has `session_count > 50 and avg_session_duration > 300`"
+  expression: "exactly 3 of users matches | session_count > 50 and avg_session_duration > 300 |"
   expected: true
   context:
       users:
@@ -222,7 +222,7 @@
 - name: financial_risk_assessment
   category: array_sugar_advanced
   description: "Risk management: any portfolio exceeds risk tolerance"
-  expression: "any of portfolios has `risk_score > 7.5 and exposure_percentage > 0.15`"
+  expression: "any of portfolios matches | risk_score > 7.5 and exposure_percentage > 0.15 |"
   expected: false
   context:
       portfolios:
@@ -246,7 +246,7 @@
 - name: content_moderation_workflow
   category: array_sugar_advanced
   description: "Content moderation: all posts reviewed and none flagged as spam"
-  expression: "all of posts has `reviewed == true` and none of posts has `flags contains 'spam'`"
+  expression: "all of posts matches |reviewed == true| and none of posts matches |flags contains 'spam'|"
   expected: false
   context:
       posts:
@@ -270,7 +270,7 @@
 - name: infrastructure_scaling_decision
   category: array_sugar_advanced
   description: "Auto-scaling: at least 2 nodes with high CPU and exactly 1 with low memory"
-  expression: "at least 2 of nodes has `cpu_usage > 85` and exactly 1 of nodes has `memory_usage < 20`"
+  expression: "at least 2 of nodes matches |cpu_usage > 85| and exactly 1 of nodes matches |memory_usage < 20|"
   expected: true
   context:
       nodes:
@@ -294,7 +294,7 @@
 - name: quality_assurance_gates
   category: array_sugar_advanced
   description: "QA pipeline: none of test suites have failing tests"
-  expression: "none of test_suites has `failed_tests > 0 or test_coverage < 80`"
+  expression: "none of test_suites matches | failed_tests > 0 or test_coverage < 80 |"
   expected: true
   context:
       test_suites:
@@ -314,7 +314,7 @@
 - name: customer_satisfaction_metrics
   category: array_sugar_advanced
   description: "Customer success: at most 3 customers with low satisfaction"
-  expression: "at most 3 of customers has `satisfaction_score < 7 and support_tickets > 5`"
+  expression: "at most 3 of customers matches | satisfaction_score < 7 and support_tickets > 5 |"
   expected: true
   context:
       customers:
@@ -342,7 +342,7 @@
 - name: deployment_readiness_check
   category: array_sugar_advanced
   description: "DevOps: all environments healthy and exactly 0 with pending deployments"
-  expression: "all of environments has `health_status == 'green'` and exactly 0 of environments has `pending_deployments > 0`"
+  expression: "all of environments matches |health_status == 'green'| and exactly 0 of environments matches |pending_deployments > 0|"
   expected: true
   context:
       environments:
