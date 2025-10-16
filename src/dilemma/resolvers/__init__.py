@@ -74,14 +74,14 @@ try:
     from .jsonpath_resolver import JsonPathResolver
 
     register_resolver(JsonPathResolver)
-except ImportError:
+except ImportError:  # pragma: no cover
     logger.info("JsonPath resolver not available")
 
 try:
     from .jq_resolver import JqResolver
 
     register_resolver(JqResolver)
-except ImportError:
+except ImportError:  # pragma: no cover
     logger.info("JQ resolver not available")
 
 if not _resolvers:  # pragma: no cover

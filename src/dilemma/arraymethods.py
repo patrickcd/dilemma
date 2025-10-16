@@ -27,16 +27,13 @@ class ArrayMethods:
             return bool(result)
         except Exception as e:
             # Log the error for debugging but return False to continue processing
-            try:
-                from .logconf import get_logger
+            from .logconf import get_logger
 
-                log = get_logger(__name__)
-                log.debug(
-                    f"Predicate evaluation failed for '{raw_expr}' with item {item}: {e}"
-                )
-            except ImportError:
-                # If logging fails, just continue silently
-                pass
+            log = get_logger(__name__)
+            log.debug(
+                f"Predicate evaluation failed for '{raw_expr}' with item {item}: {e}"
+            )
+
             return False
 
     def func_call(self, items: list[Token | Any]) -> int | bool:
