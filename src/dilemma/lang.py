@@ -300,9 +300,6 @@ class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
         elif isinstance(left, (list, tuple)):
             # For lists/tuples, check if the item exists in the collection
             return right in left
-        elif hasattr(left, right) and isinstance(right, str):
-            # For objects with attributes, check if attribute exists
-            return hasattr(left, right)
         else:
             # For other types, return False (they don't have properties)
             return False
@@ -341,37 +338,12 @@ class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
         else:
             raise ContainerError(template_key="wrong_container", operation="is $empty")
 
-    def transform_backticked_expression(self, items):
-        """Transform a backticked expression into a value by passing it to the resolver."""
-        # Get the raw expression from inside the backticks
-        raw_expr = items[0]
-
-        # Use the resolver system to evaluate it, with raw=True
-        result = resolve_path(raw_expr, self.context, raw=True)
-        return result
-
     def resolver_expression(
         self, items: list[Token]
     ) -> int | float | bool | str | list | dict | datetime:
         """Process a backticked expression using the configured resolver"""
         # Extract the expression from the token: `expression` -> expression
         raw_expr = items[0].value[1:-1]  # Remove ` prefix and ` suffix
-
-        # Use the resolver system to evaluate with raw=True
-        value = resolve_path(raw_expr, self.processed_json, raw=True)
-
-        # Handle datetime reconstruction
-        if isinstance(value, dict) and "__datetime__" in value:
-            return datetime.fromisoformat(value["__datetime__"])
-
-        return value
-
-    def array_expression(
-        self, items: list[Token]
-    ) -> int | float | bool | str | list | dict | datetime:
-        """Process a pipe-delimited expression for array quantified operations"""
-        # Extract the expression from the token: |expression| -> expression
-        raw_expr = items[0].value[1:-1]  # Remove | prefix and | suffix
 
         # Use the resolver system to evaluate with raw=True
         value = resolve_path(raw_expr, self.processed_json, raw=True)

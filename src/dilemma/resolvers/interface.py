@@ -1,6 +1,5 @@
 """Interface for variable resolvers in dilemma."""
 
-import logging
 import traceback
 from ..errors import VariableError
 from ..logconf import get_logger
@@ -29,8 +28,7 @@ class ResolverSpec:
             else:
                 # For standard path expressions, convert then execute
                 converted_path = self._convert_path(path)
-                if self.logger.isEnabledFor(logging.DEBUG):
-                    self.logger.debug("Converted path '%s' to '%s'", path, converted_path)
+                self.logger.debug("Converted path '%s' to '%s'", path, converted_path)
                 result = self._execute_query(converted_path, context)
 
             # Handle null/missing results
@@ -47,16 +45,7 @@ class ResolverSpec:
         except VariableError:
             # Pass through already-formatted errors
             raise
-        except ImportError as e:
-            # Special handling for missing dependencies
-            self.logger.error(
-                "Missing dependency for %s resolver: %s", resolver_type, str(e)
-            )
-            raise VariableError(
-                template_key="resolver_unavailable",
-                resolver=resolver_type,
-                details=str(e),
-            )
+
         except Exception as e:
             # Handle all other errors with useful context
             self.logger.warning(f"Error resolving '{original_path}': {str(e)}")
@@ -98,7 +87,6 @@ class ResolverSpec:
     def _execute_raw_query(self, raw_expr, context):
         """Execute a raw expression directly.
 
-        By default, assumes raw expressions use the same format as converted paths.
-        Subclasses may override for different handling of raw expressions.
+        Subclasses must override for different handling of raw expressions.
         """
-        return self._execute_query(raw_expr, context)
+        raise NotImplementedError("Resolver must implement _execute_raw_query method")

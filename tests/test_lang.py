@@ -221,7 +221,7 @@ def test_compiled_expression_with_path_variables():
     variables2 = {"project": {"status": "active", "team": {"size": 2}}}
     variables3 = {"project": {"status": "inactive", "team": {"size": 10}}}
 
-    assert expr.evaluate(variables1) == True  # active and size(5) >= 3
+    assert expr.evaluate(variables1)  # active and size(5) >= 3
     assert expr.evaluate(variables2) == False  # active but size(2) < 3
     assert expr.evaluate(variables3) == False  # inactive and size(10) >= 3
 
@@ -359,6 +359,23 @@ def test_string_math_restrictions(expr, error_type, error_msg):
     with pytest.raises(error_type) as excinfo:
         evaluate(expr)
     assert error_msg in str(excinfo.value)
+
+
+def test_pattern_matching_type_error():
+    """Test that pattern matching with non-string operands raises appropriate error"""
+    # Test cases where pattern matching is used with non-string types
+    test_cases = [
+        "5 like 10",  # both integers
+        "true like 'pattern'",  # boolean like string
+        "'text' like 42",  # string like integer
+        "3.14 like '*'",  # float like pattern
+    ]
+
+    for expr in test_cases:
+        with pytest.raises(DilemmaError) as excinfo:
+            evaluate(expr)
+        # Should contain the TypeError message wrapped in VisitError/EvaluationError
+        assert "Pattern matching requires string operands" in str(excinfo.value)
 
 
 def test_possesive_lookup():
