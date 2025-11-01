@@ -4,6 +4,7 @@ import pytest
 from dilemma.lang import evaluate, ExpressionTransformer
 from dilemma.errors.exc import ContainerError, VariableError
 
+
 def test_list_membership():
     """Test basic list membership operations."""
     variables = {
@@ -131,29 +132,28 @@ def test_container_type_errors():
         evaluate("boolean contains 'r'", variables)
 
 
-
 def test_direct_transformer_methods():
     """Test ExpressionTransformer methods directly to ensure coverage."""
     transformer = ExpressionTransformer()
 
-    # Test contains with list
-    assert transformer.contains(["key", ["value1", "value2", "key"]]) is True
+    # Test contains with list (v_args inline=True unpacks arguments)
+    assert transformer.contains("key", ["value1", "value2", "key"]) is True
 
     # Test contains with dict
-    assert transformer.contains(["key", {"key": "value", "other": 123}]) is True
+    assert transformer.contains("key", {"key": "value", "other": 123}) is True
 
     # Test contained_in with list
-    assert transformer.contained_in([["value1", "value2", "key"], "key"]) is True
+    assert transformer.contained_in(["value1", "value2", "key"], "key") is True
 
     # Test contained_in with dict
-    assert transformer.contained_in([{"key": "value", "other": 123}, "key"]) is True
+    assert transformer.contained_in({"key": "value", "other": 123}, "key") is True
 
     # Test with non-collection types (these should raise ContainerError)
     with pytest.raises(ContainerError):
-        transformer.contains([42, 100])
+        transformer.contains(42, 100)
 
     with pytest.raises(ContainerError):
-        transformer.contained_in([42, "test"])
+        transformer.contained_in(42, "test")
 
 
 def test_datetime_in_collections():

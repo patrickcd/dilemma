@@ -8,7 +8,7 @@ import fnmatch
 from datetime import datetime
 from typing import Union
 
-from lark import Token
+from lark import Token, v_args
 from lark import Lark, Transformer
 
 from .errors import (
@@ -23,7 +23,6 @@ from .dates import DateMethods, DateTimeEncoder
 from .logconf import get_logger
 from .resolvers import resolve_path
 from .utils import (
-    binary_op,
     both_strings,
     reject_strings,
     check_containment,
@@ -181,7 +180,7 @@ class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
 
         return value
 
-    @binary_op
+    @v_args(inline=True)
     def add(self, left, right):
         """Addition operator (+) - allows string concatenation with limits"""
         # Allow string concatenation only when both operands are strings
@@ -200,19 +199,19 @@ class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
         # Regular addition for non-string types
         return left + right
 
-    @binary_op
+    @v_args(inline=True)
     def sub(self, left, right):
         """Subtraction operator (-) - deny for strings"""
         reject_strings(left, right, "-")
         return left - right
 
-    @binary_op
+    @v_args(inline=True)
     def mul(self, left, right):
         """Multiplication operator (*) - deny for strings"""
         reject_strings(left, right, "*")
         return left * right
 
-    @binary_op
+    @v_args(inline=True)
     def div(self, left, right):
         """Division operator (/) - deny for strings"""
         reject_strings(left, right, "/")
@@ -229,7 +228,7 @@ class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
         return items[0][1:-1].encode("utf-8").decode("unicode_escape")
 
     # Comparison operations
-    @binary_op
+    @v_args(inline=True)
     def eq(self, left, right) -> bool:
         """Check if two items are equal, with special handling for different types"""
 
@@ -239,49 +238,49 @@ class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
 
         return left == right
 
-    @binary_op
+    @v_args(inline=True)
     def ne(self, left, right) -> bool:
         """Check if two items are not equal, with special handling for float comparison"""
         return not self.eq(left, right)
 
-    @binary_op
+    @v_args(inline=True)
     def lt(self, left, right) -> bool:
         return left < right
 
-    @binary_op
+    @v_args(inline=True)
     def gt(self, left, right) -> bool:
         return left > right
 
-    @binary_op
+    @v_args(inline=True)
     def le(self, left, right) -> bool:
         return left <= right
 
-    @binary_op
+    @v_args(inline=True)
     def ge(self, left, right) -> bool:
         return left >= right
 
     # Logical operations
-    @binary_op
+    @v_args(inline=True)
     def and_op(self, left, right) -> bool:
         return bool(left) and bool(right)
 
-    @binary_op
+    @v_args(inline=True)
     def or_op(self, left, right) -> bool:
         return bool(left) or bool(right)
 
-    @binary_op
+    @v_args(inline=True)
     def contains(self, left, right) -> bool:
         """Check if the left operand is contained in the right operand (container)"""
         return check_containment(container=right, item=left, container_position="in")
 
-    @binary_op
+    @v_args(inline=True)
     def contained_in(self, left, right) -> bool:
         """Check if the right operand is contained in the left operand (container)"""
         return check_containment(
             container=left, item=right, container_position="contains"
         )
 
-    @binary_op
+    @v_args(inline=True)
     def has_property(self, left, right) -> bool:
         """
         Check if the left operand (object) has the right operand as a property/key.
@@ -304,7 +303,7 @@ class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
             # For other types, return False (they don't have properties)
             return False
 
-    @binary_op
+    @v_args(inline=True)
     def pattern_match(self, left, right) -> bool:
         """
         Implements case-insensitive wildcard pattern matching using fnmatch.
@@ -319,7 +318,7 @@ class ExpressionTransformer(Transformer, DateMethods, ArrayMethods):
 
         return fnmatch.fnmatch(string, pattern)
 
-    @binary_op
+    @v_args(inline=True)
     def pattern_not_match(self, left, right) -> bool:
         """
         Implements negated case-insensitive wildcard pattern matching.
