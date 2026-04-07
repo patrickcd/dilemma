@@ -281,6 +281,12 @@ except VariableError as e:
 - ✅ Memory and complexity limits
 
 
+## Sponsors
+
+[RiskNodes AIRM Agentic Intelligence Risk Management](https://www.risknodes.io)
+
+
+
 ## License
 
 MIT License - see [LICENSE](https://github.com/patrickcd/dilemma/blob/main/LICENSE) file for details.
